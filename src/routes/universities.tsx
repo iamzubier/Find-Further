@@ -40,7 +40,7 @@ const REGIONS = [
 
 function UniversitiesPage() {
   const search = Route.useSearch();
-  const [tab, setTab] = useState<"featured" | "catalog">("featured");
+  const [tab, setTab] = useState<"featured" | "catalog">("catalog");
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-10">
@@ -50,7 +50,7 @@ function UniversitiesPage() {
           <p className="mt-1 text-sm text-muted-foreground">
             {tab === "featured"
               ? "Hand-curated picks with tuition, scholarships & admission hacks."
-              : "Searchable directory of 5,900+ universities across EU, UK, US, CA, AU, Asia."}
+              : "10,000+ universities worldwide — EU, UK, US, CA, AU, Asia and beyond."}
           </p>
         </div>
         <div className="inline-flex rounded-lg border border-border bg-card p-1 text-sm">
