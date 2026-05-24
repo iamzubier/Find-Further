@@ -22,6 +22,8 @@ export function Navbar({ profileStrength }: { profileStrength?: number }) {
         <nav className="hidden items-center gap-7 md:flex">
           <Link to="/universities" className={linkClass}>Universities</Link>
           <Link to="/scholarships" className={linkClass}>Scholarships</Link>
+          <Link to="/compare" className={linkClass}>Compare</Link>
+
           {user && <Link to="/dashboard" className={linkClass}>Dashboard</Link>}
           {user && <Link to="/ask-ai" className={linkClass}>Ask Aria</Link>}
           {user && <Link to="/shortlist" className={linkClass}>Saved</Link>}

@@ -125,6 +125,54 @@ export type Database = {
         }
         Relationships: []
       }
+      university_hacks: {
+        Row: {
+          created_at: string
+          hack_text: string
+          id: string
+          source_type: string
+          source_url: string | null
+          uni_id: string
+          upvotes: number
+        }
+        Insert: {
+          created_at?: string
+          hack_text: string
+          id?: string
+          source_type?: string
+          source_url?: string | null
+          uni_id: string
+          upvotes?: number
+        }
+        Update: {
+          created_at?: string
+          hack_text?: string
+          id?: string
+          source_type?: string
+          source_url?: string | null
+          uni_id?: string
+          upvotes?: number
+        }
+        Relationships: []
+      }
+      university_hacks_ai: {
+        Row: {
+          content_md: string
+          generated_at: string
+          uni_id: string
+        }
+        Insert: {
+          content_md: string
+          generated_at?: string
+          uni_id: string
+        }
+        Update: {
+          content_md?: string
+          generated_at?: string
+          uni_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

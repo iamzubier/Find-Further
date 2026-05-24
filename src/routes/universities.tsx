@@ -141,9 +141,10 @@ export function UniversityCard({ u, match }: { u: University; match?: number }) 
           <Button variant="outline" size="sm" onClick={save} disabled={saving}>
             <Heart className="mr-1 h-4 w-4" /> Save
           </Button>
-          <Button size="sm" className="bg-primary text-primary-foreground hover:bg-primary/90">
-            View <ArrowRight className="ml-1 h-4 w-4" />
+          <Button asChild size="sm" className="bg-primary text-primary-foreground hover:bg-primary/90">
+            <Link to="/universities/$uniId" params={{ uniId: u.id }}>View <ArrowRight className="ml-1 h-4 w-4" /></Link>
           </Button>
+
         </div>
       </div>
     </div>
