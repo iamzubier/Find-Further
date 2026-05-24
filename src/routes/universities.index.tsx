@@ -253,29 +253,33 @@ function CatalogBrowser() {
       <div className="mt-4 grid gap-2">
         {(listQuery.data?.rows ?? []).map((u: any) => (
           <div key={u.id} className="card-surface flex flex-wrap items-center justify-between gap-3 p-4">
-            <div className="min-w-0 flex-1">
-              <div className="flex flex-wrap items-center gap-2">
-                {u.slug ? (
-                  <Link
-                    to="/universities/$slug"
-                    params={{ slug: u.slug }}
-                    className="font-heading text-base font-bold leading-tight hover:text-primary hover:underline"
-                  >
-                    {u.name}
-                  </Link>
-                ) : (
-                  <h3 className="font-heading text-base font-bold leading-tight">{u.name}</h3>
-                )}
-                {u.has_curated_data && (
-                  <span className="rounded-full bg-primary/15 px-2 py-0.5 text-[10px] font-semibold text-primary ring-1 ring-primary/30">
-                    <Sparkles className="mr-0.5 inline h-2.5 w-2.5" /> Curated
-                  </span>
-                )}
-              </div>
-              <div className="mt-0.5 text-xs text-muted-foreground">
-                {u.country}{u.state_province ? ` · ${u.state_province}` : ""}
+            <div className="flex min-w-0 flex-1 items-center gap-3">
+              <UniLogo website={u.website} name={u.name} />
+              <div className="min-w-0 flex-1">
+                <div className="flex flex-wrap items-center gap-2">
+                  {u.slug ? (
+                    <Link
+                      to="/universities/$slug"
+                      params={{ slug: u.slug }}
+                      className="font-heading text-base font-bold leading-tight hover:text-primary hover:underline"
+                    >
+                      {u.name}
+                    </Link>
+                  ) : (
+                    <h3 className="font-heading text-base font-bold leading-tight">{u.name}</h3>
+                  )}
+                  {u.has_curated_data && (
+                    <span className="rounded-full bg-primary/15 px-2 py-0.5 text-[10px] font-semibold text-primary ring-1 ring-primary/30">
+                      <Sparkles className="mr-0.5 inline h-2.5 w-2.5" /> Curated
+                    </span>
+                  )}
+                </div>
+                <div className="mt-0.5 text-xs text-muted-foreground">
+                  {u.country}{u.state_province ? ` · ${u.state_province}` : ""}
+                </div>
               </div>
             </div>
+
             <div className="flex items-center gap-3">
               {u.slug && (
                 <Button asChild size="sm" className="h-8 bg-primary text-primary-foreground hover:bg-primary/90">
