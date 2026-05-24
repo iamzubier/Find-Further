@@ -116,6 +116,28 @@ function FeatureTrio() {
       body: "Browse 10,000+ universities worldwide — filter by region, country, program, and tuition.",
       cta: "Open the atlas",
       to: "/universities" as const,
+      image: "https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=1200&q=80",
+    },
+    {
+      icon: GitCompare,
+      kicker: "II.",
+      title: "Compare",
+      body: "Stack up to 3 universities side by side — tuition, acceptance, scholarships, deadlines.",
+      cta: "Start a comparison",
+      to: "/compare" as const,
+      image: "https://images.unsplash.com/photo-1498243691581-b145c3f54a5a?w=1200&q=80",
+    },
+    {
+      icon: Lightbulb,
+      kicker: "III.",
+      title: "Tips & Hacks",
+      body: "Curated admission hacks, GPA conversions, and a personalised AI advisor (Aria).",
+      cta: "Ask Aria",
+      to: "/ask-ai" as const,
+      image: "https://images.unsplash.com/photo-1532012197267-da84d127e765?w=1200&q=80",
+    },
+  ];
+
     },
     {
       icon: GitCompare,
