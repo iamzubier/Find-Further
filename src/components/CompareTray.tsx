@@ -1,37 +1,64 @@
 import { Link } from "@tanstack/react-router";
 import { useCompare } from "@/lib/compare-store";
-import { UNIVERSITIES } from "@/lib/data";
 import { Button } from "@/components/ui/button";
-import { X, GitCompare } from "lucide-react";
+import { X, GitCompare, Plus, ArrowRight } from "lucide-react";
+
+const FALLBACK_IMG = "https://images.unsplash.com/photo-1541339907198-e08756dedf3f?w=200&q=70";
 
 export function CompareTray() {
-  const ids = useCompare((s) => s.ids);
+  const items = useCompare((s) => s.items);
   const remove = useCompare((s) => s.remove);
   const clear = useCompare((s) => s.clear);
-  if (ids.length === 0) return null;
+  if (items.length === 0) return null;
 
-  const unis = ids.map((id) => UNIVERSITIES.find((u) => u.id === id)).filter(Boolean) as typeof UNIVERSITIES;
+  const slots = [0, 1, 2];
 
   return (
-    <div className="fixed inset-x-3 bottom-3 z-40 mx-auto max-w-3xl rounded-2xl border border-border bg-card/95 p-3 shadow-2xl backdrop-blur-md md:inset-x-auto md:right-6 md:left-auto">
-      <div className="flex flex-wrap items-center gap-2">
-        <span className="flex items-center gap-1.5 px-2 text-xs font-semibold uppercase text-muted-foreground">
-          <GitCompare className="h-3.5 w-3.5 text-primary" /> Compare ({ids.length}/3)
-        </span>
-        {unis.map((u) => (
-          <span key={u.id} className="flex items-center gap-1.5 rounded-full bg-secondary px-3 py-1 text-xs">
-            {u.countryFlag} <span className="max-w-[140px] truncate">{u.name}</span>
-            <button onClick={() => remove(u.id)} className="text-muted-foreground hover:text-foreground" aria-label="Remove">
-              <X className="h-3 w-3" />
-            </button>
-          </span>
-        ))}
-        <div className="ml-auto flex gap-2">
-          <Button size="sm" variant="ghost" onClick={clear}>Clear</Button>
-          <Button asChild size="sm" className="bg-primary text-primary-foreground hover:bg-primary/90" disabled={ids.length < 2}>
-            <Link to="/compare">Compare →</Link>
-          </Button>
+    <div className="fixed inset-x-0 bottom-0 z-40 border-t bg-[#111118]" style={{ borderColor: "#1e1e2a" }}>
+      <div className="mx-auto flex max-w-6xl items-center gap-3 px-4 py-3 md:py-3.5">
+        <div className="hidden items-center gap-2 text-xs font-semibold uppercase tracking-wider text-white/70 md:flex">
+          <GitCompare className="h-4 w-4 text-emerald-400" /> Compare
         </div>
+        <div className="flex flex-1 items-center gap-2 overflow-x-auto">
+          {slots.map((i) => {
+            const it = items[i];
+            if (!it) {
+              return (
+                <Link
+                  key={i}
+                  to="/universities"
+                  className="flex h-12 min-w-[150px] items-center gap-2 rounded-lg border border-dashed border-white/20 px-3 text-xs text-white/50 hover:border-white/40 hover:text-white/80"
+                >
+                  <Plus className="h-3.5 w-3.5" /> Add university
+                </Link>
+              );
+            }
+            return (
+              <div key={it.slug} className="flex h-12 min-w-[180px] items-center gap-2 rounded-lg bg-white/5 px-2 pr-1">
+                <img
+                  src={it.logoUrl || it.imageUrl || FALLBACK_IMG}
+                  alt=""
+                  className="h-9 w-9 flex-none rounded-full border border-white/10 bg-white object-cover"
+                  onError={(e) => { (e.target as HTMLImageElement).src = FALLBACK_IMG; }}
+                />
+                <span className="min-w-0 flex-1 truncate text-xs font-medium text-white">{it.name}</span>
+                <button
+                  onClick={() => remove(it.slug)}
+                  className="rounded p-1 text-white/60 hover:bg-white/10 hover:text-white"
+                  aria-label="Remove"
+                >
+                  <X className="h-3.5 w-3.5" />
+                </button>
+              </div>
+            );
+          })}
+        </div>
+        <Button variant="ghost" size="sm" onClick={clear} className="text-white/70 hover:bg-white/10 hover:text-white">
+          Clear
+        </Button>
+        <Button asChild size="sm" className="bg-emerald-600 text-white hover:bg-emerald-700" disabled={items.length < 2}>
+          <Link to="/compare">Compare <ArrowRight className="ml-1 h-3.5 w-3.5" /></Link>
+        </Button>
       </div>
     </div>
   );
