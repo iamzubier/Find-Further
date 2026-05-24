@@ -385,21 +385,43 @@ const PLATFORM_BADGES: Record<string, { label: string; class: string; emoji: str
 };
 const TAGS = ["All","Academics","ECA","Scholarship","Strategy","CampusLife","FinancialAid"];
 
+const COUNTRY_NAMES: Record<string, string> = {
+  BD: "Bangladesh", IN: "India", PK: "Pakistan", LK: "Sri Lanka", NP: "Nepal",
+  CN: "China", NG: "Nigeria", AE: "UAE", MY: "Malaysia",
+};
+
 function Tips({ uni, tips }: any) {
   const [tag, setTag] = useState("All");
+  const evalSum = useMemo(() => loadEvalSummary(), []);
+  const homeCountry = evalSum?.country;
+  const homeName = homeCountry ? COUNTRY_NAMES[homeCountry] : null;
+  const [onlyMine, setOnlyMine] = useState(false);
   const { user } = useAuth();
-  const filtered = tag === "All" ? tips : tips.filter((t: any) => t.tag === tag);
+  let filtered = tag === "All" ? tips : tips.filter((t: any) => t.tag === tag);
+  if (onlyMine && homeName) {
+    const needle = homeName.toLowerCase();
+    filtered = filtered.filter((t: any) =>
+      t.tip_text?.toLowerCase().includes(needle) ||
+      t.source_url?.toLowerCase().includes(needle.replace(/\s+/g, ""))
+    );
+  }
   return (
     <>
       <Card title="Real tips from students and communities 🎯" icon={Lightbulb}>
         <p className="mb-4 text-sm text-muted-foreground">Curated from Reddit, Quora, YouTube and college forums.</p>
-        <div className="mb-4 flex flex-wrap gap-2">
+        <div className="mb-4 flex flex-wrap items-center gap-2">
           {TAGS.map(t => (
             <button key={t} onClick={() => setTag(t)}
               className={`rounded-full px-3 py-1 text-xs font-medium ring-1 ${tag===t ? "bg-primary text-primary-foreground ring-primary" : "bg-secondary text-foreground ring-border"}`}>
               {t}
             </button>
           ))}
+          {homeName && (
+            <button onClick={() => setOnlyMine(v => !v)}
+              className={`rounded-full px-3 py-1 text-xs font-semibold ring-1 ${onlyMine ? "bg-emerald-600 text-white ring-emerald-600" : "bg-emerald-500/10 text-emerald-700 ring-emerald-500/30"}`}>
+              🌍 Tips mentioning {homeName}
+            </button>
+          )}
           <SubmitTip uniSlug={uni.slug} disabled={!user} />
         </div>
         <div className="grid gap-3">
