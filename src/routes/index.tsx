@@ -165,9 +165,9 @@ function FeatureTrio() {
 
 function Stats() {
   const stats = [
-    { num: "4,200+", label: "Universities" },
+    { num: "10,200+", label: "Universities" },
     { num: "180+", label: "Scholarships" },
-    { num: "28", label: "Countries" },
+    { num: "120+", label: "Countries" },
   ];
   return (
     <section className="mx-auto max-w-6xl px-4 py-6">
