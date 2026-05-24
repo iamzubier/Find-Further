@@ -197,7 +197,7 @@ function CatalogBrowser() {
       if (region !== "all") query = query.eq("region", region);
       if (country !== "all") query = query.eq("country", country);
       if (q.trim()) query = query.ilike("name", `%${q.trim()}%`);
-      query = query.order("name").range(page * PAGE_SIZE, page * PAGE_SIZE + PAGE_SIZE - 1);
+      query = query.order("has_curated_data", { ascending: false }).order("qs_rank", { ascending: true, nullsFirst: false }).order("name").range(page * PAGE_SIZE, page * PAGE_SIZE + PAGE_SIZE - 1);
       const { data, error, count } = await query;
       if (error) throw error;
       return { rows: data ?? [], count: count ?? 0 };
