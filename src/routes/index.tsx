@@ -134,7 +134,7 @@ function FeatureTrio() {
       body: "Curated admission hacks, GPA conversions, and a personalised AI advisor (Aria).",
       cta: "Ask Aria",
       to: "/ask-ai" as const,
-      image: "https://images.unsplash.com/photo-1532012197267-da84d127e765?w=1200&q=80",
+      image: "https://images.unsplash.com/photo-1434030216411-0b793f4b4173?w=1200&q=80",
     },
   ];
 
