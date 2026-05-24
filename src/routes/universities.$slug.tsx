@@ -84,11 +84,19 @@ function UniDetailPage() {
   );
 }
 
+const FALLBACK_CAMPUS = "https://images.unsplash.com/photo-1541339907198-e08756dedf3f?w=1600&q=80&auto=format&fit=crop";
+
 function Hero({ uni }: { uni: any }) {
+  const [imgSrc, setImgSrc] = useState<string>(uni.campus_image_url || FALLBACK_CAMPUS);
   return (
-    <div className="relative h-[420px] w-full overflow-hidden">
-      <img src={uni.campus_image_url} alt={`${uni.name} campus`} className="absolute inset-0 h-full w-full object-cover" />
-      <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-black/30" />
+    <div className="relative h-[420px] w-full overflow-hidden bg-neutral-900">
+      <img
+        src={imgSrc}
+        alt={`${uni.name} campus`}
+        className="absolute inset-0 h-full w-full object-cover"
+        onError={() => { if (imgSrc !== FALLBACK_CAMPUS) setImgSrc(FALLBACK_CAMPUS); }}
+      />
+      <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-black/20" />
       <div className="absolute inset-x-0 top-0 p-4">
         <Link to="/universities" className="inline-flex items-center gap-1 text-sm text-white/80 hover:text-white">
           <ArrowLeft className="h-4 w-4" /> All universities
@@ -98,14 +106,14 @@ function Hero({ uni }: { uni: any }) {
         <div className="flex flex-wrap items-end gap-5">
           {uni.logo_url && (
             <div className="flex h-20 w-20 items-center justify-center rounded-xl bg-white p-3 shadow-2xl ring-1 ring-white/20">
-              <img src={uni.logo_url} alt={`${uni.name} logo`} className="max-h-full max-w-full" onError={(e) => { (e.target as HTMLImageElement).style.display='none'; }} />
+              <img src={uni.logo_url} alt="" className="max-h-full max-w-full" onError={(e) => { (e.currentTarget.parentElement as HTMLElement).style.display='none'; }} />
             </div>
           )}
           <div className="text-white">
             <h1 className="font-heading text-4xl font-extrabold leading-tight md:text-5xl">{uni.name}</h1>
             <div className="mt-2 flex flex-wrap items-center gap-3 text-sm text-white/85">
-              <span className="text-xl">{uni.country_flag}</span>
-              <span><MapPin className="mr-1 inline h-3.5 w-3.5" />{uni.city}, {uni.country}</span>
+              {uni.country_flag && <span className="text-xl">{uni.country_flag}</span>}
+              <span><MapPin className="mr-1 inline h-3.5 w-3.5" />{uni.city ? `${uni.city}, ` : ""}{uni.country}</span>
               {uni.qs_rank && <span className="rounded-full bg-primary px-3 py-0.5 font-bold text-primary-foreground">QS #{uni.qs_rank}</span>}
               {uni.founded_year && <span>Founded {uni.founded_year}</span>}
             </div>
@@ -147,9 +155,11 @@ function Overview({ uni }: any) {
           ))}
         </div>
       </Card>
-      <Card title="Campus Life">
-        <p className="leading-relaxed text-foreground/90">{uni.campus_life}</p>
-      </Card>
+      {uni.campus_life && (
+        <Card title="Campus Life">
+          <p className="leading-relaxed text-foreground/90">{uni.campus_life}</p>
+        </Card>
+      )}
       {uni.notable_alumni?.length > 0 && (
         <Card title="Notable Alumni" icon={Award}>
           <ul className="flex flex-wrap gap-2">
@@ -169,18 +179,24 @@ function Overview({ uni }: any) {
           </ul>
         </Card>
       )}
-      <Card title="Location">
-        <a href={uni.official_url} target="_blank" rel="noopener noreferrer" className="mb-3 inline-flex">
-          <Button variant="outline" size="sm"><ExternalLink className="mr-2 h-3 w-3" /> Official Website</Button>
-        </a>
-        <div className="aspect-video overflow-hidden rounded-lg border border-border">
-          <iframe
-            title={`Map of ${uni.name}`}
-            src={`https://www.google.com/maps?q=${encodeURIComponent(uni.maps_query)}&output=embed`}
-            className="h-full w-full" loading="lazy"
-          />
-        </div>
-      </Card>
+      {(uni.maps_query || uni.official_url) && (
+        <Card title="Location">
+          {uni.official_url && (
+            <a href={uni.official_url} target="_blank" rel="noopener noreferrer" className="mb-3 inline-flex">
+              <Button variant="outline" size="sm"><ExternalLink className="mr-2 h-3 w-3" /> Official Website</Button>
+            </a>
+          )}
+          {uni.maps_query && (
+            <div className="aspect-video overflow-hidden rounded-lg border border-border">
+              <iframe
+                title={`Map of ${uni.name}`}
+                src={`https://www.google.com/maps?q=${encodeURIComponent(uni.maps_query)}&output=embed`}
+                className="h-full w-full" loading="lazy"
+              />
+            </div>
+          )}
+        </Card>
+      )}
     </>
   );
 }
@@ -251,17 +267,25 @@ function Admissions({ uni }: any) {
           </table>
         </div>
       </Card>
-      <Card title="Deadlines" icon={Calendar}>
-        <div className="grid gap-3">
-          {uni.deadlines?.map((d: any) => (
-            <div key={d.intake} className="rounded-lg border border-border p-4">
-              <div className="font-semibold">{d.intake}</div>
-              <div className="mt-1 text-sm text-muted-foreground">Apply by <span className="font-medium text-foreground">{d.deadline}</span> · Decision: {d.decision}</div>
-            </div>
-          ))}
-        </div>
-        <p className="mt-3 text-xs text-muted-foreground">Avg. processing time: {uni.processing_time}</p>
-      </Card>
+      {uni.deadlines?.length > 0 && (
+        <Card title="Deadlines" icon={Calendar}>
+          <div className="grid gap-3">
+            {uni.deadlines.map((d: any, i: number) => {
+              const dl = d.deadline ?? d.date;
+              return (
+                <div key={`${d.intake}-${i}`} className="rounded-lg border border-border p-4">
+                  <div className="font-semibold">{d.intake ?? d.round ?? "Intake"}</div>
+                  <div className="mt-1 text-sm text-muted-foreground">
+                    Apply by <span className="font-medium text-foreground">{dl ?? "TBA"}</span>
+                    {d.decision && <> · Decision: {d.decision}</>}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+          {uni.processing_time && <p className="mt-3 text-xs text-muted-foreground">Avg. processing time: {uni.processing_time}</p>}
+        </Card>
+      )}
       <Card title="Application Process">
         <ol className="space-y-2 text-sm">
           {uni.application_steps?.map((s: string, i: number) => (
@@ -685,7 +709,10 @@ function Sidebar({ uni }: any) {
     try { await navigator.share({ title: uni.name, url: window.location.href }); }
     catch { await navigator.clipboard.writeText(window.location.href); toast.success("Link copied"); }
   };
-  const nextDeadline = uni.deadlines?.[0];
+  const nextDeadline = (uni.deadlines ?? []).find((d: any) => {
+    const v = d.deadline ?? d.date;
+    return v && !isNaN(new Date(v).getTime());
+  }) ?? uni.deadlines?.[0];
   const evalSum = useMemo(() => loadEvalSummary(), []);
   return (
     <aside className="lg:sticky lg:top-32 lg:self-start">
@@ -701,8 +728,8 @@ function Sidebar({ uni }: any) {
           <Button variant="outline" size="sm" onClick={addCmp} disabled={inCompare}><GitCompare className="h-4 w-4" /></Button>
           <Button variant="outline" size="sm" onClick={share}><Share2 className="h-4 w-4" /></Button>
         </div>
-        {nextDeadline && <Countdown deadline={nextDeadline.deadline} intake={nextDeadline.intake} />}
-        <Button asChild className="w-full bg-primary text-primary-foreground"><a href={uni.application_url} target="_blank" rel="noopener noreferrer">Apply now <ExternalLink className="ml-2 h-3 w-3" /></a></Button>
+        {nextDeadline && <Countdown deadline={nextDeadline.deadline ?? nextDeadline.date} intake={nextDeadline.intake ?? nextDeadline.round ?? "Next intake"} />}
+        {uni.application_url && <Button asChild className="w-full bg-primary text-primary-foreground"><a href={uni.application_url} target="_blank" rel="noopener noreferrer">Apply now <ExternalLink className="ml-2 h-3 w-3" /></a></Button>}
       </div>
     </aside>
   );
@@ -752,19 +779,25 @@ function MatchRing({ uni }: any) {
   );
 }
 
-function Countdown({ deadline, intake }: { deadline: string; intake: string }) {
+function Countdown({ deadline, intake }: { deadline?: string; intake: string }) {
   const [now, setNow] = useState(Date.now());
   useEffect(() => { const i = setInterval(() => setNow(Date.now()), 60_000); return () => clearInterval(i); }, []);
-  const target = new Date(deadline).getTime();
-  const diff = Math.max(0, target - now);
+  const target = deadline ? new Date(deadline).getTime() : NaN;
+  const valid = !isNaN(target);
+  const diff = valid ? target - now : 0;
+  const inFuture = valid && diff > 0;
   const d = Math.floor(diff / 86400000);
   const h = Math.floor((diff / 3600000) % 24);
   const m = Math.floor((diff / 60000) % 60);
   return (
     <div className="rounded-lg border border-border bg-secondary/40 p-3 text-center">
       <div className="text-xs text-muted-foreground">{intake}</div>
-      <div className="mt-1 font-heading text-lg font-bold tabular-nums">{d}d {h}h {m}m</div>
-      <div className="text-[10px] uppercase tracking-wider text-muted-foreground">until deadline</div>
+      <div className="mt-1 font-heading text-lg font-bold tabular-nums">
+        {inFuture ? <>{d}d {h}h {m}m</> : (deadline ?? "TBA")}
+      </div>
+      <div className="text-[10px] uppercase tracking-wider text-muted-foreground">
+        {inFuture ? "until deadline" : "deadline"}
+      </div>
     </div>
   );
 }
