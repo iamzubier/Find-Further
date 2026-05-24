@@ -5,7 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { UNIVERSITIES, SCHOLARSHIPS, daysLeft } from "@/lib/data";
 import { gpaConversionLine } from "@/lib/gpa";
-import { UniversityCard } from "../universities";
+import { UniversityCard } from "../universities.index";
 import { ScholarshipCard } from "../scholarships";
 import { matchUniversity } from "@/lib/matching";
 import { ArrowRight, Sparkles, TrendingUp, AlertCircle, Target } from "lucide-react";
