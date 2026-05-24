@@ -7,6 +7,8 @@ import { usToBd } from "@/lib/gpa";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/integrations/supabase/client";
 import { useCompare } from "@/lib/compare-store";
+import { loadEvalSummary, type EvalSummary } from "@/lib/evaluation-store";
+import { requirementInStudentSystem, CURRICULUMS } from "@/lib/curriculum";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
