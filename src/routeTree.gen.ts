@@ -9,12 +9,12 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as UniversitiesRouteImport } from './routes/universities'
 import { Route as ScholarshipsRouteImport } from './routes/scholarships'
 import { Route as CompareRouteImport } from './routes/compare'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as UniversitiesIndexRouteImport } from './routes/universities.index'
 import { Route as UniversitiesUniIdRouteImport } from './routes/universities.$uniId'
 import { Route as UniversitiesSlugRouteImport } from './routes/universities.$slug'
 import { Route as AuthenticatedShortlistRouteImport } from './routes/_authenticated/shortlist'
@@ -22,11 +22,6 @@ import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticate
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedAskAiRouteImport } from './routes/_authenticated/ask-ai'
 
-const UniversitiesRoute = UniversitiesRouteImport.update({
-  id: '/universities',
-  path: '/universities',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const ScholarshipsRoute = ScholarshipsRouteImport.update({
   id: '/scholarships',
   path: '/scholarships',
@@ -49,6 +44,11 @@ const AuthenticatedRoute = AuthenticatedRouteImport.update({
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const UniversitiesIndexRoute = UniversitiesIndexRouteImport.update({
+  id: '/universities/',
+  path: '/universities/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const UniversitiesUniIdRoute = UniversitiesUniIdRouteImport.update({
@@ -87,26 +87,26 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/compare': typeof CompareRoute
   '/scholarships': typeof ScholarshipsRoute
-  '/universities': typeof UniversitiesRouteWithChildren
   '/ask-ai': typeof AuthenticatedAskAiRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/shortlist': typeof AuthenticatedShortlistRoute
   '/universities/$slug': typeof UniversitiesSlugRoute
   '/universities/$uniId': typeof UniversitiesUniIdRoute
+  '/universities/': typeof UniversitiesIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/compare': typeof CompareRoute
   '/scholarships': typeof ScholarshipsRoute
-  '/universities': typeof UniversitiesRouteWithChildren
   '/ask-ai': typeof AuthenticatedAskAiRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/shortlist': typeof AuthenticatedShortlistRoute
   '/universities/$slug': typeof UniversitiesSlugRoute
   '/universities/$uniId': typeof UniversitiesUniIdRoute
+  '/universities': typeof UniversitiesIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -115,13 +115,13 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/compare': typeof CompareRoute
   '/scholarships': typeof ScholarshipsRoute
-  '/universities': typeof UniversitiesRouteWithChildren
   '/_authenticated/ask-ai': typeof AuthenticatedAskAiRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
   '/_authenticated/shortlist': typeof AuthenticatedShortlistRoute
   '/universities/$slug': typeof UniversitiesSlugRoute
   '/universities/$uniId': typeof UniversitiesUniIdRoute
+  '/universities/': typeof UniversitiesIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -130,26 +130,26 @@ export interface FileRouteTypes {
     | '/auth'
     | '/compare'
     | '/scholarships'
-    | '/universities'
     | '/ask-ai'
     | '/dashboard'
     | '/profile'
     | '/shortlist'
     | '/universities/$slug'
     | '/universities/$uniId'
+    | '/universities/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/auth'
     | '/compare'
     | '/scholarships'
-    | '/universities'
     | '/ask-ai'
     | '/dashboard'
     | '/profile'
     | '/shortlist'
     | '/universities/$slug'
     | '/universities/$uniId'
+    | '/universities'
   id:
     | '__root__'
     | '/'
@@ -157,13 +157,13 @@ export interface FileRouteTypes {
     | '/auth'
     | '/compare'
     | '/scholarships'
-    | '/universities'
     | '/_authenticated/ask-ai'
     | '/_authenticated/dashboard'
     | '/_authenticated/profile'
     | '/_authenticated/shortlist'
     | '/universities/$slug'
     | '/universities/$uniId'
+    | '/universities/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -172,18 +172,11 @@ export interface RootRouteChildren {
   AuthRoute: typeof AuthRoute
   CompareRoute: typeof CompareRoute
   ScholarshipsRoute: typeof ScholarshipsRoute
-  UniversitiesRoute: typeof UniversitiesRouteWithChildren
+  UniversitiesIndexRoute: typeof UniversitiesIndexRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/universities': {
-      id: '/universities'
-      path: '/universities'
-      fullPath: '/universities'
-      preLoaderRoute: typeof UniversitiesRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/scholarships': {
       id: '/scholarships'
       path: '/scholarships'
@@ -217,6 +210,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/universities/': {
+      id: '/universities/'
+      path: '/universities'
+      fullPath: '/universities/'
+      preLoaderRoute: typeof UniversitiesIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/universities/$uniId': {
@@ -282,28 +282,24 @@ const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
   AuthenticatedRouteChildren,
 )
 
-interface UniversitiesRouteChildren {
-  UniversitiesSlugRoute: typeof UniversitiesSlugRoute
-  UniversitiesUniIdRoute: typeof UniversitiesUniIdRoute
-}
-
-const UniversitiesRouteChildren: UniversitiesRouteChildren = {
-  UniversitiesSlugRoute: UniversitiesSlugRoute,
-  UniversitiesUniIdRoute: UniversitiesUniIdRoute,
-}
-
-const UniversitiesRouteWithChildren = UniversitiesRoute._addFileChildren(
-  UniversitiesRouteChildren,
-)
-
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRoute: AuthenticatedRouteWithChildren,
   AuthRoute: AuthRoute,
   CompareRoute: CompareRoute,
   ScholarshipsRoute: ScholarshipsRoute,
-  UniversitiesRoute: UniversitiesRouteWithChildren,
+  UniversitiesIndexRoute: UniversitiesIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
