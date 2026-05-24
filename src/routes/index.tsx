@@ -116,6 +116,7 @@ function FeatureTrio() {
       body: "Browse 10,000+ universities worldwide — filter by region, country, program, and tuition.",
       cta: "Open the atlas",
       to: "/universities" as const,
+      image: "https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=1200&q=80",
     },
     {
       icon: GitCompare,
@@ -124,6 +125,7 @@ function FeatureTrio() {
       body: "Stack up to 3 universities side by side — tuition, acceptance, scholarships, deadlines.",
       cta: "Start a comparison",
       to: "/compare" as const,
+      image: "https://images.unsplash.com/photo-1498243691581-b145c3f54a5a?w=1200&q=80",
     },
     {
       icon: Lightbulb,
@@ -132,8 +134,10 @@ function FeatureTrio() {
       body: "Curated admission hacks, GPA conversions, and a personalised AI advisor (Aria).",
       cta: "Ask Aria",
       to: "/ask-ai" as const,
+      image: "https://images.unsplash.com/photo-1532012197267-da84d127e765?w=1200&q=80",
     },
   ];
+
   return (
     <section className="mx-auto max-w-6xl px-4 pt-14 pb-4">
       <div className="mb-6 flex items-end justify-between">
@@ -143,29 +147,32 @@ function FeatureTrio() {
         <span className="hidden text-xs uppercase tracking-[0.25em] text-muted-foreground md:block">Chapters</span>
       </div>
       <div className="grid gap-4 md:grid-cols-3">
-        {items.map(({ icon: Icon, kicker, title, body, cta, to }) => (
+        {items.map(({ icon: Icon, kicker, title, body, cta, to, image }) => (
           <Link
             key={title}
             to={to}
-            className="card-surface group relative overflow-hidden p-7 transition-all hover:-translate-y-0.5 hover:shadow-[0_18px_40px_-22px_rgba(0,0,0,0.18)]"
+            className="group relative min-h-[280px] overflow-hidden rounded-2xl border border-border bg-cover bg-center text-white shadow-md transition-all hover:-translate-y-0.5 hover:shadow-2xl"
+            style={{ backgroundImage: `url('${image}')` }}
           >
-            <div className="flex items-center justify-between text-xs uppercase tracking-[0.25em] text-muted-foreground">
-              <span>Chapter {kicker}</span>
-              <Icon className="h-4 w-4" />
+            <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/65 to-black/90" aria-hidden />
+            <div className="relative z-[1] flex h-full min-h-[280px] flex-col p-7">
+              <div className="flex items-center justify-between text-xs uppercase tracking-[0.25em] text-white/70">
+                <span>Chapter {kicker}</span>
+                <Icon className="h-4 w-4" />
+              </div>
+              <h3 className="mt-auto pt-10 font-heading text-3xl font-bold tracking-tight">{title}</h3>
+              <p className="mt-3 text-sm leading-relaxed text-white/85">{body}</p>
+              <div className="mt-6 inline-flex items-center gap-2 text-sm font-medium text-white">
+                {cta} <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+              </div>
             </div>
-            <h3 className="mt-6 font-heading text-3xl font-bold tracking-tight">{title}</h3>
-            <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{body}</p>
-            <div className="mt-6 inline-flex items-center gap-2 text-sm font-medium text-foreground">
-              {cta} <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
-            </div>
-            {/* faded corner crest */}
-            <CrestArt variant="c" className="pointer-events-none absolute -bottom-10 -right-10 h-40 w-40 text-foreground/[0.05]" />
           </Link>
         ))}
       </div>
     </section>
   );
 }
+
 
 function Stats() {
   const stats = [

@@ -253,29 +253,33 @@ function CatalogBrowser() {
       <div className="mt-4 grid gap-2">
         {(listQuery.data?.rows ?? []).map((u: any) => (
           <div key={u.id} className="card-surface flex flex-wrap items-center justify-between gap-3 p-4">
-            <div className="min-w-0 flex-1">
-              <div className="flex flex-wrap items-center gap-2">
-                {u.slug ? (
-                  <Link
-                    to="/universities/$slug"
-                    params={{ slug: u.slug }}
-                    className="font-heading text-base font-bold leading-tight hover:text-primary hover:underline"
-                  >
-                    {u.name}
-                  </Link>
-                ) : (
-                  <h3 className="font-heading text-base font-bold leading-tight">{u.name}</h3>
-                )}
-                {u.has_curated_data && (
-                  <span className="rounded-full bg-primary/15 px-2 py-0.5 text-[10px] font-semibold text-primary ring-1 ring-primary/30">
-                    <Sparkles className="mr-0.5 inline h-2.5 w-2.5" /> Curated
-                  </span>
-                )}
-              </div>
-              <div className="mt-0.5 text-xs text-muted-foreground">
-                {u.country}{u.state_province ? ` · ${u.state_province}` : ""}
+            <div className="flex min-w-0 flex-1 items-center gap-3">
+              <UniLogo website={u.website} name={u.name} />
+              <div className="min-w-0 flex-1">
+                <div className="flex flex-wrap items-center gap-2">
+                  {u.slug ? (
+                    <Link
+                      to="/universities/$slug"
+                      params={{ slug: u.slug }}
+                      className="font-heading text-base font-bold leading-tight hover:text-primary hover:underline"
+                    >
+                      {u.name}
+                    </Link>
+                  ) : (
+                    <h3 className="font-heading text-base font-bold leading-tight">{u.name}</h3>
+                  )}
+                  {u.has_curated_data && (
+                    <span className="rounded-full bg-primary/15 px-2 py-0.5 text-[10px] font-semibold text-primary ring-1 ring-primary/30">
+                      <Sparkles className="mr-0.5 inline h-2.5 w-2.5" /> Curated
+                    </span>
+                  )}
+                </div>
+                <div className="mt-0.5 text-xs text-muted-foreground">
+                  {u.country}{u.state_province ? ` · ${u.state_province}` : ""}
+                </div>
               </div>
             </div>
+
             <div className="flex items-center gap-3">
               {u.slug && (
                 <Button asChild size="sm" className="h-8 bg-primary text-primary-foreground hover:bg-primary/90">
@@ -322,6 +326,46 @@ function CatalogBrowser() {
 }
 
 const CARD_FALLBACK = "https://images.unsplash.com/photo-1541339907198-e08756dedf3f?w=800&q=80";
+
+function domainFromWebsite(website?: string | null): string | null {
+  if (!website) return null;
+  try {
+    const url = website.startsWith("http") ? website : `https://${website}`;
+    return new URL(url).hostname.replace(/^www\./, "");
+  } catch { return null; }
+}
+
+function UniLogo({ website, name, size = 48 }: { website?: string | null; name: string; size?: number }) {
+  const domain = domainFromWebsite(website);
+  const [errored, setErrored] = useState(false);
+  const initials = name.split(/\s+/).filter(w => /^[A-Z]/.test(w)).slice(0, 2).map(w => w[0]).join("") || name.slice(0, 2).toUpperCase();
+  if (!domain || errored) {
+    return (
+      <div
+        className="flex flex-none items-center justify-center rounded-lg bg-primary/10 font-heading text-sm font-extrabold text-primary ring-1 ring-primary/20"
+        style={{ width: size, height: size }}
+        aria-hidden
+      >
+        {initials}
+      </div>
+    );
+  }
+  return (
+    <div
+      className="flex flex-none items-center justify-center overflow-hidden rounded-lg border border-border bg-white p-1.5"
+      style={{ width: size, height: size }}
+    >
+      <img
+        src={`https://logo.clearbit.com/${domain}`}
+        alt=""
+        className="max-h-full max-w-full object-contain"
+        loading="lazy"
+        onError={() => setErrored(true)}
+      />
+    </div>
+  );
+}
+
 
 export function UniversityCard({ u, match }: { u: University; match?: number }) {
   const { user } = useAuth();
