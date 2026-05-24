@@ -36,6 +36,7 @@ const REGIONS = [
   { value: "CA", label: "Canada" },
   { value: "AU", label: "Australia / NZ" },
   { value: "ASIA", label: "Asia / Middle East" },
+  { value: "OTHER", label: "Rest of world" },
 ];
 
 function UniversitiesPage() {
