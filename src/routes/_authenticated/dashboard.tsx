@@ -7,6 +7,7 @@ import { UNIVERSITIES, SCHOLARSHIPS, daysLeft } from "@/lib/data";
 import { gpaConversionLine } from "@/lib/gpa";
 import { UniversityCard } from "../universities";
 import { ScholarshipCard } from "../scholarships";
+import { matchUniversity } from "@/lib/matching";
 import { ArrowRight, Sparkles, TrendingUp, AlertCircle, Target } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
@@ -23,13 +24,25 @@ function Dashboard() {
     supabase.from("profiles").select("*").eq("id", user.id).maybeSingle().then(({ data }) => setProfile(data));
   }, [user]);
 
-  // Demo score (would normally be derived from profile + AI). Spec says "show 7.2 as example".
-  const score = 7.2;
-  const strengths = profile?.hsc_gpa && profile.hsc_gpa >= 4.5 ? "High GPA" : "Strong motivation";
-  const weaknesses = !profile?.sat ? "No SAT yet" : "Limited ECA";
-  const improvement = !profile?.ielts ? "Add IELTS" : "Add a leadership ECA";
+  const matches = useMemo(() => {
+    if (!profile) return [];
+    return UNIVERSITIES
+      .map((u) => ({ u, m: matchUniversity(u, profile) }))
+      .sort((a, b) => b.m.score - a.m.score);
+  }, [profile]);
 
-  const picks = useMemo(() => UNIVERSITIES.slice(0, 3).map((u, i) => ({ u, match: [92, 86, 78][i] })), []);
+  const score = useMemo(() => {
+    if (!profile) return 5.0;
+    const top = matches.slice(0, 5);
+    const avg = top.length ? top.reduce((s, x) => s + x.m.score, 0) / top.length : 50;
+    return Math.round(avg) / 10;
+  }, [profile, matches]);
+
+  const strengths = profile?.hsc_gpa && profile.hsc_gpa >= 4.5 ? `HSC GPA ${profile.hsc_gpa}` : "Solid foundation";
+  const weaknesses = !profile?.ielts && !profile?.toefl ? "No English test yet" : !profile?.sat ? "No SAT yet" : "Limited ECA";
+  const improvement = !profile?.ielts ? "Add IELTS — unlocks 80% of unis" : !profile?.countries?.length ? "Pick 2–3 target countries" : "Add a leadership ECA";
+
+  const picks = useMemo(() => (matches.length ? matches.slice(0, 3) : UNIVERSITIES.slice(0, 3).map((u) => ({ u, m: { score: 0, verdict: "Match" as const, reasons: [] } }))), [matches]);
   const deadlines = useMemo(() => [...SCHOLARSHIPS].sort((a,b) => +new Date(a.deadline) - +new Date(b.deadline)).slice(0, 3), []);
   const gpaLine = gpaConversionLine(profile?.hsc_gpa);
 
@@ -56,7 +69,7 @@ function Dashboard() {
           <h2 className="font-heading text-2xl font-extrabold">Best Picks For You</h2>
           <Link to="/universities" className="text-sm text-primary hover:underline">See all</Link>
         </div>
-        <div className="grid gap-3">{picks.map(({ u, match }) => <UniversityCard key={u.id} u={u} match={match} />)}</div>
+        <div className="grid gap-3">{picks.map(({ u, m }) => <UniversityCard key={u.id} u={u} match={m.score || undefined} />)}</div>
       </section>
 
       <section className="mt-10">
