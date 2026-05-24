@@ -76,11 +76,22 @@ function UniversitiesPage() {
 }
 
 function FeaturedList({ initial }: { initial: { country?: string; program?: string; q?: string } }) {
+  const { user } = useAuth();
   const [q, setQ] = useState(initial.q ?? "");
   const [country, setCountry] = useState(initial.country ?? "all");
   const [program, setProgram] = useState(initial.program ?? "all");
-  const [sort, setSort] = useState<"rank" | "name">("rank");
+  const [sort, setSort] = useState<"rank" | "name" | "match">("rank");
   const [scholarshipOnly, setScholarshipOnly] = useState(false);
+
+  const profileQuery = useQuery({
+    queryKey: ["profile-match", user?.id],
+    enabled: !!user,
+    queryFn: async () => {
+      const { data } = await supabase.from("profiles").select("*").eq("id", user!.id).maybeSingle();
+      return data;
+    },
+  });
+  const profile = profileQuery.data;
 
   const results = useMemo(() => {
     let list = UNIVERSITIES.filter((u) => {
@@ -90,9 +101,12 @@ function FeaturedList({ initial }: { initial: { country?: string; program?: stri
       if (q && !(u.name.toLowerCase().includes(q.toLowerCase()) || u.country.toLowerCase().includes(q.toLowerCase()))) return false;
       return true;
     });
-    list.sort((a, b) => sort === "rank" ? a.qsRank - b.qsRank : a.name.localeCompare(b.name));
-    return list;
-  }, [q, country, program, sort, scholarshipOnly]);
+    const withMatch = list.map((u) => ({ u, score: profile ? matchUniversity(u, profile).score : 0 }));
+    if (sort === "match" && profile) withMatch.sort((a, b) => b.score - a.score);
+    else if (sort === "name") withMatch.sort((a, b) => a.u.name.localeCompare(b.u.name));
+    else withMatch.sort((a, b) => a.u.qsRank - b.u.qsRank);
+    return withMatch;
+  }, [q, country, program, sort, scholarshipOnly, profile]);
 
   return (
     <>
@@ -109,11 +123,12 @@ function FeaturedList({ initial }: { initial: { country?: string; program?: stri
           <SelectTrigger className="h-11 bg-secondary"><SelectValue placeholder="Program" /></SelectTrigger>
           <SelectContent><SelectItem value="all">All programs</SelectItem>{PROGRAMS.map(p => <SelectItem key={p} value={p}>{p}</SelectItem>)}</SelectContent>
         </Select>
-        <Select value={sort} onValueChange={(v) => setSort(v as "rank"|"name")}>
+        <Select value={sort} onValueChange={(v) => setSort(v as "rank"|"name"|"match")}>
           <SelectTrigger className="h-11 bg-secondary"><SelectValue /></SelectTrigger>
           <SelectContent>
             <SelectItem value="rank">Sort: QS Rank</SelectItem>
             <SelectItem value="name">Sort: Name</SelectItem>
+            {profile && <SelectItem value="match">Sort: My match</SelectItem>}
           </SelectContent>
         </Select>
         <label className="flex items-center gap-2 px-3 text-sm text-muted-foreground">
@@ -121,7 +136,9 @@ function FeaturedList({ initial }: { initial: { country?: string; program?: stri
         </label>
       </div>
 
-      <p className="mt-3 text-xs text-muted-foreground">{results.length} matches</p>
+      <p className="mt-3 text-xs text-muted-foreground">
+        {results.length} matches{profile && sort === "match" ? " · ranked by your profile" : ""}
+      </p>
 
       {results.length === 0 ? (
         <div className="card-surface mt-6 p-12 text-center">
@@ -130,7 +147,7 @@ function FeaturedList({ initial }: { initial: { country?: string; program?: stri
         </div>
       ) : (
         <div className="mt-4 grid gap-3">
-          {results.map((u) => <UniversityCard key={u.id} u={u} />)}
+          {results.map(({ u, score }) => <UniversityCard key={u.id} u={u} match={profile && score ? score : undefined} />)}
         </div>
       )}
     </>
