@@ -164,6 +164,123 @@ export type Database = {
         }
         Relationships: []
       }
+      universities_detail: {
+        Row: {
+          about: string | null
+          acceptance_rate: string | null
+          admission_reqs: Json | null
+          application_steps: string[] | null
+          application_url: string | null
+          campus_image_url: string | null
+          campus_life: string | null
+          catalog_id: string | null
+          city: string | null
+          country: string
+          country_flag: string | null
+          created_at: string
+          deadlines: Json | null
+          exams: Json | null
+          fee_waivers: string | null
+          financial_aid: string | null
+          founded_year: number | null
+          international_pct: string | null
+          living_cost_monthly: number | null
+          logo_url: string | null
+          maps_query: string | null
+          name: string
+          notable_alumni: string[] | null
+          official_url: string | null
+          processing_time: string | null
+          programs_detail: Json | null
+          qs_rank: number | null
+          required_docs: string[] | null
+          scholarships: Json | null
+          slug: string
+          student_faculty_ratio: string | null
+          subject_rankings: Json | null
+          total_students: string | null
+          tuition: Json | null
+          updated_at: string
+          work_permit: string | null
+        }
+        Insert: {
+          about?: string | null
+          acceptance_rate?: string | null
+          admission_reqs?: Json | null
+          application_steps?: string[] | null
+          application_url?: string | null
+          campus_image_url?: string | null
+          campus_life?: string | null
+          catalog_id?: string | null
+          city?: string | null
+          country: string
+          country_flag?: string | null
+          created_at?: string
+          deadlines?: Json | null
+          exams?: Json | null
+          fee_waivers?: string | null
+          financial_aid?: string | null
+          founded_year?: number | null
+          international_pct?: string | null
+          living_cost_monthly?: number | null
+          logo_url?: string | null
+          maps_query?: string | null
+          name: string
+          notable_alumni?: string[] | null
+          official_url?: string | null
+          processing_time?: string | null
+          programs_detail?: Json | null
+          qs_rank?: number | null
+          required_docs?: string[] | null
+          scholarships?: Json | null
+          slug: string
+          student_faculty_ratio?: string | null
+          subject_rankings?: Json | null
+          total_students?: string | null
+          tuition?: Json | null
+          updated_at?: string
+          work_permit?: string | null
+        }
+        Update: {
+          about?: string | null
+          acceptance_rate?: string | null
+          admission_reqs?: Json | null
+          application_steps?: string[] | null
+          application_url?: string | null
+          campus_image_url?: string | null
+          campus_life?: string | null
+          catalog_id?: string | null
+          city?: string | null
+          country?: string
+          country_flag?: string | null
+          created_at?: string
+          deadlines?: Json | null
+          exams?: Json | null
+          fee_waivers?: string | null
+          financial_aid?: string | null
+          founded_year?: number | null
+          international_pct?: string | null
+          living_cost_monthly?: number | null
+          logo_url?: string | null
+          maps_query?: string | null
+          name?: string
+          notable_alumni?: string[] | null
+          official_url?: string | null
+          processing_time?: string | null
+          programs_detail?: Json | null
+          qs_rank?: number | null
+          required_docs?: string[] | null
+          scholarships?: Json | null
+          slug?: string
+          student_faculty_ratio?: string | null
+          subject_rankings?: Json | null
+          total_students?: string | null
+          tuition?: Json | null
+          updated_at?: string
+          work_permit?: string | null
+        }
+        Relationships: []
+      }
       university_hacks: {
         Row: {
           created_at: string
@@ -211,6 +328,59 @@ export type Database = {
           uni_id?: string
         }
         Relationships: []
+      }
+      university_tips: {
+        Row: {
+          approved: boolean
+          created_at: string
+          id: string
+          posted_at: string | null
+          source_platform: string
+          source_upvotes: number | null
+          source_url: string | null
+          submitted_by: string | null
+          tag: string
+          tip_text: string
+          uni_slug: string
+          verified: boolean
+        }
+        Insert: {
+          approved?: boolean
+          created_at?: string
+          id?: string
+          posted_at?: string | null
+          source_platform: string
+          source_upvotes?: number | null
+          source_url?: string | null
+          submitted_by?: string | null
+          tag: string
+          tip_text: string
+          uni_slug: string
+          verified?: boolean
+        }
+        Update: {
+          approved?: boolean
+          created_at?: string
+          id?: string
+          posted_at?: string | null
+          source_platform?: string
+          source_upvotes?: number | null
+          source_url?: string | null
+          submitted_by?: string | null
+          tag?: string
+          tip_text?: string
+          uni_slug?: string
+          verified?: boolean
+        }
+        Relationships: [
+          {
+            foreignKeyName: "university_tips_uni_slug_fkey"
+            columns: ["uni_slug"]
+            isOneToOne: false
+            referencedRelation: "universities_detail"
+            referencedColumns: ["slug"]
+          },
+        ]
       }
     }
     Views: {
