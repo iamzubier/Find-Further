@@ -88,7 +88,7 @@ function ComparePage() {
         const ps = (u.programs_detail ?? []).slice(0, 4).map((p: any) => p.name ?? p).filter(Boolean);
         return ps.length ? <div className="flex flex-wrap gap-1">{ps.map((n: string) => <span key={n} className="rounded bg-secondary px-1.5 py-0.5 text-[11px]">{n}</span>)}</div> : "—";
     }},
-    { label: "Next deadline", get: (u) => u.deadlines?.[0] ? `${u.deadlines[0].intake ?? ""} · ${u.deadlines[0].deadline ?? ""}` : "—" },
+    { label: "Next deadline", get: (u) => { const d = u.deadlines?.[0]; if (!d) return "—"; const dl = d.deadline ?? d.date; return `${d.intake ?? d.round ?? ""} · ${dl ?? "TBA"}`.trim().replace(/^·\s*/, ""); } },
     { label: "Official site", get: (u) => u.official_url
       ? <a href={u.official_url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-primary hover:underline">Visit <ExternalLink className="h-3 w-3" /></a>
       : "—" },
