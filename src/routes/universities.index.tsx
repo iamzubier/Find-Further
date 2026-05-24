@@ -7,13 +7,15 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
-import { Search, Heart, ArrowRight, Globe, ChevronLeft, ChevronRight, Sparkles } from "lucide-react";
+import { Search, Heart, ArrowRight, Globe, ChevronLeft, ChevronRight, Sparkles, GitCompare } from "lucide-react";
 import { UNIVERSITIES, COUNTRIES, PROGRAMS, type University } from "@/lib/data";
 import { matchUniversity } from "@/lib/matching";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/integrations/supabase/client";
 import { getUniversityCount } from "@/lib/admin-import.functions";
+import { useCompare } from "@/lib/compare-store";
 import { toast } from "sonner";
+
 
 const SearchSchema = z.object({
   country: z.string().optional(),
