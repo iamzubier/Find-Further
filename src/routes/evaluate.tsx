@@ -127,7 +127,21 @@ function EvaluatePage() {
       };
       return computeFn({ data: payload });
     },
-    onSuccess: (data) => { setResult(data); window.scrollTo({ top: 0, behavior: "smooth" }); },
+    onSuccess: (data) => {
+      setResult(data);
+      saveEvalSummary({
+        country: f.country, curriculum: f.curriculum as CurriculumId,
+        raw: raw!, converted: data.converted,
+        tests: {
+          ielts: f.ielts ? +f.ielts : undefined, toefl: f.toefl ? +f.toefl : undefined,
+          sat: f.sat ? +f.sat : undefined, act: f.act ? +f.act : undefined,
+          duolingo: f.duolingo ? +f.duolingo : undefined,
+        },
+        targetCountries: f.targetCountries,
+        score: data.breakdown.total, ts: Date.now(),
+      });
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    },
     onError: (e: Error) => toast.error(e.message),
   });
 
