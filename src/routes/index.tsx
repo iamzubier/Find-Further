@@ -47,7 +47,7 @@ function Hero() {
       <div
         className="absolute inset-0 -z-10 bg-cover bg-center"
         aria-hidden
-        style={{ backgroundImage: "url('https://images.unsplash.com/photo-1562774053-701939374585?w=1920&q=80')" }}
+        style={{ backgroundImage: "url('https://images.unsplash.com/photo-1541339907198-e08756dedf3f?w=1600&q=80')" }}
       />
       <div className="absolute inset-0 -z-10 bg-gradient-to-b from-black/70 via-black/55 to-black/85" aria-hidden />
       <CrestArt variant="c" className="pointer-events-none absolute right-10 bottom-4 h-44 w-44 text-white/10" />
