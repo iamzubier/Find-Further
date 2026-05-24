@@ -709,7 +709,10 @@ function Sidebar({ uni }: any) {
     try { await navigator.share({ title: uni.name, url: window.location.href }); }
     catch { await navigator.clipboard.writeText(window.location.href); toast.success("Link copied"); }
   };
-  const nextDeadline = uni.deadlines?.[0];
+  const nextDeadline = (uni.deadlines ?? []).find((d: any) => {
+    const v = d.deadline ?? d.date;
+    return v && !isNaN(new Date(v).getTime());
+  }) ?? uni.deadlines?.[0];
   const evalSum = useMemo(() => loadEvalSummary(), []);
   return (
     <aside className="lg:sticky lg:top-32 lg:self-start">
