@@ -1,15 +1,13 @@
 import { Link } from "@tanstack/react-router";
+import { Logo } from "@/components/Logo";
 
 export function Footer() {
   return (
     <footer className="mt-24 border-t border-border bg-background">
       <div className="mx-auto grid max-w-7xl gap-8 px-4 py-12 md:grid-cols-4">
         <div>
-          <div className="flex items-center gap-2 font-heading text-lg font-extrabold">
-            <span className="inline-block h-2.5 w-2.5 rounded-full bg-primary" />
-            BeyondBorder
-          </div>
-          <p className="mt-2 text-sm text-muted-foreground">
+          <Logo />
+          <p className="mt-3 text-sm text-muted-foreground">
             Built for Bangladeshi students who think consultants are overrated.
           </p>
         </div>
