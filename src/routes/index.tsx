@@ -138,7 +138,6 @@ function FeatureTrio() {
     },
   ];
 
-  ];
   return (
     <section className="mx-auto max-w-6xl px-4 pt-14 pb-4">
       <div className="mb-6 flex items-end justify-between">
