@@ -5,7 +5,15 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { scoreProfile, matchUniversity, type EvalInput, type MatchedUni } from "./evaluation";
 import { convertToAll, type RawGrade, type ConvertedGrades } from "./curriculum";
 
-const RawSchema = z.any();
+const RawSchema = z.discriminatedUnion("curriculum", [
+  z.object({ curriculum: z.literal("BD_HSC"), hscGpa: z.number().min(0).max(5), sscGpa: z.number().min(0).max(5).optional() }),
+  z.object({ curriculum: z.enum(["CBSE", "ICSE", "PK_FSC"]), percentage: z.number().min(0).max(100) }),
+  z.object({ curriculum: z.literal("A_LEVELS"), grades: z.array(z.string().max(2)).max(10) }),
+  z.object({ curriculum: z.literal("IB"), points: z.number().min(0).max(45) }),
+  z.object({ curriculum: z.enum(["US_GPA", "CA_GPA"]), gpa: z.number().min(0).max(4) }),
+  z.object({ curriculum: z.literal("GAOKAO"), score: z.number().min(0).max(750) }),
+  z.object({ curriculum: z.literal("ABITUR"), grade: z.number().min(1).max(6) }),
+]);
 const TestSchema = z.object({
   ielts: z.number().optional(), toefl: z.number().optional(),
   duolingo: z.number().optional(), pte: z.number().optional(),
