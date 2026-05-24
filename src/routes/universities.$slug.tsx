@@ -267,17 +267,25 @@ function Admissions({ uni }: any) {
           </table>
         </div>
       </Card>
-      <Card title="Deadlines" icon={Calendar}>
-        <div className="grid gap-3">
-          {uni.deadlines?.map((d: any) => (
-            <div key={d.intake} className="rounded-lg border border-border p-4">
-              <div className="font-semibold">{d.intake}</div>
-              <div className="mt-1 text-sm text-muted-foreground">Apply by <span className="font-medium text-foreground">{d.deadline}</span> · Decision: {d.decision}</div>
-            </div>
-          ))}
-        </div>
-        <p className="mt-3 text-xs text-muted-foreground">Avg. processing time: {uni.processing_time}</p>
-      </Card>
+      {uni.deadlines?.length > 0 && (
+        <Card title="Deadlines" icon={Calendar}>
+          <div className="grid gap-3">
+            {uni.deadlines.map((d: any, i: number) => {
+              const dl = d.deadline ?? d.date;
+              return (
+                <div key={`${d.intake}-${i}`} className="rounded-lg border border-border p-4">
+                  <div className="font-semibold">{d.intake ?? d.round ?? "Intake"}</div>
+                  <div className="mt-1 text-sm text-muted-foreground">
+                    Apply by <span className="font-medium text-foreground">{dl ?? "TBA"}</span>
+                    {d.decision && <> · Decision: {d.decision}</>}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+          {uni.processing_time && <p className="mt-3 text-xs text-muted-foreground">Avg. processing time: {uni.processing_time}</p>}
+        </Card>
+      )}
       <Card title="Application Process">
         <ol className="space-y-2 text-sm">
           {uni.application_steps?.map((s: string, i: number) => (
