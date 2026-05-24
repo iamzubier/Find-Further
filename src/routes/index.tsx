@@ -1,10 +1,13 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { UNIVERSITIES, SCHOLARSHIPS, COUNTRIES, PROGRAMS, WTF_FACTS } from "@/lib/data";
 import { ArrowRight, Search, Sparkles, Zap, Compass, GitCompare, Lightbulb } from "lucide-react";
 import { LogoMark, CrestArt } from "@/components/Logo";
+import { getUniversityCount } from "@/lib/admin-import.functions";
 
 export const Route = createFileRoute("/")({
   head: () => ({
