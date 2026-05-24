@@ -16,6 +16,7 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as UniversitiesUniIdRouteImport } from './routes/universities.$uniId'
+import { Route as UniversitiesSlugRouteImport } from './routes/universities.$slug'
 import { Route as AuthenticatedShortlistRouteImport } from './routes/_authenticated/shortlist'
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
@@ -55,6 +56,11 @@ const UniversitiesUniIdRoute = UniversitiesUniIdRouteImport.update({
   path: '/$uniId',
   getParentRoute: () => UniversitiesRoute,
 } as any)
+const UniversitiesSlugRoute = UniversitiesSlugRouteImport.update({
+  id: '/$slug',
+  path: '/$slug',
+  getParentRoute: () => UniversitiesRoute,
+} as any)
 const AuthenticatedShortlistRoute = AuthenticatedShortlistRouteImport.update({
   id: '/shortlist',
   path: '/shortlist',
@@ -86,6 +92,7 @@ export interface FileRoutesByFullPath {
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/shortlist': typeof AuthenticatedShortlistRoute
+  '/universities/$slug': typeof UniversitiesSlugRoute
   '/universities/$uniId': typeof UniversitiesUniIdRoute
 }
 export interface FileRoutesByTo {
@@ -98,6 +105,7 @@ export interface FileRoutesByTo {
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/shortlist': typeof AuthenticatedShortlistRoute
+  '/universities/$slug': typeof UniversitiesSlugRoute
   '/universities/$uniId': typeof UniversitiesUniIdRoute
 }
 export interface FileRoutesById {
@@ -112,6 +120,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
   '/_authenticated/shortlist': typeof AuthenticatedShortlistRoute
+  '/universities/$slug': typeof UniversitiesSlugRoute
   '/universities/$uniId': typeof UniversitiesUniIdRoute
 }
 export interface FileRouteTypes {
@@ -126,6 +135,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/profile'
     | '/shortlist'
+    | '/universities/$slug'
     | '/universities/$uniId'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -138,6 +148,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/profile'
     | '/shortlist'
+    | '/universities/$slug'
     | '/universities/$uniId'
   id:
     | '__root__'
@@ -151,6 +162,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard'
     | '/_authenticated/profile'
     | '/_authenticated/shortlist'
+    | '/universities/$slug'
     | '/universities/$uniId'
   fileRoutesById: FileRoutesById
 }
@@ -214,6 +226,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof UniversitiesUniIdRouteImport
       parentRoute: typeof UniversitiesRoute
     }
+    '/universities/$slug': {
+      id: '/universities/$slug'
+      path: '/$slug'
+      fullPath: '/universities/$slug'
+      preLoaderRoute: typeof UniversitiesSlugRouteImport
+      parentRoute: typeof UniversitiesRoute
+    }
     '/_authenticated/shortlist': {
       id: '/_authenticated/shortlist'
       path: '/shortlist'
@@ -264,10 +283,12 @@ const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
 )
 
 interface UniversitiesRouteChildren {
+  UniversitiesSlugRoute: typeof UniversitiesSlugRoute
   UniversitiesUniIdRoute: typeof UniversitiesUniIdRoute
 }
 
 const UniversitiesRouteChildren: UniversitiesRouteChildren = {
+  UniversitiesSlugRoute: UniversitiesSlugRoute,
   UniversitiesUniIdRoute: UniversitiesUniIdRoute,
 }
 
