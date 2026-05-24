@@ -784,7 +784,8 @@ function Countdown({ deadline, intake }: { deadline?: string; intake: string }) 
   useEffect(() => { const i = setInterval(() => setNow(Date.now()), 60_000); return () => clearInterval(i); }, []);
   const target = deadline ? new Date(deadline).getTime() : NaN;
   const valid = !isNaN(target);
-  const diff = valid ? Math.max(0, target - now) : 0;
+  const diff = valid ? target - now : 0;
+  const inFuture = valid && diff > 0;
   const d = Math.floor(diff / 86400000);
   const h = Math.floor((diff / 3600000) % 24);
   const m = Math.floor((diff / 60000) % 60);
@@ -792,9 +793,11 @@ function Countdown({ deadline, intake }: { deadline?: string; intake: string }) 
     <div className="rounded-lg border border-border bg-secondary/40 p-3 text-center">
       <div className="text-xs text-muted-foreground">{intake}</div>
       <div className="mt-1 font-heading text-lg font-bold tabular-nums">
-        {valid ? <>{d}d {h}h {m}m</> : (deadline ?? "TBA")}
+        {inFuture ? <>{d}d {h}h {m}m</> : (deadline ?? "TBA")}
       </div>
-      <div className="text-[10px] uppercase tracking-wider text-muted-foreground">until deadline</div>
+      <div className="text-[10px] uppercase tracking-wider text-muted-foreground">
+        {inFuture ? "until deadline" : "deadline"}
+      </div>
     </div>
   );
 }
