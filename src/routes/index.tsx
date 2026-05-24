@@ -47,7 +47,7 @@ function Hero() {
       <div
         className="absolute inset-0 -z-10 bg-cover bg-center"
         aria-hidden
-        style={{ backgroundImage: "url('https://images.unsplash.com/photo-1541339907198-e08756dedf3f?w=1600&q=80')" }}
+        style={{ backgroundImage: "url('https://images.unsplash.com/photo-1607237138185-eedd9c632b0b?w=1600&q=80')" }}
       />
       <div className="absolute inset-0 -z-10 bg-gradient-to-b from-black/70 via-black/55 to-black/85" aria-hidden />
       <CrestArt variant="c" className="pointer-events-none absolute right-10 bottom-4 h-44 w-44 text-white/10" />
@@ -116,7 +116,7 @@ function FeatureTrio() {
       body: "Browse 10,000+ universities worldwide — filter by region, country, program, and tuition.",
       cta: "Open the atlas",
       to: "/universities" as const,
-      image: "https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=1200&q=80",
+      image: "https://images.unsplash.com/photo-1524661135-423995f22d0b?w=1200&q=80",
     },
     {
       icon: GitCompare,
@@ -125,7 +125,7 @@ function FeatureTrio() {
       body: "Stack up to 3 universities side by side — tuition, acceptance, scholarships, deadlines.",
       cta: "Start a comparison",
       to: "/compare" as const,
-      image: "https://images.unsplash.com/photo-1498243691581-b145c3f54a5a?w=1200&q=80",
+      image: "https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=1200&q=80",
     },
     {
       icon: Lightbulb,
@@ -134,7 +134,7 @@ function FeatureTrio() {
       body: "Curated admission hacks, GPA conversions, and a personalised AI advisor (Aria).",
       cta: "Ask Aria",
       to: "/ask-ai" as const,
-      image: "https://images.unsplash.com/photo-1532012197267-da84d127e765?w=1200&q=80",
+      image: "https://images.unsplash.com/photo-1434030216411-0b793f4b4173?w=1200&q=80",
     },
   ];
 
@@ -182,17 +182,24 @@ function Stats() {
   ];
   return (
     <section className="mx-auto max-w-6xl px-4 py-6">
-      <div className="grid gap-3 md:grid-cols-3">
-        {stats.map((s) => (
-          <div key={s.label} className="card-surface flex items-baseline justify-between p-6">
-            <div className="font-heading text-4xl font-extrabold text-foreground md:text-5xl">{s.num}</div>
-            <div className="text-sm uppercase tracking-wide text-muted-foreground">{s.label}</div>
-          </div>
-        ))}
+      <div
+        className="relative overflow-hidden rounded-2xl border border-border bg-cover bg-center p-6 md:p-8"
+        style={{ backgroundImage: "url('https://images.unsplash.com/photo-1517486808906-6ca8b3f04846?w=1600&q=80')" }}
+      >
+        <div className="absolute inset-0 bg-gradient-to-r from-black/85 via-black/70 to-black/55" aria-hidden />
+        <div className="relative grid gap-6 md:grid-cols-3">
+          {stats.map((s) => (
+            <div key={s.label} className="flex items-baseline justify-between gap-3 border-b border-white/15 pb-3 md:border-b-0 md:border-r md:pb-0 md:pr-6 last:border-0">
+              <div className="font-heading text-4xl font-extrabold text-white md:text-5xl">{s.num}</div>
+              <div className="text-sm uppercase tracking-wide text-white/75">{s.label}</div>
+            </div>
+          ))}
+        </div>
       </div>
     </section>
   );
 }
+
 
 function WtfSection() {
   return (
@@ -239,16 +246,22 @@ function WtfSection() {
 function CtaStrip() {
   return (
     <section className="mx-auto max-w-6xl px-4 py-12">
-      <div className="card-surface flex flex-col items-center justify-between gap-4 p-8 md:flex-row md:p-10">
-        <div>
-          <h3 className="font-heading text-2xl font-extrabold md:text-3xl">Want to see your best matches?</h3>
-          <p className="mt-1 text-muted-foreground">Free account. Profile-aware recommendations. AI advisor named Aria.</p>
+      <div
+        className="relative overflow-hidden rounded-2xl border border-border bg-cover bg-center p-8 md:p-12"
+        style={{ backgroundImage: "url('https://images.unsplash.com/photo-1523580494863-6f3031224c94?w=1600&q=80')" }}
+      >
+        <div className="absolute inset-0 bg-gradient-to-r from-black/85 via-black/65 to-black/40" aria-hidden />
+        <div className="relative flex flex-col items-start justify-between gap-5 text-white md:flex-row md:items-center">
+          <div>
+            <h3 className="font-heading text-2xl font-extrabold md:text-3xl">Want to see your best matches?</h3>
+            <p className="mt-1 text-sm text-white/85 md:text-base">Free account. Profile-aware recommendations. AI advisor named Aria.</p>
+          </div>
+          <Button asChild size="lg" className="bg-white text-black hover:bg-white/90">
+            <Link to="/auth" search={{ tab: "signup" }}>
+              Create a free account <Sparkles className="ml-2 h-4 w-4" />
+            </Link>
+          </Button>
         </div>
-        <Button asChild size="lg" className="bg-primary text-primary-foreground hover:bg-primary/90">
-          <Link to="/auth" search={{ tab: "signup" }}>
-            Create a free account <Sparkles className="ml-2 h-4 w-4" />
-          </Link>
-        </Button>
       </div>
       <p className="mt-6 text-center text-xs text-muted-foreground">
         {UNIVERSITIES.length} universities · {SCHOLARSHIPS.length} live scholarships indexed
@@ -256,3 +269,4 @@ function CtaStrip() {
     </section>
   );
 }
+
