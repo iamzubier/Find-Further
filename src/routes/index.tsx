@@ -74,7 +74,7 @@ function Hero() {
         </div>
 
         <p className="mt-10 max-w-2xl text-lg leading-relaxed text-foreground/80 md:text-xl">
-          10,000+ real universities. Live scholarships. An AI advisor named <em>Aria</em>.
+          {countLabel} real universities. Live scholarships. An AI advisor named <em>Aria</em>.
           One honest atlas for HSC & A-level students who think consultants are overrated.
         </p>
 
