@@ -424,7 +424,7 @@ export function ResultsView({
         <div>
           <p className="text-sm font-semibold text-primary">Your evaluation</p>
           <h1 className="mt-1 font-heading text-4xl font-extrabold">Profile score: <span className="text-primary">{breakdown.total}/100</span></h1>
-          <p className="mt-2 text-sm text-muted-foreground">{conversionLine({ curriculum: "US_GPA", gpa: converted.us4 })}</p>
+          <p className="mt-2 text-sm text-muted-foreground">US <b>{converted.us4.toFixed(2)}</b>/4.0 · UK <b>{converted.uk}</b> · German <b>{converted.german.toFixed(1)}</b> · ECTS <b>{converted.ects}</b> · AU <b>{converted.au7.toFixed(1)}</b>/7.0</p>
         </div>
         <div className="flex gap-2">
           {onReset && <Button variant="outline" onClick={onReset}>Edit answers</Button>}
