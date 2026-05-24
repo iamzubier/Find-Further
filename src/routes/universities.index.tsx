@@ -347,15 +347,11 @@ export function UniversityCard({ u, match }: { u: University; match?: number }) 
           <Button variant="outline" size="sm" onClick={save} disabled={saving}>
             <Heart className="mr-1 h-4 w-4" /> Save
           </Button>
-          {FEATURED_SLUG_MAP[u.id] ? (
-            <Button asChild size="sm" className="bg-primary text-primary-foreground hover:bg-primary/90">
-              <Link to="/universities/$slug" params={{ slug: FEATURED_SLUG_MAP[u.id] }}>View <ArrowRight className="ml-1 h-4 w-4" /></Link>
-            </Button>
-          ) : (
-            <Button asChild size="sm" className="bg-primary text-primary-foreground hover:bg-primary/90">
-              <Link to="/universities/$uniId" params={{ uniId: u.id }}>View <ArrowRight className="ml-1 h-4 w-4" /></Link>
-            </Button>
-          )}
+          <Button asChild size="sm" className="bg-primary text-primary-foreground hover:bg-primary/90">
+            <Link to="/universities/$slug" params={{ slug: FEATURED_SLUG_MAP[u.id] ?? u.id }}>
+              View <ArrowRight className="ml-1 h-4 w-4" />
+            </Link>
+          </Button>
         </div>
       </div>
     </div>
@@ -367,6 +363,7 @@ const FEATURED_SLUG_MAP: Record<string, string> = {
   u1: "helsinki",
   u2: "aalto",
   u3: "tu-munich",
+  u4: "rwth-aachen",
   u5: "oslo",
   u6: "politecnico-milano",
   u7: "mit",
