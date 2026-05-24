@@ -77,6 +77,16 @@ function UniversitiesPage() {
         </div>
       </div>
 
+      <div className="card-surface mt-5 flex flex-wrap items-center justify-between gap-3 border-emerald-500/30 bg-emerald-500/5 p-4">
+        <p className="text-sm">
+          <Sparkles className="mr-1 inline h-4 w-4 text-emerald-600" />
+          <b>See your chances</b> at every university — works for any curriculum (HSC, A-Levels, IB, Gaokao, Abitur…).
+        </p>
+        <Button asChild size="sm" className="bg-emerald-600 text-white hover:bg-emerald-700">
+          <Link to="/evaluate">✨ Evaluate my profile</Link>
+        </Button>
+      </div>
+
       {tab === "featured" ? <FeaturedList initial={search} /> : <CatalogBrowser />}
 
       <LoginNudge text="Want to see which match YOUR profile?" />
