@@ -1,10 +1,13 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { UNIVERSITIES, SCHOLARSHIPS, COUNTRIES, PROGRAMS, WTF_FACTS } from "@/lib/data";
 import { ArrowRight, Search, Sparkles, Zap, Compass, GitCompare, Lightbulb } from "lucide-react";
 import { LogoMark, CrestArt } from "@/components/Logo";
+import { getUniversityCount } from "@/lib/admin-import.functions";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -34,6 +37,9 @@ function Hero() {
   const [country, setCountry] = useState<string>("");
   const [program, setProgram] = useState<string>("");
   const [budget, setBudget] = useState<string>("");
+  const countFn = useServerFn(getUniversityCount);
+  const { data: countData } = useQuery({ queryKey: ["uni-count"], queryFn: () => countFn(), staleTime: 60_000 });
+  const countLabel = countData?.count ? `${countData.count.toLocaleString()}+` : "10,000+";
 
   return (
     <section className="relative overflow-hidden border-b border-border">
@@ -68,7 +74,7 @@ function Hero() {
         </div>
 
         <p className="mt-10 max-w-2xl text-lg leading-relaxed text-foreground/80 md:text-xl">
-          10,000+ real universities. Live scholarships. An AI advisor named <em>Aria</em>.
+          {countLabel} real universities. Live scholarships. An AI advisor named <em>Aria</em>.
           One honest atlas for HSC & A-level students who think consultants are overrated.
         </p>
 

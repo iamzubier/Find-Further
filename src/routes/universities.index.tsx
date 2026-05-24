@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { z } from "zod";
 import { useQuery, keepPreviousData } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -11,6 +12,7 @@ import { UNIVERSITIES, COUNTRIES, PROGRAMS, type University } from "@/lib/data";
 import { matchUniversity } from "@/lib/matching";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/integrations/supabase/client";
+import { getUniversityCount } from "@/lib/admin-import.functions";
 import { toast } from "sonner";
 
 const SearchSchema = z.object({
@@ -42,6 +44,11 @@ const REGIONS = [
 function UniversitiesPage() {
   const search = Route.useSearch();
   const [tab, setTab] = useState<"featured" | "catalog">("catalog");
+  const countFn = useServerFn(getUniversityCount);
+  const { data: countData } = useQuery({
+    queryKey: ["uni-count"], queryFn: () => countFn(), staleTime: 60_000,
+  });
+  const countLabel = countData?.count ? `${countData.count.toLocaleString()}+` : "10,000+";
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-10">
@@ -51,7 +58,7 @@ function UniversitiesPage() {
           <p className="mt-1 text-sm text-muted-foreground">
             {tab === "featured"
               ? "Hand-curated picks with tuition, scholarships & admission hacks."
-              : "10,000+ universities worldwide — EU, UK, US, CA, AU, Asia and beyond."}
+              : `${countLabel} universities worldwide — EU, UK, US, CA, AU, Asia and beyond.`}
           </p>
         </div>
         <div className="inline-flex rounded-lg border border-border bg-card p-1 text-sm">
