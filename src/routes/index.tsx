@@ -12,10 +12,10 @@ import { getUniversityCount } from "@/lib/admin-import.functions";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "BeyondBorder — Find your best deal abroad" },
-      { name: "description", content: "Hidden tuition-free unis, scholarships, AI advisor — for Bangladeshi students who think consultants are overrated." },
-      { property: "og:title", content: "BeyondBorder — Find your best deal abroad" },
-      { property: "og:description", content: "Hidden tuition-free unis, scholarships, AI advisor for Bangladeshi students." },
+      { title: "BeyondBorder — Find your university. Know your chances. Get in." },
+      { name: "description", content: "Find your path to the world's best universities. Live tuition, scholarships, an AI advisor, and real student tips — for students worldwide." },
+      { property: "og:title", content: "BeyondBorder — Find your university. Know your chances. Get in." },
+      { property: "og:description", content: "Find your path to the world's best universities. For students worldwide." },
     ],
   }),
   component: HomePage,
@@ -43,39 +43,37 @@ function Hero() {
 
   return (
     <section className="relative overflow-hidden border-b border-border">
-      {/* Wallpaper of crests + soft wash */}
-      <div className="absolute inset-0 -z-10" aria-hidden style={{
-        background: "radial-gradient(70% 60% at 50% 0%, color-mix(in oklab, var(--color-background) 40%, transparent), var(--color-background) 80%)",
-      }} />
-      {/* Giant decorative crests */}
-      <CrestArt variant="a" className="pointer-events-none absolute -left-16 top-10 hidden h-[26rem] w-[26rem] text-foreground/[0.06] md:block" />
-      <CrestArt variant="b" className="pointer-events-none absolute -right-20 top-24 hidden h-[28rem] w-[28rem] text-foreground/[0.07] md:block" />
-      <CrestArt variant="c" className="pointer-events-none absolute right-10 bottom-4 h-44 w-44 text-foreground/10" />
-      <div className="absolute inset-x-0 bottom-0 -z-10 h-32 bg-gradient-to-b from-transparent to-background" aria-hidden />
+      {/* Campus photo background */}
+      <div
+        className="absolute inset-0 -z-10 bg-cover bg-center"
+        aria-hidden
+        style={{ backgroundImage: "url('https://images.unsplash.com/photo-1562774053-701939374585?w=1920&q=80')" }}
+      />
+      <div className="absolute inset-0 -z-10 bg-gradient-to-b from-black/70 via-black/55 to-black/85" aria-hidden />
+      <CrestArt variant="c" className="pointer-events-none absolute right-10 bottom-4 h-44 w-44 text-white/10" />
 
       <div className="relative mx-auto max-w-6xl px-4 pb-16 pt-16 md:pt-24">
-        {/* Big crest mark above the headline */}
-        <LogoMark className="mb-6 h-14 w-14 text-foreground" />
+        <LogoMark className="mb-6 h-14 w-14 text-white" />
 
-        <div className="inline-flex items-center gap-2 border-y border-foreground/80 px-3 py-1 text-[11px] uppercase tracking-[0.22em] text-foreground">
-          <Zap className="h-3 w-3" /> A field guide for Bangladeshi students · est. MMXXVI
+        <div className="inline-flex items-center gap-2 border-y border-white/80 px-3 py-1 text-[11px] uppercase tracking-[0.22em] text-white">
+          <Zap className="h-3 w-3" /> A field guide for students worldwide · est. MMXXVI
         </div>
 
-        <h1 className="mt-7 max-w-5xl font-heading text-[3.2rem] font-bold leading-[1] tracking-tight md:text-[6.5rem]">
-          Find your <em className="font-medium not-italic italic">best deal</em>
+        <h1 className="mt-7 max-w-5xl font-heading text-[3.2rem] font-bold leading-[1] tracking-tight text-white md:text-[6.5rem]">
+          Find your <em className="font-medium not-italic italic">university.</em>
           <br />
-          <span className="text-foreground/55">abroad.</span>
+          <span className="text-white/70">Know your chances. Get in.</span>
         </h1>
 
-        <div className="mt-6 flex items-center gap-4 text-[11px] uppercase tracking-[0.25em] text-muted-foreground">
+        <div className="mt-6 flex items-center gap-4 text-[11px] uppercase tracking-[0.25em] text-white/70">
           <span>Vol. II</span>
-          <span className="h-px flex-1 bg-foreground/30" />
+          <span className="h-px flex-1 bg-white/30" />
           <span>{new Date().toLocaleDateString("en-US", { month: "long", year: "numeric" })}</span>
         </div>
 
-        <p className="mt-10 max-w-2xl text-lg leading-relaxed text-foreground/80 md:text-xl">
+        <p className="mt-10 max-w-2xl text-lg leading-relaxed text-white/85 md:text-xl">
           {countLabel} real universities. Live scholarships. An AI advisor named <em>Aria</em>.
-          One honest atlas for HSC & A-level students who think consultants are overrated.
+          One honest atlas for students applying to the world's best universities.
         </p>
 
         <div className="card-surface mt-10 p-3 md:p-4 shadow-[0_1px_0_0_var(--color-border),0_18px_40px_-24px_rgba(0,0,0,0.18)]">
@@ -204,7 +202,7 @@ function WtfSection() {
           <h2 className="font-heading text-3xl font-extrabold md:text-5xl">
             Wait… you didn't know this? <span>🤯</span>
           </h2>
-          <p className="mt-2 text-muted-foreground">Shocking facts BD students assume aren't possible.</p>
+          <p className="mt-2 text-muted-foreground">Shocking facts most international students assume aren't possible.</p>
         </div>
         <div className="hidden gap-1 md:flex">
           {WTF_FACTS.map((_, i) => (
