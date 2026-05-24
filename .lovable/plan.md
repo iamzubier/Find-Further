@@ -1,100 +1,111 @@
+## What you're getting
 
-# BeyondBorder v2 — "One Umbrella" Plan
+A full **per-university detail page system** at `/universities/[slug]` for 30 seed universities (MIT, Harvard, Stanford, Oxford, Cambridge, ETH, TU Munich, UCL, Imperial, Edinburgh, Toronto, McGill, Waterloo, UBC, Melbourne, Sydney, Amsterdam, TU Delft, KTH, Uppsala, Helsinki, Aalto, Oslo, Politecnico Milano, Sapienza, NUS, SNU, KAIST, U Tokyo, Waseda).
 
-Build a thin end-to-end version of all three pillars (bigger directory + compare, hacks system, profile-matching engine) on top of what's shipped. Honest about data sources — no faking real Reddit links.
+Each page has 6 sticky tabs, a campus hero, logos from Clearbit, sticky match/compare/save sidebar, deadline countdown, and a community tips system pulling from Reddit/Quora/YouTube-style entries.
 
----
-
-## 1. Massive university directory
-
-**Data source:** Import the open **Hipolabs universities dataset** (~10k unis worldwide, with name, country, web pages, domains — free, no API key). Filter to BD-relevant target regions: EU, US, UK, Canada, Australia, key Asia (Singapore, Japan, Malaysia, HK, South Korea).
-
-- New table `universities_catalog` (id, name, country, region, website, domains, qs_rank nullable, has_curated_data bool).
-- Seed via a migration that ingests the dataset (~5–8k rows after filtering).
-- Existing hand-curated 13 unis stay as "featured/curated" — flagged `has_curated_data = true` with rich tuition/deadline/dealTag/blurb data.
-- Universities list page: paginated, infinite-scroll, search by name+country, filter by region/program (program filter only applies to curated entries in v1).
-
-## 2. University detail page (`/universities/$id`)
-
-The hook lives here. Sections in order:
-1. **Header** — name, country flag, QS rank, "curated" or "community" badge.
-2. **Quick facts** — tuition, deadline, deal tag (curated unis only; for non-curated, show "Help us add this — verified data coming soon" + link to official site).
-3. **Your match** (logged in only) — score + Reach / Match / Safety verdict + 3 reasons. See Pillar 3.
-4. **Admission hacks & tricks** — hybrid:
-   - For curated/top unis: a small `university_hacks` table with hand-added entries `{ hack_text, source_url, source_type: 'reddit'|'quora'|'official'|'youtube' }`, rendered with the platform's logo icon next to each link.
-   - For others: a "Generate AI insights" button — calls a new `getUniHacks` server function that uses Lovable AI (gemini-3-flash-preview) to synthesize common community advice, **clearly labeled "AI summary — not direct quotes"**. Cached in a `university_hacks_ai` table after first generation to keep costs down.
-5. **Entrance exams & prep** — if uni requires SAT/ACT/IELTS/TOEFL/uni-specific exam: list each with official syllabus link + "Generate my study plan" button (Aria-powered, uses student's current scores from profile).
-6. **Compare button** — adds uni to a comparison tray (Zustand store, up to 3 unis).
-7. **Save to shortlist** — existing flow.
-
-## 3. Comparison page (`/compare`)
-
-Side-by-side table for up to 3 unis: tuition, deadline, deal tag, min GPA (BD scale + converted), required tests, your match %, scholarships available. Tray persists in localStorage. Inspired by bachelorsportal.
-
-## 4. Profile-matching engine
-
-New `src/lib/matching.ts` — pure function that scores a uni against a profile:
+## Page structure
 
 ```
-score = weighted(
-  gpa_fit (uni.min_gpa vs profile.hsc_gpa, converted),
-  test_fit (SAT/IELTS/TOEFL vs typical bar for that uni's tier),
-  country_fit (profile.countries includes uni.country),
-  program_fit (profile.program in uni.programs),
-  budget_fit (uni.tuition vs profile.budget)
+/universities/mit
+├── HERO: campus photo + dark gradient
+│        ├ Logo (Clearbit) bottom-left
+│        ├ Name, flag, city, QS #, founded year
+├── STICKY TAB BAR ──────────────────────────────┐
+│   Overview │ Admissions │ Tuition │ Programs │ How To Get In │ Exams
+│                                               │
+├── TAB CONTENT ────────────────────┐  ┌────────┤
+│                                   │  │ SIDEBAR (sticky)
+│                                   │  │ ├ Match % (circular)
+│                                   │  │ ├ Save / Compare / Share
+│                                   │  │ ├ Deadline countdown
+│                                   │  │ └ Apply button
+└── FLOATING COMPARE BAR (when ≥1 added)
+```
+
+## Tabs in detail
+
+1. **Overview** — about, key stats row (acceptance, students, intl %, ratio), campus life, alumni, subject rankings, website button, Google Maps embed.
+2. **Admissions** — requirements table with **BD↔US/UK/EU GPA conversion shown inline**, deadlines by intake (Fall/Spring/Winter), step-by-step process, doc checklist, apply link, processing time.
+3. **Tuition & Aid** — tuition tables, living costs, total CoA, fee waivers, scholarship cards, financial aid, work permit rules per country.
+4. **Programs** — programs grouped by faculty with search + faculty filter; each row shows duration, language, tuition.
+5. **How To Get In** — curated community tips with source platform logos (Reddit/Quora/YouTube), upvote counts, tag filter, "Submit a tip" form, disclaimer.
+6. **Entrance Exams** — required exams with score thresholds for THIS uni, registration links, next dates, prep resources, sample paper links.
+
+## Database changes
+
+New tables (`/universities` catalog stays for the directory; new `universities_detail` holds rich page data so we don't bloat the 10k-row catalog):
+
+```sql
+universities_detail (
+  slug text primary key,
+  catalog_id text,              -- joins universities_catalog.id
+  name, country, city, qs_rank, founded_year,
+  acceptance_rate, total_students, international_pct, student_faculty_ratio,
+  about, campus_life, notable_alumni text[], subject_rankings jsonb,
+  logo_url, campus_image_url, official_url, application_url, maps_query,
+  admission_reqs jsonb,         -- {min_gpa_us, ielts, toefl, sat_min, sat_max, act_min, act_max, language}
+  deadlines jsonb,              -- [{intake, deadline, decision}]
+  application_steps text[],
+  required_docs text[],
+  processing_time text,
+  tuition jsonb,                -- {per_year_usd, per_semester, per_credit, currency, display}
+  living_cost_monthly integer,
+  fee_waivers text,
+  scholarships jsonb,           -- [{name, amount, eligibility, deadline, url}]
+  financial_aid text,
+  work_permit text,
+  programs_detail jsonb,        -- [{faculty, name, duration, language, tuition, seats}]
+  exams jsonb                   -- [{name, what_it_tests, score_req, register_url, next_dates, prep_links[], sample_url}]
 )
-→ verdict: 'Safety' (85+) | 'Match' (60–84) | 'Reach' (35–59) | 'Long shot' (<35)
+
+university_tips (
+  id uuid primary key,
+  uni_slug text references universities_detail(slug),
+  tip_text text,
+  source_platform text,         -- reddit | quora | youtube | forum
+  source_url text,
+  source_upvotes integer,
+  tag text,                     -- Academics | ECA | Scholarship | Strategy | CampusLife | FinancialAid
+  posted_at date,
+  verified boolean default false,
+  submitted_by uuid,            -- nullable; user-submitted tips
+  approved boolean default true,
+  created_at timestamptz default now()
+)
 ```
 
-Used on:
-- Dashboard "Best picks" — top 12 across all unis the student qualifies for.
-- Uni detail page header.
-- Universities list — optional "Sort by my match" toggle (logged in only).
+Seeded with the 30 universities + ~6 tips each (180 tips). All RLS-protected (public read, authenticated insert for tips with `approved=false`).
 
-Each match shows 2–3 plain-English reasons ("Your GPA 4.8 ≈ US 3.7 — clears RWTH's 3.5 bar"; "IELTS 7.0 meets the 6.5 minimum").
+## Compare upgrade
 
-## 5. Aria upgrades
+`/compare` page rewritten to show the new richer rows: logo+name, QS, country, acceptance %, tuition, IELTS, GPA (with BD conversion), SAT, scholarships, top programs, intl %, deadline, website. **Best value per row highlighted green.** "Match to my profile" button per column if logged in.
 
-- New server fn `generateStudyPlan({ uniId, exam })` — Aria builds a week-by-week plan from current score → target.
-- New server fn `getUniHacks({ uniId })` — AI synthesis fallback for non-curated unis.
-- Existing chat unchanged.
+The existing floating CompareTray stays; it already supports max 3.
 
-## 6. Schema changes (one migration)
+## GPA conversion utility
 
-```
-universities_catalog  (id, name, country, region, website, qs_rank, has_curated_data, ...)
-university_hacks      (id, uni_id, hack_text, source_url, source_type, upvotes, created_at)  -- curated, RLS read-all
-university_hacks_ai   (id, uni_id, content_md, generated_at)  -- cache, RLS read-all, server writes only
-```
+Already exists at `src/lib/gpa.ts` (`bdToUs`, `bdToUk`, `bdToEcts`). I'll add the **reverse** helper `usToBd(usGpa)` so when a uni says "min 3.5 US", we render: **"3.5 US GPA = BD HSC 4.25+ / 5.0"** automatically everywhere.
 
-RLS: read-public for catalog + hacks tables (no PII); writes only via server fns using service role.
+## Files
 
-## 7. Honest tradeoffs
+**Created**
+- `supabase/migrations/...sql` — two new tables + seed for 30 unis + tips
+- `src/lib/universities-detail.ts` — typed seed data (used to generate migration + as fallback)
+- `src/lib/universities-detail.functions.ts` — server fn to fetch detail + tips by slug
+- `src/lib/tips.functions.ts` — submit-tip server fn (auth-gated)
+- `src/routes/universities.$slug.tsx` — the new detail page (replaces `universities.$uniId.tsx`)
+- `src/components/uni/Hero.tsx`, `TabBar.tsx`, `Sidebar.tsx`, `TipCard.tsx`, `SubmitTipDialog.tsx`, `DeadlineCountdown.tsx`, `MatchRing.tsx`
 
-- **No live Reddit/Quora scraping in v1.** Real cited hacks come from manual curation (top ~30 unis). Everywhere else is AI-synthesized with a visible label. If you later want real live citations, we add the Firecrawl connector — that's a separate decision because it costs per request.
-- The 5–8k imported unis will have **name + country + website only** at first. Tuition/deadlines fill in as you curate them. The catalog still feels "complete" because every uni is searchable and openable.
-- Match scoring is heuristic, not predictive — based on published minimums and tier inference, not admit rates.
+**Modified**
+- `src/routes/universities.tsx` — link to `/universities/<slug>` instead of `/<id>`
+- `src/routes/compare.tsx` — rewrite with richer rows + green-highlight + match button
+- `src/lib/gpa.ts` — add `usToBd()` helper
 
-## 8. File map
+## Out of scope (call out so you can ask if you want them)
 
-```
-supabase/migrations/<new>.sql          -- 3 new tables + RLS + seed loader function
-scripts/seed-universities.ts           -- one-off Hipolabs → DB import (run once via psql)
-src/lib/matching.ts                    -- scoring engine
-src/lib/uni-catalog.functions.ts       -- listCatalog, getUni, getCompareData
-src/lib/hacks.functions.ts             -- getCuratedHacks, generateAiHacks
-src/lib/exam-plan.functions.ts         -- generateStudyPlan
-src/routes/universities.tsx            -- rewrite for paginated catalog + match sort
-src/routes/universities.$id.tsx        -- NEW detail page
-src/routes/compare.tsx                 -- NEW comparison page
-src/components/MatchBadge.tsx          -- Reach/Match/Safety pill
-src/components/HackCard.tsx            -- hack + source-platform icon
-src/components/CompareTray.tsx         -- floating "compare 2/3" tray
-src/lib/compare-store.ts               -- Zustand store
-```
+- Live Reddit/Quora scraping — tips are seeded as realistic examples per uni. Real scraping needs API keys + scheduled jobs; tell me if you want that added.
+- Clearbit logos and Unsplash photos use direct URLs at runtime (no API key needed for Clearbit's free logo endpoint). If a logo 404s we fall back to a monogram.
+- The 10k catalog directory keeps working unchanged. Only the 30 seeded unis get rich detail pages; clicking any other catalog uni shows a "Rich page coming soon — basic info + outbound link" stub (so we don't break the directory).
 
-## 9. What ships this turn
-
-All of the above as a working lightweight v1. The 5k+ uni import + 30-uni hack curation set + the matching engine + detail page + compare page + AI study plan button. No Firecrawl, no live scraping, no exam-question bank — those are v2.
-
-Ready to build?
+Approve and I'll ship it in one pass.
