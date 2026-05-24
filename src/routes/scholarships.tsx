@@ -18,10 +18,18 @@ export const Route = createFileRoute("/scholarships")({
   component: ScholarshipsPage,
 });
 
+const LEVELS = [
+  { value: "undergraduate", label: "Undergraduate" },
+  { value: "postgraduate", label: "Master's" },
+  { value: "phd", label: "PhD" },
+  { value: "all", label: "All levels" },
+] as const;
+
 function ScholarshipsPage() {
   const [q, setQ] = useState("");
   const [country, setCountry] = useState<string>("all");
   const [type, setType] = useState<string>("all");
+  const [level, setLevel] = useState<string>("undergraduate");
 
   const sorted = useMemo(() => {
     return [...SCHOLARSHIPS].sort((a, b) => +new Date(a.deadline) - +new Date(b.deadline));
@@ -29,12 +37,13 @@ function ScholarshipsPage() {
 
   const filtered = useMemo(() => {
     return sorted.filter((s) => {
+      if (level !== "any" && s.level !== level && s.level !== "all") return false;
       if (country !== "all" && s.country !== country) return false;
       if (type !== "all" && s.type !== type) return false;
       if (q && !s.name.toLowerCase().includes(q.toLowerCase())) return false;
       return true;
     });
-  }, [sorted, country, type, q]);
+  }, [sorted, country, type, q, level]);
 
   const closingSoon = filtered.filter((s) => daysLeft(s.deadline) <= 30 && daysLeft(s.deadline) >= 0);
   const countries = Array.from(new Set(SCHOLARSHIPS.map((s) => s.country)));
@@ -43,6 +52,25 @@ function ScholarshipsPage() {
     <div className="mx-auto max-w-6xl px-4 py-10">
       <h1 className="font-heading text-4xl font-extrabold md:text-5xl">Scholarships</h1>
       <p className="mt-1 text-sm text-muted-foreground">{filtered.length} live · sorted by deadline</p>
+
+      {/* Degree level — primary filter */}
+      <div className="mt-6 inline-flex flex-wrap rounded-lg border border-border bg-card p-1 text-sm">
+        {LEVELS.map((l) => (
+          <button
+            key={l.value}
+            onClick={() => setLevel(l.value)}
+            className={`rounded-md px-3 py-1.5 ${level === l.value ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground"}`}
+          >
+            {l.label}
+          </button>
+        ))}
+        <button
+          onClick={() => setLevel("any")}
+          className={`rounded-md px-3 py-1.5 ${level === "any" ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground"}`}
+        >
+          Any
+        </button>
+      </div>
 
       {closingSoon.length > 0 && (
         <div className="mt-6 flex items-start gap-3 rounded-2xl border border-destructive/40 bg-destructive/10 p-4">
@@ -74,14 +102,27 @@ function ScholarshipsPage() {
         </Select>
       </div>
 
-      <div className="mt-6 grid gap-3">
-        {filtered.map((s) => <ScholarshipCard key={s.id} s={s} />)}
-      </div>
+      {filtered.length === 0 ? (
+        <div className="card-surface mt-6 p-10 text-center text-sm text-muted-foreground">
+          No scholarships match those filters. Try switching to <b>Any</b> level.
+        </div>
+      ) : (
+        <div className="mt-6 grid gap-3">
+          {filtered.map((s) => <ScholarshipCard key={s.id} s={s} />)}
+        </div>
+      )}
 
       <LoginNudge text="Which of these are you actually eligible for?" />
     </div>
   );
 }
+
+const LEVEL_BADGE: Record<string, { label: string; cls: string }> = {
+  undergraduate: { label: "Bachelor's", cls: "bg-emerald-500/15 text-emerald-700 ring-emerald-500/30 dark:text-emerald-300" },
+  postgraduate:  { label: "Master's",   cls: "bg-blue-500/15 text-blue-700 ring-blue-500/30 dark:text-blue-300" },
+  phd:           { label: "PhD",        cls: "bg-purple-500/15 text-purple-700 ring-purple-500/30 dark:text-purple-300" },
+  all:           { label: "All levels", cls: "bg-amber-500/15 text-amber-700 ring-amber-500/30 dark:text-amber-300" },
+};
 
 export function ScholarshipCard({ s }: { s: Scholarship }) {
   const [open, setOpen] = useState(false);
@@ -92,6 +133,7 @@ export function ScholarshipCard({ s }: { s: Scholarship }) {
     d <= 10 ? "bg-destructive/20 text-destructive ring-1 ring-destructive/40" :
     d <= 30 ? "bg-warning/20 text-warning ring-1 ring-warning/40" :
     "bg-secondary text-muted-foreground";
+  const lvl = LEVEL_BADGE[s.level] ?? LEVEL_BADGE.all;
 
   const save = async () => {
     if (!user) { toast.error("Log in to save scholarships"); return; }
@@ -110,6 +152,7 @@ export function ScholarshipCard({ s }: { s: Scholarship }) {
           <div>
             <h3 className="font-heading text-lg font-extrabold">{s.name}</h3>
             <div className="mt-1 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+              <span className={`rounded-full px-2 py-0.5 text-[11px] font-semibold ring-1 ${lvl.cls}`}>{lvl.label}</span>
               <span>{s.country}</span><span>·</span>
               <span className="rounded-full bg-secondary px-2 py-0.5">{s.type}</span>
             </div>
@@ -128,8 +171,8 @@ export function ScholarshipCard({ s }: { s: Scholarship }) {
           <p className="text-sm text-foreground/85">{s.description}</p>
           <div className="mt-4 grid gap-3 text-sm md:grid-cols-4">
             <Stat label="Amount" value={s.amount} />
+            <Stat label="Level" value={lvl.label} />
             <Stat label="Type" value={s.type} />
-            <Stat label="Min GPA (BD)" value={s.minGpa ? `${s.minGpa.toFixed(1)} / 5.0` : "—"} />
             <Stat label="Deadline" value={new Date(s.deadline).toLocaleDateString()} />
           </div>
           <div className="mt-5 flex flex-wrap gap-2">
