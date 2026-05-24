@@ -1,10 +1,10 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { UNIVERSITIES, SCHOLARSHIPS, COUNTRIES, PROGRAMS, WTF_FACTS } from "@/lib/data";
-import { ArrowRight, Search, Sparkles, Zap } from "lucide-react";
+import { ArrowRight, Search, Sparkles, Zap, Compass, GitCompare, Lightbulb } from "lucide-react";
+import { LogoMark, CrestArt } from "@/components/Logo";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -22,6 +22,7 @@ function HomePage() {
   return (
     <div>
       <Hero />
+      <FeatureTrio />
       <Stats />
       <WtfSection />
       <CtaStrip />
