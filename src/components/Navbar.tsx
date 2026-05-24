@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Menu, X, Sparkles } from "lucide-react";
 import { useState } from "react";
+import { Logo } from "@/components/Logo";
 
 export function Navbar({ profileStrength }: { profileStrength?: number }) {
   const { user, loading } = useAuth();
@@ -14,10 +15,8 @@ export function Navbar({ profileStrength }: { profileStrength?: number }) {
   return (
     <header className="sticky top-0 z-50 border-b border-border bg-background/85 backdrop-blur-md">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4">
-        <Link to="/" className="flex items-center gap-2 font-heading text-xl font-extrabold tracking-tight">
-          <span className="inline-block h-2.5 w-2.5 rounded-full bg-primary glow-green" />
-          BeyondBorder
-        </Link>
+        <Logo />
+
 
         <nav className="hidden items-center gap-7 md:flex">
           <Link to="/universities" className={linkClass}>Universities</Link>
