@@ -190,13 +190,27 @@ function GpaLine({ usGpa }: { usGpa: number }) {
   return <span className="text-xs text-muted-foreground">= BD HSC {bd.toFixed(2)}+ / 5.0</span>;
 }
 
+function StudentSystemLine({ usGpa, evalSum }: { usGpa: number; evalSum: EvalSummary }) {
+  const inStudent = requirementInStudentSystem(usGpa, evalSum.curriculum);
+  const ok = evalSum.converted.us4 >= usGpa;
+  return (
+    <span className={`ml-2 inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-semibold ring-1 ${ok ? "bg-emerald-500/10 text-emerald-700 ring-emerald-500/30" : "bg-rose-500/10 text-rose-700 ring-rose-500/30"}`}>
+      = {inStudent} in your {CURRICULUMS[evalSum.curriculum].scale} {ok ? "✓" : "✗"}
+    </span>
+  );
+}
+
 function Admissions({ uni }: any) {
   const r = uni.admission_reqs ?? {};
+  const evalSum = useMemo(() => loadEvalSummary(), []);
+  const ieltsOk = evalSum?.tests.ielts && r.ielts ? evalSum.tests.ielts >= r.ielts : null;
+  const toeflOk = evalSum?.tests.toefl && r.toefl ? evalSum.tests.toefl >= r.toefl : null;
+  const satOk = evalSum?.tests.sat && r.sat_min ? evalSum.tests.sat >= r.sat_min : null;
   const rows = [
-    { label: "Minimum GPA (US 4.0 scale)", value: r.min_gpa_us ? `${r.min_gpa_us}` : "—", extra: r.min_gpa_us ? <GpaLine usGpa={r.min_gpa_us} /> : null },
-    { label: "IELTS Academic", value: r.ielts ? `${r.ielts}+` : "—" },
-    { label: "TOEFL iBT", value: r.toefl ? `${r.toefl}+` : "—" },
-    { label: "SAT range", value: (r.sat_min && r.sat_max) ? `${r.sat_min} – ${r.sat_max}` : "—" },
+    { label: "Minimum GPA (US 4.0 scale)", value: r.min_gpa_us ? `${r.min_gpa_us}` : "—", extra: r.min_gpa_us ? (<><GpaLine usGpa={r.min_gpa_us} />{evalSum && <StudentSystemLine usGpa={r.min_gpa_us} evalSum={evalSum} />}</>) : null },
+    { label: "IELTS Academic", value: r.ielts ? `${r.ielts}+` : "—", extra: ieltsOk !== null ? <YourScore ok={ieltsOk} mine={`yours ${evalSum!.tests.ielts}`} /> : null },
+    { label: "TOEFL iBT", value: r.toefl ? `${r.toefl}+` : "—", extra: toeflOk !== null ? <YourScore ok={toeflOk} mine={`yours ${evalSum!.tests.toefl}`} /> : null },
+    { label: "SAT range", value: (r.sat_min && r.sat_max) ? `${r.sat_min} – ${r.sat_max}` : "—", extra: satOk !== null ? <YourScore ok={satOk} mine={`yours ${evalSum!.tests.sat}`} /> : null },
     { label: "ACT range", value: (r.act_min && r.act_max) ? `${r.act_min} – ${r.act_max}` : "—" },
     { label: "Language of Instruction", value: r.language ?? "—" },
   ];
