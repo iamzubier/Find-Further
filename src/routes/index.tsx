@@ -116,7 +116,7 @@ function FeatureTrio() {
       body: "Browse 10,000+ universities worldwide — filter by region, country, program, and tuition.",
       cta: "Open the atlas",
       to: "/universities" as const,
-      image: "https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=1200&q=80",
+      image: "https://images.unsplash.com/photo-1524661135-423995f22d0b?w=1200&q=80",
     },
     {
       icon: GitCompare,
