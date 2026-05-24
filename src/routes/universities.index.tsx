@@ -25,7 +25,7 @@ export const Route = createFileRoute("/universities/")({
   validateSearch: (s) => SearchSchema.parse(s),
   head: () => ({ meta: [
     { title: "Universities — BeyondBorder" },
-    { name: "description", content: "Browse 10,000+ universities worldwide with tuition, scholarships, and admission hacks for BD students." },
+    { name: "description", content: "Browse 10,000+ universities worldwide with tuition, scholarships, and real admission tips from students." },
   ]}),
   component: UniversitiesPage,
 });
