@@ -51,9 +51,9 @@ const UniversitiesIndexRoute = UniversitiesIndexRouteImport.update({
   getParentRoute: () => rootRouteImport,
 } as any)
 const UniversitiesSlugRoute = UniversitiesSlugRouteImport.update({
-  id: '/$slug',
-  path: '/$slug',
-  getParentRoute: () => UniversitiesRoute,
+  id: '/universities/$slug',
+  path: '/universities/$slug',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedShortlistRoute = AuthenticatedShortlistRouteImport.update({
   id: '/shortlist',
@@ -160,6 +160,7 @@ export interface RootRouteChildren {
   AuthRoute: typeof AuthRoute
   CompareRoute: typeof CompareRoute
   ScholarshipsRoute: typeof ScholarshipsRoute
+  UniversitiesSlugRoute: typeof UniversitiesSlugRoute
   UniversitiesIndexRoute: typeof UniversitiesIndexRoute
 }
 
@@ -209,10 +210,10 @@ declare module '@tanstack/react-router' {
     }
     '/universities/$slug': {
       id: '/universities/$slug'
-      path: '/$slug'
+      path: '/universities/$slug'
       fullPath: '/universities/$slug'
       preLoaderRoute: typeof UniversitiesSlugRouteImport
-      parentRoute: typeof UniversitiesRoute
+      parentRoute: typeof rootRouteImport
     }
     '/_authenticated/shortlist': {
       id: '/_authenticated/shortlist'
@@ -269,18 +270,9 @@ const rootRouteChildren: RootRouteChildren = {
   AuthRoute: AuthRoute,
   CompareRoute: CompareRoute,
   ScholarshipsRoute: ScholarshipsRoute,
+  UniversitiesSlugRoute: UniversitiesSlugRoute,
   UniversitiesIndexRoute: UniversitiesIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
