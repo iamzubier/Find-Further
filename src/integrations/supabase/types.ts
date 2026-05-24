@@ -14,6 +14,66 @@ export type Database = {
   }
   public: {
     Tables: {
+      evaluations: {
+        Row: {
+          budget: string | null
+          created_at: string
+          curriculum_type: string
+          eca_text: string | null
+          grades_converted: Json
+          grades_raw: Json
+          home_country: string
+          id: string
+          intake: string | null
+          intended_major: string | null
+          last_evaluated: string
+          profile_score: number
+          scholarship_need: string | null
+          score_breakdown: Json
+          target_countries: string[]
+          test_scores: Json
+          user_id: string | null
+        }
+        Insert: {
+          budget?: string | null
+          created_at?: string
+          curriculum_type: string
+          eca_text?: string | null
+          grades_converted?: Json
+          grades_raw?: Json
+          home_country: string
+          id?: string
+          intake?: string | null
+          intended_major?: string | null
+          last_evaluated?: string
+          profile_score?: number
+          scholarship_need?: string | null
+          score_breakdown?: Json
+          target_countries?: string[]
+          test_scores?: Json
+          user_id?: string | null
+        }
+        Update: {
+          budget?: string | null
+          created_at?: string
+          curriculum_type?: string
+          eca_text?: string | null
+          grades_converted?: Json
+          grades_raw?: Json
+          home_country?: string
+          id?: string
+          intake?: string | null
+          intended_major?: string | null
+          last_evaluated?: string
+          profile_score?: number
+          scholarship_need?: string | null
+          score_breakdown?: Json
+          target_countries?: string[]
+          test_scores?: Json
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           act: number | null

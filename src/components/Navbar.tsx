@@ -19,6 +19,12 @@ export function Navbar({ profileStrength }: { profileStrength?: number }) {
 
 
         <nav className="hidden items-center gap-7 md:flex">
+          <Link
+            to="/evaluate"
+            className="rounded-full bg-emerald-500/15 px-3 py-1 text-sm font-semibold text-emerald-700 ring-1 ring-emerald-500/30 transition hover:bg-emerald-500/25"
+          >
+            ✨ Evaluate My Profile
+          </Link>
           <Link to="/universities" className={linkClass}>Universities</Link>
           <Link to="/scholarships" className={linkClass}>Scholarships</Link>
           <Link to="/compare" className={linkClass}>Compare</Link>
@@ -27,6 +33,7 @@ export function Navbar({ profileStrength }: { profileStrength?: number }) {
           {user && <Link to="/ask-ai" className={linkClass}>Ask Aria</Link>}
           {user && <Link to="/shortlist" className={linkClass}>Saved</Link>}
         </nav>
+
 
         <div className="hidden items-center gap-3 md:flex">
           {typeof profileStrength === "number" && user && (
@@ -59,7 +66,9 @@ export function Navbar({ profileStrength }: { profileStrength?: number }) {
       {open && (
         <div className="border-t border-border bg-background md:hidden">
           <div className="mx-auto flex max-w-7xl flex-col gap-3 px-4 py-4">
+            <Link to="/evaluate" className="rounded-md bg-emerald-500/15 px-2 py-1 text-sm font-semibold text-emerald-700" onClick={() => setOpen(false)}>✨ Evaluate My Profile</Link>
             <Link to="/universities" className={linkClass} onClick={() => setOpen(false)}>Universities</Link>
+
             <Link to="/scholarships" className={linkClass} onClick={() => setOpen(false)}>Scholarships</Link>
             {user && <Link to="/dashboard" className={linkClass} onClick={() => setOpen(false)}>Dashboard</Link>}
             {user && <Link to="/profile" className={linkClass} onClick={() => setOpen(false)}>Profile</Link>}
