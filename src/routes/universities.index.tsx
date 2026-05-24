@@ -44,6 +44,11 @@ const REGIONS = [
 function UniversitiesPage() {
   const search = Route.useSearch();
   const [tab, setTab] = useState<"featured" | "catalog">("catalog");
+  const countFn = useServerFn(getUniversityCount);
+  const { data: countData } = useQuery({
+    queryKey: ["uni-count"], queryFn: () => countFn(), staleTime: 60_000,
+  });
+  const countLabel = countData?.count ? `${countData.count.toLocaleString()}+` : "10,000+";
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-10">
@@ -53,7 +58,7 @@ function UniversitiesPage() {
           <p className="mt-1 text-sm text-muted-foreground">
             {tab === "featured"
               ? "Hand-curated picks with tuition, scholarships & admission hacks."
-              : "10,000+ universities worldwide — EU, UK, US, CA, AU, Asia and beyond."}
+              : `${countLabel} universities worldwide — EU, UK, US, CA, AU, Asia and beyond.`}
           </p>
         </div>
         <div className="inline-flex rounded-lg border border-border bg-card p-1 text-sm">
