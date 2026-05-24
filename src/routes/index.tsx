@@ -125,7 +125,7 @@ function FeatureTrio() {
       body: "Stack up to 3 universities side by side — tuition, acceptance, scholarships, deadlines.",
       cta: "Start a comparison",
       to: "/compare" as const,
-      image: "https://images.unsplash.com/photo-1498243691581-b145c3f54a5a?w=1200&q=80",
+      image: "https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=1200&q=80",
     },
     {
       icon: Lightbulb,
