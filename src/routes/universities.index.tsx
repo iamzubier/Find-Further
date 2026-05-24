@@ -19,7 +19,7 @@ const SearchSchema = z.object({
   q: z.string().optional(),
 });
 
-export const Route = createFileRoute("/universities")({
+export const Route = createFileRoute("/universities/")({
   validateSearch: (s) => SearchSchema.parse(s),
   head: () => ({ meta: [
     { title: "Universities — BeyondBorder" },
