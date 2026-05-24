@@ -13,7 +13,7 @@ import { LoginNudge } from "./universities.index";
 export const Route = createFileRoute("/scholarships")({
   head: () => ({ meta: [
     { title: "Scholarships — BeyondBorder" },
-    { name: "description", content: "Live international scholarships sorted by deadline. Built for BD students." },
+    { name: "description", content: "Live international scholarships sorted by deadline. For students worldwide." },
   ]}),
   component: ScholarshipsPage,
 });

@@ -8,7 +8,7 @@ export function Footer() {
         <div>
           <Logo />
           <p className="mt-3 text-sm text-muted-foreground">
-            Built for Bangladeshi students who think consultants are overrated.
+            Find your path to the world's best universities.
           </p>
         </div>
         <div>
@@ -16,7 +16,7 @@ export function Footer() {
           <ul className="space-y-2 text-sm text-muted-foreground">
             <li><Link to="/universities" className="hover:text-primary">Universities</Link></li>
             <li><Link to="/scholarships" className="hover:text-primary">Scholarships</Link></li>
-            <li><Link to="/" className="hover:text-primary">WTF moments</Link></li>
+            <li><Link to="/evaluate" className="hover:text-primary">Evaluate my profile</Link></li>
           </ul>
         </div>
         <div>
@@ -28,9 +28,9 @@ export function Footer() {
           </ul>
         </div>
         <div>
-          <h4 className="mb-3 font-heading text-sm font-bold uppercase tracking-wide text-foreground">Built in BD</h4>
+          <h4 className="mb-3 font-heading text-sm font-bold uppercase tracking-wide text-foreground">Global</h4>
           <p className="text-sm text-muted-foreground">
-            Made with 🇧🇩 for HSC and A-level students. 100% free, no shady commissions.
+            For students from any country, applying to any university worldwide. Free. No commissions.
           </p>
         </div>
       </div>

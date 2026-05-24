@@ -23,8 +23,8 @@ export const generateAiHacks = createServerFn({ method: "POST" })
     const apiKey = process.env.LOVABLE_API_KEY;
     if (!apiKey) return { content: "AI is not configured.", cached: false as const, error: "no_api_key" };
 
-    const prompt = `You are advising a Bangladeshi undergraduate applicant about ${data.uniName} in ${data.country}.
-Generate 5–7 concrete admission tips, hacks, or insider knowledge that commonly appears on Reddit (r/ApplyingToCollege, country subs), Quora, and student forums. Focus on what BD students specifically need to know.
+    const prompt = `You are advising an international undergraduate applicant about ${data.uniName} in ${data.country}.
+Generate 5–7 concrete admission tips, hacks, or insider knowledge that commonly appears on Reddit (r/ApplyingToCollege, country subs), Quora, and student forums. Focus on what international students from any country need to know.
 
 Format as a markdown bullet list. Each bullet:
 - One specific actionable tip
@@ -69,7 +69,7 @@ export const generateStudyPlan = createServerFn({ method: "POST" })
     const apiKey = process.env.LOVABLE_API_KEY;
     if (!apiKey) return { plan: "AI is not configured.", error: "no_api_key" };
 
-    const prompt = `Create a ${data.weeks}-week ${data.exam} prep plan for a Bangladeshi student targeting ${data.uniName}.
+    const prompt = `Create a ${data.weeks}-week ${data.exam} prep plan for an international student targeting ${data.uniName}.
 Current score: ${data.currentScore || "not provided"}. Target score: ${data.targetScore || "competitive for this uni"}.
 
 Format as markdown:
