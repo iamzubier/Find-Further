@@ -122,7 +122,7 @@ function RootComponent() {
           <Footer />
         </div>
         <CompareTray />
-        <Toaster theme="dark" />
+        <Toaster theme="light" />
 
       </AuthProvider>
     </QueryClientProvider>
