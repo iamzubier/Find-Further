@@ -37,6 +37,9 @@ function Hero() {
   const [country, setCountry] = useState<string>("");
   const [program, setProgram] = useState<string>("");
   const [budget, setBudget] = useState<string>("");
+  const countFn = useServerFn(getUniversityCount);
+  const { data: countData } = useQuery({ queryKey: ["uni-count"], queryFn: () => countFn(), staleTime: 60_000 });
+  const countLabel = countData?.count ? `${countData.count.toLocaleString()}+` : "10,000+";
 
   return (
     <section className="relative overflow-hidden border-b border-border">
