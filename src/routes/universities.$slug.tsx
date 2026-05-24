@@ -668,9 +668,19 @@ function Sidebar({ uni }: any) {
   };
   const addCmp = () => {
     if (inCompare) return toast.info("Already in compare");
-    if (!add(uni.slug)) toast.error("Compare full (max 3)");
+    const ok = add({
+      slug: uni.slug,
+      name: uni.name,
+      country: uni.country,
+      countryFlag: uni.country_flag,
+      qsRank: uni.qs_rank,
+      logoUrl: uni.logo_url,
+      imageUrl: uni.campus_image_url,
+    });
+    if (!ok) toast.error("Compare full (max 3)");
     else toast.success("Added to compare");
   };
+
   const share = async () => {
     try { await navigator.share({ title: uni.name, url: window.location.href }); }
     catch { await navigator.clipboard.writeText(window.location.href); toast.success("Link copied"); }
