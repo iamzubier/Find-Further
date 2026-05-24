@@ -376,75 +376,204 @@ function Programs({ uni }: any) {
   );
 }
 
-const PLATFORM_BADGES: Record<string, { label: string; class: string; emoji: string }> = {
-  reddit:   { label: "Reddit",  class: "bg-orange-500/15 text-orange-700 ring-orange-500/30", emoji: "🔶" },
-  quora:    { label: "Quora",   class: "bg-red-500/15 text-red-700 ring-red-500/30",          emoji: "🅀" },
-  youtube:  { label: "YouTube", class: "bg-rose-500/15 text-rose-700 ring-rose-500/30",       emoji: "▶" },
-  forum:    { label: "Forum",   class: "bg-blue-500/15 text-blue-700 ring-blue-500/30",       emoji: "💬" },
-  official: { label: "Official",class: "bg-emerald-500/15 text-emerald-700 ring-emerald-500/30", emoji: "✓" },
+// Brand SVG logos for source platforms.
+function RedditLogo({ className = "h-5 w-5" }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 20 20" className={className} aria-hidden>
+      <circle cx="10" cy="10" r="10" fill="#FF4500" />
+      <path fill="#fff" d="M16.7 10.2a1.5 1.5 0 00-2.5-1.1c-1-.6-2.2-1-3.6-1.1l.7-2.3 2 .5a1 1 0 101-1.3l-2.5-.6a.3.3 0 00-.4.2l-.9 2.8c-1.4 0-2.7.5-3.7 1.2a1.5 1.5 0 10-1.7 2.5c0 .2-.1.3-.1.5 0 2.2 2.5 4 5.6 4s5.6-1.8 5.6-4l-.1-.5c.4-.3.6-.7.6-1.3zm-9.5.8a.9.9 0 111.8 0 .9.9 0 01-1.8 0zm5.5 2.7c-.7.7-2 .8-2.4.8s-1.7 0-2.4-.8a.3.3 0 010-.4.3.3 0 01.4 0c.4.5 1.4.6 2 .6s1.6-.1 2-.6a.3.3 0 01.4 0 .3.3 0 010 .4zm-.4-1.8a.9.9 0 110-1.8.9.9 0 010 1.8z" />
+    </svg>
+  );
+}
+function QuoraLogo({ className = "h-5 w-5" }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 20 20" className={className} aria-hidden>
+      <circle cx="10" cy="10" r="10" fill="#B92B27" />
+      <path fill="#fff" d="M13.6 14.4c-.5-1-1.1-2-2.4-2-.3 0-.6 0-.8.2l-.5-1c1-.5 2.7-.9 4-.2.9-1 1.3-2.4 1.3-3.9 0-3-2.4-5.4-5.4-5.4S4.4 4.5 4.4 7.5s2.4 5.5 5.4 5.5h.4c.5 1.2 1.4 2.6 3.3 2.6.9 0 1.5-.3 2-.7l-1.9-.5zm-3.8-1.7c-2 0-2.9-2-2.9-5.1s.9-5.2 2.9-5.2 2.9 2 2.9 5.2c0 1.2-.1 2.2-.4 3-.5-.9-1.3-1.7-2.6-1.7-.4 0-.7 0-.9.2l.5 1c.1-.1.2-.1.4-.1.9 0 1.4 1 1.7 1.9-.5.5-1 .8-1.6.8z" />
+    </svg>
+  );
+}
+function YoutubeLogo({ className = "h-5 w-5" }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" className={className} aria-hidden>
+      <rect width="24" height="24" rx="4" fill="#FF0000" />
+      <path fill="#fff" d="M10 8.5v7l6-3.5z" />
+    </svg>
+  );
+}
+function ForumLogo({ className = "h-5 w-5" }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 20 20" className={className} aria-hidden>
+      <circle cx="10" cy="10" r="10" fill="#3B82F6" />
+      <path fill="#fff" d="M5 6h10v6H8l-3 3z" />
+    </svg>
+  );
+}
+function OfficialLogo({ className = "h-5 w-5" }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 20 20" className={className} aria-hidden>
+      <circle cx="10" cy="10" r="10" fill="#10B981" />
+      <path fill="#fff" d="M8.5 13.5L5 10l1.4-1.4 2.1 2.1L13.6 5.6 15 7z" />
+    </svg>
+  );
+}
+
+const PLATFORMS: Record<string, { label: string; Logo: (p: { className?: string }) => JSX.Element }> = {
+  reddit:   { label: "Reddit",   Logo: RedditLogo },
+  quora:    { label: "Quora",    Logo: QuoraLogo },
+  youtube:  { label: "YouTube",  Logo: YoutubeLogo },
+  forum:    { label: "Forum",    Logo: ForumLogo },
+  official: { label: "Official", Logo: OfficialLogo },
 };
-const TAGS = ["All","Academics","ECA","Scholarship","Strategy","CampusLife","FinancialAid"];
+
+const TAG_LABELS: Record<string, string> = {
+  Academics: "Academics", ECA: "ECA", Scholarship: "Scholarship",
+  Strategy: "Application", CampusLife: "Campus Life", FinancialAid: "Financial Aid", Visa: "Visa",
+};
+const TAGS = ["All", "Academics", "ECA", "Scholarship", "Strategy", "CampusLife", "FinancialAid"];
 
 const COUNTRY_NAMES: Record<string, string> = {
   BD: "Bangladesh", IN: "India", PK: "Pakistan", LK: "Sri Lanka", NP: "Nepal",
   CN: "China", NG: "Nigeria", AE: "UAE", MY: "Malaysia",
 };
 
+function prettyDomain(url?: string) {
+  if (!url) return "";
+  try {
+    const u = new URL(url);
+    return (u.hostname + u.pathname).replace(/^www\./, "").replace(/\/$/, "");
+  } catch { return url; }
+}
+
+function TipCard({ t }: { t: any }) {
+  const p = PLATFORMS[t.source_platform] ?? PLATFORMS.forum;
+  const [vote, setVote] = useState<"up" | "down" | null>(null);
+  return (
+    <div className="rounded-xl border border-border bg-card p-5 transition-colors hover:border-primary/40">
+      <div className="flex items-start gap-3">
+        <p.Logo className="mt-0.5 h-6 w-6 shrink-0" />
+        <div className="min-w-0 flex-1">
+          <div className="mb-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-muted-foreground">
+            <span className="font-semibold text-foreground">{p.label}</span>
+            {t.source_url && <>
+              <span>·</span>
+              <a href={t.source_url} target="_blank" rel="noopener noreferrer" className="truncate hover:text-primary hover:underline">
+                {prettyDomain(t.source_url)}
+              </a>
+            </>}
+          </div>
+          <p className="text-sm leading-relaxed text-foreground">{t.tip_text}</p>
+          <div className="mt-3 flex flex-wrap items-center gap-3 text-xs">
+            <span className="rounded-full bg-primary/10 px-2.5 py-0.5 font-semibold text-primary ring-1 ring-primary/20">
+              {TAG_LABELS[t.tag] ?? t.tag}
+            </span>
+            {t.source_upvotes > 0 && (
+              <span className="inline-flex items-center gap-1 text-muted-foreground">
+                <ThumbsUp className="h-3 w-3" /> {t.source_upvotes.toLocaleString()} upvotes
+              </span>
+            )}
+            {t.posted_at && <span className="text-muted-foreground">{new Date(t.posted_at).toLocaleDateString()}</span>}
+            <div className="ml-auto flex items-center gap-1.5">
+              <span className="text-muted-foreground">Helpful?</span>
+              <button
+                onClick={() => setVote(vote === "up" ? null : "up")}
+                className={`rounded-md p-1 ring-1 transition ${vote === "up" ? "bg-emerald-500/15 text-emerald-700 ring-emerald-500/30" : "ring-border text-muted-foreground hover:text-foreground"}`}
+                aria-label="Helpful"
+              >👍</button>
+              <button
+                onClick={() => setVote(vote === "down" ? null : "down")}
+                className={`rounded-md p-1 ring-1 transition ${vote === "down" ? "bg-rose-500/15 text-rose-700 ring-rose-500/30" : "ring-border text-muted-foreground hover:text-foreground"}`}
+                aria-label="Not helpful"
+              >👎</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function Tips({ uni, tips }: any) {
   const [tag, setTag] = useState("All");
+  const [platform, setPlatform] = useState<"all" | keyof typeof PLATFORMS>("all");
+  const [sort, setSort] = useState<"upvoted" | "recent">("upvoted");
   const evalSum = useMemo(() => loadEvalSummary(), []);
   const homeCountry = evalSum?.country;
   const homeName = homeCountry ? COUNTRY_NAMES[homeCountry] : null;
   const [onlyMine, setOnlyMine] = useState(false);
   const { user } = useAuth();
-  let filtered = tag === "All" ? tips : tips.filter((t: any) => t.tag === tag);
+
+  let filtered = tips as any[];
+  if (tag !== "All") filtered = filtered.filter(t => t.tag === tag);
+  if (platform !== "all") filtered = filtered.filter(t => t.source_platform === platform);
   if (onlyMine && homeName) {
     const needle = homeName.toLowerCase();
-    filtered = filtered.filter((t: any) =>
+    filtered = filtered.filter(t =>
       t.tip_text?.toLowerCase().includes(needle) ||
       t.source_url?.toLowerCase().includes(needle.replace(/\s+/g, ""))
     );
   }
+  filtered = [...filtered].sort((a, b) => sort === "upvoted"
+    ? (b.source_upvotes ?? 0) - (a.source_upvotes ?? 0)
+    : new Date(b.posted_at ?? b.created_at).getTime() - new Date(a.posted_at ?? a.created_at).getTime()
+  );
+
   return (
-    <>
-      <Card title="Real tips from students and communities 🎯" icon={Lightbulb}>
-        <p className="mb-4 text-sm text-muted-foreground">Curated from Reddit, Quora, YouTube and college forums.</p>
-        <div className="mb-4 flex flex-wrap items-center gap-2">
-          {TAGS.map(t => (
-            <button key={t} onClick={() => setTag(t)}
-              className={`rounded-full px-3 py-1 text-xs font-medium ring-1 ${tag===t ? "bg-primary text-primary-foreground ring-primary" : "bg-secondary text-foreground ring-border"}`}>
-              {t}
-            </button>
-          ))}
-          {homeName && (
-            <button onClick={() => setOnlyMine(v => !v)}
-              className={`rounded-full px-3 py-1 text-xs font-semibold ring-1 ${onlyMine ? "bg-emerald-600 text-white ring-emerald-600" : "bg-emerald-500/10 text-emerald-700 ring-emerald-500/30"}`}>
-              🌍 Tips mentioning {homeName}
-            </button>
-          )}
-          <SubmitTip uniSlug={uni.slug} disabled={!user} />
-        </div>
-        <div className="grid gap-3">
-          {filtered.map((t: any) => {
-            const b = PLATFORM_BADGES[t.source_platform] ?? PLATFORM_BADGES.forum;
-            return (
-              <div key={t.id} className="rounded-lg border border-border p-4">
-                <p className="text-sm leading-relaxed">{t.tip_text}</p>
-                <div className="mt-3 flex flex-wrap items-center gap-2 text-xs">
-                  <span className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 ring-1 ${b.class}`}>{b.emoji} {b.label}</span>
-                  <span className="rounded-full bg-secondary px-2 py-0.5">{t.tag}</span>
-                  {t.source_upvotes > 0 && <span className="inline-flex items-center gap-1 text-muted-foreground"><ThumbsUp className="h-3 w-3" /> {t.source_upvotes.toLocaleString()}</span>}
-                  {t.posted_at && <span className="text-muted-foreground">{new Date(t.posted_at).toLocaleDateString()}</span>}
-                  {t.source_url && <a href={t.source_url} target="_blank" rel="noopener noreferrer" className="ml-auto inline-flex items-center gap-1 text-primary hover:underline">Source <ExternalLink className="h-3 w-3" /></a>}
-                </div>
-              </div>
-            );
-          })}
-          {filtered.length === 0 && <p className="text-sm text-muted-foreground">No tips for this tag yet.</p>}
-        </div>
-        <p className="mt-4 text-xs italic text-muted-foreground">Tips are sourced from public community posts. Always verify with official university sources.</p>
-      </Card>
-    </>
+    <Card title="Real tips from students and communities 🎯" icon={Lightbulb}>
+      <p className="mb-4 text-sm text-muted-foreground">Sourced from Reddit, Quora, YouTube and college forums.</p>
+
+      <div className="mb-3 flex flex-wrap items-center gap-2">
+        {TAGS.map(t => (
+          <button key={t} onClick={() => setTag(t)}
+            className={`rounded-full px-3 py-1 text-xs font-medium ring-1 ${tag === t ? "bg-primary text-primary-foreground ring-primary" : "bg-secondary text-foreground ring-border hover:border-primary/40"}`}>
+            {t === "All" ? "All" : (TAG_LABELS[t] ?? t)}
+          </button>
+        ))}
+      </div>
+
+      <div className="mb-4 flex flex-wrap items-center gap-2 border-t border-border pt-3">
+        <span className="text-xs uppercase tracking-wide text-muted-foreground">Platform</span>
+        {(["all", "reddit", "quora", "youtube", "forum"] as const).map(pk => (
+          <button key={pk} onClick={() => setPlatform(pk)}
+            className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium ring-1 ${platform === pk ? "bg-primary text-primary-foreground ring-primary" : "bg-secondary text-foreground ring-border hover:border-primary/40"}`}>
+            {pk !== "all" && PLATFORMS[pk] && <PLATFORMS[pk].Logo className="h-3.5 w-3.5" />}
+            {pk === "all" ? "All sources" : PLATFORMS[pk].label}
+          </button>
+        ))}
+
+        <span className="ml-auto text-xs uppercase tracking-wide text-muted-foreground">Sort</span>
+        <Select value={sort} onValueChange={(v) => setSort(v as any)}>
+          <SelectTrigger className="h-8 w-[170px] text-xs"><SelectValue /></SelectTrigger>
+          <SelectContent>
+            <SelectItem value="upvoted">Most upvoted</SelectItem>
+            <SelectItem value="recent">Most recent</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+
+      <div className="mb-4 flex flex-wrap items-center gap-2">
+        {homeName && (
+          <button onClick={() => setOnlyMine(v => !v)}
+            className={`rounded-full px-3 py-1 text-xs font-semibold ring-1 ${onlyMine ? "bg-emerald-600 text-white ring-emerald-600" : "bg-emerald-500/10 text-emerald-700 ring-emerald-500/30"}`}>
+            🌍 Mentioning {homeName}
+          </button>
+        )}
+        <SubmitTip uniSlug={uni.slug} disabled={!user} />
+      </div>
+
+      <div className="grid gap-3">
+        {filtered.map((t: any) => <TipCard key={t.id} t={t} />)}
+        {filtered.length === 0 && (
+          <p className="rounded-lg border border-dashed border-border p-6 text-center text-sm text-muted-foreground">
+            No tips match these filters yet. Try removing one.
+          </p>
+        )}
+      </div>
+
+      <p className="mt-4 text-xs italic text-muted-foreground">
+        Tips are sourced from public community posts and student experiences. Always verify important information with official university sources.
+      </p>
+    </Card>
   );
 }
 
@@ -460,7 +589,7 @@ function SubmitTip({ uniSlug, disabled }: { uniSlug: string; disabled: boolean }
     setBusy(true);
     try {
       const res = await submit({ data: { uni_slug: uniSlug, tip_text: text, source_url: url, source_platform: platform as any, tag: tag as any } });
-      if (res.ok) { toast.success("Tip submitted for review — thanks!"); setOpen(false); setText(""); setUrl(""); }
+      if (res.ok) { toast.success("Thanks! Your tip will appear after review."); setOpen(false); setText(""); setUrl(""); }
       else toast.error(res.error ?? "Failed");
     } catch (e: any) { toast.error(e?.message ?? "Failed"); }
     finally { setBusy(false); }
@@ -468,21 +597,21 @@ function SubmitTip({ uniSlug, disabled }: { uniSlug: string; disabled: boolean }
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button size="sm" variant="outline" disabled={disabled} title={disabled ? "Log in to submit" : ""}>+ Submit a tip you found</Button>
+        <Button size="sm" variant="outline" disabled={disabled} title={disabled ? "Log in to submit" : ""}>+ Submit a tip</Button>
       </DialogTrigger>
       <DialogContent>
-        <DialogHeader><DialogTitle>Submit a tip</DialogTitle></DialogHeader>
+        <DialogHeader><DialogTitle>Share a tip</DialogTitle></DialogHeader>
         <div className="space-y-3">
-          <Textarea placeholder="Paste the tip (20-1000 chars)" value={text} onChange={e=>setText(e.target.value)} rows={4} />
-          <Input placeholder="Source URL (https://...)" value={url} onChange={e=>setUrl(e.target.value)} />
+          <Textarea placeholder="Paste the tip (20-1000 chars)" value={text} onChange={e => setText(e.target.value)} rows={4} />
+          <Input placeholder="Source URL (https://...)" value={url} onChange={e => setUrl(e.target.value)} />
           <div className="grid grid-cols-2 gap-2">
             <Select value={platform} onValueChange={setPlatform}>
               <SelectTrigger><SelectValue /></SelectTrigger>
-              <SelectContent>{Object.keys(PLATFORM_BADGES).map(p => <SelectItem key={p} value={p}>{PLATFORM_BADGES[p].label}</SelectItem>)}</SelectContent>
+              <SelectContent>{Object.keys(PLATFORMS).map(p => <SelectItem key={p} value={p}>{PLATFORMS[p].label}</SelectItem>)}</SelectContent>
             </Select>
             <Select value={tag} onValueChange={setTag}>
               <SelectTrigger><SelectValue /></SelectTrigger>
-              <SelectContent>{TAGS.slice(1).map(t => <SelectItem key={t} value={t}>{t}</SelectItem>)}</SelectContent>
+              <SelectContent>{TAGS.slice(1).map(t => <SelectItem key={t} value={t}>{TAG_LABELS[t] ?? t}</SelectItem>)}</SelectContent>
             </Select>
           </div>
         </div>
