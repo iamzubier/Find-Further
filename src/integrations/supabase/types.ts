@@ -135,6 +135,7 @@ export type Database = {
           name: string
           qs_rank: number | null
           region: string | null
+          slug: string | null
           state_province: string | null
           website: string | null
         }
@@ -147,6 +148,7 @@ export type Database = {
           name: string
           qs_rank?: number | null
           region?: string | null
+          slug?: string | null
           state_province?: string | null
           website?: string | null
         }
@@ -159,6 +161,7 @@ export type Database = {
           name?: string
           qs_rank?: number | null
           region?: string | null
+          slug?: string | null
           state_province?: string | null
           website?: string | null
         }
