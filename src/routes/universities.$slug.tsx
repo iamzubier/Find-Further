@@ -533,13 +533,16 @@ function Tips({ uni, tips }: any) {
 
       <div className="mb-4 flex flex-wrap items-center gap-2 border-t border-border pt-3">
         <span className="text-xs uppercase tracking-wide text-muted-foreground">Platform</span>
-        {(["all", "reddit", "quora", "youtube", "forum"] as const).map(pk => (
-          <button key={pk} onClick={() => setPlatform(pk)}
-            className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium ring-1 ${platform === pk ? "bg-primary text-primary-foreground ring-primary" : "bg-secondary text-foreground ring-border hover:border-primary/40"}`}>
-            {pk !== "all" && PLATFORMS[pk] && <PLATFORMS[pk].Logo className="h-3.5 w-3.5" />}
-            {pk === "all" ? "All sources" : PLATFORMS[pk].label}
-          </button>
-        ))}
+        {(["all", "reddit", "quora", "youtube", "forum"] as const).map(pk => {
+          const Logo = pk !== "all" ? PLATFORMS[pk].Logo : null;
+          return (
+            <button key={pk} onClick={() => setPlatform(pk)}
+              className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium ring-1 ${platform === pk ? "bg-primary text-primary-foreground ring-primary" : "bg-secondary text-foreground ring-border hover:border-primary/40"}`}>
+              {Logo && <Logo className="h-3.5 w-3.5" />}
+              {pk === "all" ? "All sources" : PLATFORMS[pk].label}
+            </button>
+          );
+        })}
 
         <span className="ml-auto text-xs uppercase tracking-wide text-muted-foreground">Sort</span>
         <Select value={sort} onValueChange={(v) => setSort(v as any)}>
