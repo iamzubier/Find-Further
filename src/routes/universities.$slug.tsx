@@ -200,6 +200,10 @@ function StudentSystemLine({ usGpa, evalSum }: { usGpa: number; evalSum: EvalSum
   );
 }
 
+function YourScore({ ok, mine }: { ok: boolean; mine: string }) {
+  return <span className={`ml-2 rounded-full px-2 py-0.5 text-[11px] font-semibold ring-1 ${ok ? "bg-emerald-500/10 text-emerald-700 ring-emerald-500/30" : "bg-rose-500/10 text-rose-700 ring-rose-500/30"}`}>{mine} {ok ? "✓" : "✗"}</span>;
+}
+
 function Admissions({ uni }: any) {
   const r = uni.admission_reqs ?? {};
   const evalSum = useMemo(() => loadEvalSummary(), []);
