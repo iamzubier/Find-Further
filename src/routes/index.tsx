@@ -35,23 +35,38 @@ function Hero() {
   const [budget, setBudget] = useState<string>("");
 
   return (
-    <section className="relative overflow-hidden">
+    <section className="relative overflow-hidden border-b border-border">
+      {/* Crest wall background */}
+      <div className="absolute inset-0 -z-10 crest-wall" aria-hidden />
       <div
-        className="absolute inset-0 -z-10 opacity-50"
+        className="absolute inset-0 -z-10"
+        aria-hidden
         style={{
           background:
-            "radial-gradient(60% 50% at 20% 0%, color-mix(in oklab, var(--color-primary) 18%, transparent), transparent 70%), radial-gradient(40% 40% at 90% 10%, color-mix(in oklab, var(--color-primary) 12%, transparent), transparent 70%)",
+            "radial-gradient(80% 60% at 50% 0%, color-mix(in oklab, var(--color-background) 55%, transparent), var(--color-background) 75%)",
         }}
       />
-      <div className="mx-auto max-w-6xl px-4 pb-12 pt-16 md:pt-24">
-        <div className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-3 py-1 text-xs text-muted-foreground">
-          <Zap className="h-3 w-3 text-primary" /> Built in 🇧🇩 for HSC & A-level students
+      <div className="absolute inset-x-0 bottom-0 -z-10 h-32 bg-gradient-to-b from-transparent to-background" aria-hidden />
+
+      <div className="mx-auto max-w-6xl px-4 pb-16 pt-20 md:pt-28">
+        <div className="inline-flex items-center gap-2 border-y border-foreground/80 px-3 py-1 text-[11px] uppercase tracking-[0.18em] text-foreground">
+          <Zap className="h-3 w-3" /> A field guide for Bangladeshi students
         </div>
-        <h1 className="mt-5 max-w-4xl font-heading text-5xl font-extrabold leading-[1.05] tracking-tight md:text-7xl">
-          Find your <span className="text-primary text-glow">best deal</span> abroad.
+
+        <h1 className="mt-8 max-w-5xl font-heading text-[3.4rem] leading-[0.95] tracking-tight md:text-[7rem]">
+          Find your <span className="serif-italic text-foreground/90">best deal</span><br />
+          <span className="text-foreground/60">abroad.</span>
         </h1>
-        <p className="mt-5 max-w-2xl text-lg text-muted-foreground md:text-xl">
-          Built for BD students who think consultants are overrated. Real universities, real scholarships, zero salesy nonsense.
+
+        <div className="mt-6 flex items-center gap-4 text-xs uppercase tracking-[0.2em] text-muted-foreground">
+          <span>Vol. I</span>
+          <span className="h-px flex-1 bg-foreground/30" />
+          <span>{new Date().toLocaleDateString("en-US", { month: "long", year: "numeric" })}</span>
+        </div>
+
+        <p className="mt-10 max-w-2xl text-lg leading-relaxed text-foreground/80 md:text-xl">
+          Real universities. Real scholarships. Zero salesy nonsense.
+          <span className="serif-italic"> An honest atlas</span> for HSC & A-level students who think consultants are overrated.
         </p>
 
         <div className="card-surface mt-10 p-3 md:p-4">
