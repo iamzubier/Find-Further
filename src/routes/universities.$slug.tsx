@@ -544,13 +544,14 @@ function Sidebar({ uni }: any) {
     catch { await navigator.clipboard.writeText(window.location.href); toast.success("Link copied"); }
   };
   const nextDeadline = uni.deadlines?.[0];
+  const evalSum = useMemo(() => loadEvalSummary(), []);
   return (
     <aside className="lg:sticky lg:top-32 lg:self-start">
       <div className="card-surface space-y-4 p-5">
-        {user ? <MatchRing uni={uni} /> : (
+        {evalSum ? <EvalMatchRing uni={uni} evalSum={evalSum} /> : user ? <MatchRing uni={uni} /> : (
           <div className="text-center">
-            <div className="text-sm text-muted-foreground">Build your profile to see your match score</div>
-            <Button asChild className="mt-2 w-full"><Link to="/auth" search={{ tab: "signup" }}>Sign up</Link></Button>
+            <div className="text-sm text-muted-foreground">Get your match score in 2 minutes</div>
+            <Button asChild className="mt-2 w-full bg-primary text-primary-foreground"><Link to="/evaluate">✨ Evaluate my profile</Link></Button>
           </div>
         )}
         <div className="grid grid-cols-3 gap-2">
@@ -562,6 +563,24 @@ function Sidebar({ uni }: any) {
         <Button asChild className="w-full bg-primary text-primary-foreground"><a href={uni.application_url} target="_blank" rel="noopener noreferrer">Apply now <ExternalLink className="ml-2 h-3 w-3" /></a></Button>
       </div>
     </aside>
+  );
+}
+
+function EvalMatchRing({ uni, evalSum }: { uni: any; evalSum: EvalSummary }) {
+  const r = uni.admission_reqs ?? {};
+  let s = 50;
+  if (r.min_gpa_us) s += (evalSum.converted.us4 - r.min_gpa_us) * 25;
+  if (r.ielts && evalSum.tests.ielts) s += (evalSum.tests.ielts - r.ielts) * 10;
+  if (r.sat_min && evalSum.tests.sat) s += (evalSum.tests.sat - r.sat_min) / 12;
+  if (evalSum.targetCountries.length && evalSum.targetCountries.some(c => uni.country?.toLowerCase().includes(c.toLowerCase()))) s += 8;
+  const score = Math.max(5, Math.min(99, Math.round(s)));
+  const color = score >= 75 ? "text-emerald-600" : score >= 50 ? "text-amber-600" : "text-rose-600";
+  return (
+    <div className="text-center">
+      <div className={`font-heading text-5xl font-extrabold ${color}`}>{score}%</div>
+      <div className="text-xs uppercase tracking-wide text-muted-foreground">Your match</div>
+      <Link to="/evaluate" className="mt-1 inline-block text-[11px] text-primary hover:underline">based on your evaluation · update</Link>
+    </div>
   );
 }
 
