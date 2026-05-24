@@ -319,9 +319,16 @@ function CatalogBrowser() {
   );
 }
 
+const CARD_FALLBACK = "https://images.unsplash.com/photo-1541339907198-e08756dedf3f?w=800&q=80";
+
 export function UniversityCard({ u, match }: { u: University; match?: number }) {
   const { user } = useAuth();
   const [saving, setSaving] = useState(false);
+  const compareItems = useCompare((s) => s.items);
+  const addCmp = useCompare((s) => s.add);
+  const slug = FEATURED_SLUG_MAP[u.id] ?? u.id;
+  const inCmp = compareItems.some((x) => x.slug === slug);
+  const cmpFull = compareItems.length >= 3 && !inCmp;
 
   const save = async () => {
     if (!user) { toast.error("Log in to save universities"); return; }
@@ -334,46 +341,85 @@ export function UniversityCard({ u, match }: { u: University; match?: number }) 
     else toast.success(`Saved ${u.name}`);
   };
 
+  const onCompare = () => {
+    if (inCmp) return;
+    const ok = addCmp({
+      slug,
+      name: u.name,
+      country: u.country,
+      countryFlag: u.countryFlag,
+      qsRank: u.qsRank,
+      imageUrl: u.campusImageUrl,
+    });
+    if (!ok) { toast.error("Compare full (max 3)"); return; }
+    const n = compareItems.length + 1;
+    toast.success(`Added to compare (${n}/3)`);
+  };
+
+  const img = u.campusImageUrl || CARD_FALLBACK;
+
   return (
-    <div className="card-surface group p-5 transition-colors hover:border-primary/40 md:p-6">
-      <div className="flex flex-wrap items-start justify-between gap-3">
-        <div className="flex items-start gap-3">
-          <div className="rounded-md bg-secondary px-2.5 py-1 text-xs font-semibold text-foreground">#{u.qsRank}</div>
-          <span className="text-2xl">{u.countryFlag}</span>
-          <div>
-            <h3 className="font-heading text-xl font-extrabold leading-tight">{u.name}</h3>
-            <div className="mt-1 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
-              <span>{u.country}</span>
-              <span>·</span>
-              <span>{u.programs.join(" · ")}</span>
-            </div>
+    <div
+      className="group relative min-h-[280px] overflow-hidden rounded-2xl border border-border bg-cover bg-center text-white shadow-md transition-all hover:-translate-y-0.5 hover:shadow-2xl"
+      style={{ backgroundImage: `url('${img}')` }}
+    >
+      <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-black/55 to-black/90" aria-hidden />
+      <div className="relative z-[1] flex h-full min-h-[280px] flex-col p-5 md:p-6">
+        <div className="flex flex-wrap items-start justify-between gap-2">
+          <div className="flex items-center gap-2">
+            <span className="rounded-md bg-white/15 px-2 py-0.5 text-xs font-semibold backdrop-blur">#{u.qsRank}</span>
+            <span className="text-xl">{u.countryFlag}</span>
+            <span className="text-xs text-white/85">{u.country}</span>
+          </div>
+          <div className="flex items-center gap-2">
+            {typeof match === "number" && (
+              <span className="rounded-full bg-emerald-500 px-2.5 py-0.5 text-xs font-bold text-white">{match}% match</span>
+            )}
+            <span className="rounded-full bg-white/15 px-2.5 py-0.5 text-xs font-semibold backdrop-blur">{u.dealTag}</span>
           </div>
         </div>
-        <div className="flex items-center gap-2">
-          {typeof match === "number" && (
-            <span className="rounded-full bg-primary/15 px-3 py-1 text-xs font-semibold text-primary ring-1 ring-primary/30">{match}% match</span>
-          )}
-          <span className="rounded-full bg-primary/15 px-3 py-1 text-xs font-semibold text-primary ring-1 ring-primary/30">{u.dealTag}</span>
-        </div>
-      </div>
-      <p className="mt-3 text-sm text-muted-foreground">{u.blurb}</p>
-      <div className="mt-4 grid gap-3 text-sm md:grid-cols-3">
-        <div><div className="text-xs uppercase text-muted-foreground">Tuition</div><div className="font-semibold">{u.tuition}</div></div>
-        <div><div className="text-xs uppercase text-muted-foreground">Deadline</div><div className="font-semibold">{u.deadline}</div></div>
-        <div className="flex items-end justify-end gap-2 md:col-start-3">
-          <Button variant="outline" size="sm" onClick={save} disabled={saving}>
-            <Heart className="mr-1 h-4 w-4" /> Save
-          </Button>
-          <Button asChild size="sm" className="bg-primary text-primary-foreground hover:bg-primary/90">
-            <Link to="/universities/$slug" params={{ slug: FEATURED_SLUG_MAP[u.id] ?? u.id }}>
-              View <ArrowRight className="ml-1 h-4 w-4" />
-            </Link>
-          </Button>
+
+        <div className="mt-auto pt-8">
+          <h3 className="font-heading text-2xl font-extrabold leading-tight md:text-3xl">{u.name}</h3>
+          <p className="mt-2 line-clamp-2 max-w-2xl text-sm text-white/85">{u.blurb}</p>
+          <div className="mt-4 flex flex-wrap items-end justify-between gap-3">
+            <div className="space-y-0.5 text-sm">
+              <div className="text-[10px] uppercase tracking-wide text-white/70">Tuition · Deadline</div>
+              <div className="font-semibold">{u.tuition} · {u.deadline}</div>
+            </div>
+            <div className="flex flex-wrap items-center gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={onCompare}
+                disabled={cmpFull || inCmp}
+                className={`border-white/30 bg-white/10 backdrop-blur hover:bg-white/20 ${inCmp ? "text-emerald-300" : "text-white"}`}
+              >
+                <GitCompare className="mr-1 h-4 w-4" />
+                {inCmp ? "Added ✓" : cmpFull ? "Compare full" : "Compare"}
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={save}
+                disabled={saving}
+                className="border-white/30 bg-white/10 text-white backdrop-blur hover:bg-white/20"
+              >
+                <Heart className="mr-1 h-4 w-4" /> Save
+              </Button>
+              <Button asChild size="sm" className="bg-primary text-primary-foreground hover:bg-primary/90">
+                <Link to="/universities/$slug" params={{ slug }}>
+                  View <ArrowRight className="ml-1 h-4 w-4" />
+                </Link>
+              </Button>
+            </div>
+          </div>
         </div>
       </div>
     </div>
   );
 }
+
 
 // Map featured UNIVERSITIES ids (u1..u13) to rich detail page slugs.
 const FEATURED_SLUG_MAP: Record<string, string> = {
