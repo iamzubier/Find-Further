@@ -86,6 +86,22 @@ function UniDetailPage() {
 
 const FALLBACK_CAMPUS = "https://images.unsplash.com/photo-1541339907198-e08756dedf3f?w=1600&q=80&auto=format&fit=crop";
 
+function UniHeroLogo({ logoUrl, name }: { logoUrl?: string | null; name: string }) {
+  const [errored, setErrored] = useState(false);
+  const initials = name.split(/\s+/).filter(w => /^[A-Za-z]/.test(w)).slice(0, 2).map(w => w[0]!.toUpperCase()).join("") || name.slice(0, 2).toUpperCase();
+  const showImg = logoUrl && !errored;
+  return (
+    <div className="flex h-20 w-20 flex-none items-center justify-center overflow-hidden rounded-xl bg-white p-3 shadow-2xl ring-1 ring-white/20">
+      {showImg ? (
+        <img src={logoUrl} alt={`${name} logo`} className="max-h-full max-w-full object-contain" onError={() => setErrored(true)} />
+      ) : (
+        <span className="font-heading text-2xl font-extrabold text-foreground">{initials}</span>
+      )}
+    </div>
+  );
+}
+
+
 function Hero({ uni }: { uni: any }) {
   const [imgSrc, setImgSrc] = useState<string>(uni.campus_image_url || FALLBACK_CAMPUS);
   return (
