@@ -1,4 +1,14 @@
 // Convert BD 5.0 scale GPA to common international scales.
+// Reverse: US 4.0 -> BD HSC 5.0 minimum equivalent
+export function usToBd(us: number): number {
+  if (us >= 4.0) return 5.0;
+  if (us >= 3.7) return 4.5;
+  if (us >= 3.3) return 4.0;
+  if (us >= 3.0) return 3.5;
+  if (us >= 2.7) return 3.0;
+  return Math.max(0, +(us / 0.7).toFixed(1));
+}
+
 export function bdToUs(gpa: number): number {
   if (gpa >= 5.0) return 4.0;
   if (gpa >= 4.5) return 3.7;
