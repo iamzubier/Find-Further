@@ -728,8 +728,8 @@ function Sidebar({ uni }: any) {
           <Button variant="outline" size="sm" onClick={addCmp} disabled={inCompare}><GitCompare className="h-4 w-4" /></Button>
           <Button variant="outline" size="sm" onClick={share}><Share2 className="h-4 w-4" /></Button>
         </div>
-        {nextDeadline && <Countdown deadline={nextDeadline.deadline} intake={nextDeadline.intake} />}
-        <Button asChild className="w-full bg-primary text-primary-foreground"><a href={uni.application_url} target="_blank" rel="noopener noreferrer">Apply now <ExternalLink className="ml-2 h-3 w-3" /></a></Button>
+        {nextDeadline && <Countdown deadline={nextDeadline.deadline ?? nextDeadline.date} intake={nextDeadline.intake ?? nextDeadline.round ?? "Next intake"} />}
+        {uni.application_url && <Button asChild className="w-full bg-primary text-primary-foreground"><a href={uni.application_url} target="_blank" rel="noopener noreferrer">Apply now <ExternalLink className="ml-2 h-3 w-3" /></a></Button>}
       </div>
     </aside>
   );
