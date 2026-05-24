@@ -216,6 +216,20 @@ function Admissions({ uni }: any) {
   ];
   return (
     <>
+      {evalSum && (
+        <div className="card-surface mb-4 flex flex-wrap items-center justify-between gap-3 border-primary/30 bg-primary/5 p-4">
+          <p className="text-sm">
+            <b>Personalized for you:</b> Showing requirements in your <b>{CURRICULUMS[evalSum.curriculum].scale}</b> scale. Your grade: US {evalSum.converted.us4.toFixed(2)}/4.0.
+          </p>
+          <Link to="/evaluate" className="text-xs font-semibold text-primary hover:underline">Update profile →</Link>
+        </div>
+      )}
+      {!evalSum && (
+        <div className="card-surface mb-4 flex flex-wrap items-center justify-between gap-3 p-4">
+          <p className="text-sm text-muted-foreground">See requirements in <b>your</b> grading system (HSC, A-Levels, Gaokao, IB…).</p>
+          <Button asChild size="sm"><Link to="/evaluate">Evaluate my profile →</Link></Button>
+        </div>
+      )}
       <Card title="Requirements" icon={GraduationCap}>
         <div className="overflow-hidden rounded-lg border border-border">
           <table className="w-full text-sm">
