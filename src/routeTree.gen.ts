@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as UniversitiesRouteImport } from './routes/universities'
 import { Route as ScholarshipsRouteImport } from './routes/scholarships'
+import { Route as CompareRouteImport } from './routes/compare'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
@@ -28,6 +29,11 @@ const UniversitiesRoute = UniversitiesRouteImport.update({
 const ScholarshipsRoute = ScholarshipsRouteImport.update({
   id: '/scholarships',
   path: '/scholarships',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CompareRoute = CompareRouteImport.update({
+  id: '/compare',
+  path: '/compare',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthRoute = AuthRouteImport.update({
@@ -73,6 +79,7 @@ const AuthenticatedAskAiRoute = AuthenticatedAskAiRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/compare': typeof CompareRoute
   '/scholarships': typeof ScholarshipsRoute
   '/universities': typeof UniversitiesRouteWithChildren
   '/ask-ai': typeof AuthenticatedAskAiRoute
@@ -84,6 +91,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/compare': typeof CompareRoute
   '/scholarships': typeof ScholarshipsRoute
   '/universities': typeof UniversitiesRouteWithChildren
   '/ask-ai': typeof AuthenticatedAskAiRoute
@@ -97,6 +105,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteWithChildren
   '/auth': typeof AuthRoute
+  '/compare': typeof CompareRoute
   '/scholarships': typeof ScholarshipsRoute
   '/universities': typeof UniversitiesRouteWithChildren
   '/_authenticated/ask-ai': typeof AuthenticatedAskAiRoute
@@ -110,6 +119,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/auth'
+    | '/compare'
     | '/scholarships'
     | '/universities'
     | '/ask-ai'
@@ -121,6 +131,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/auth'
+    | '/compare'
     | '/scholarships'
     | '/universities'
     | '/ask-ai'
@@ -133,6 +144,7 @@ export interface FileRouteTypes {
     | '/'
     | '/_authenticated'
     | '/auth'
+    | '/compare'
     | '/scholarships'
     | '/universities'
     | '/_authenticated/ask-ai'
@@ -146,6 +158,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
   AuthRoute: typeof AuthRoute
+  CompareRoute: typeof CompareRoute
   ScholarshipsRoute: typeof ScholarshipsRoute
   UniversitiesRoute: typeof UniversitiesRouteWithChildren
 }
@@ -164,6 +177,13 @@ declare module '@tanstack/react-router' {
       path: '/scholarships'
       fullPath: '/scholarships'
       preLoaderRoute: typeof ScholarshipsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/compare': {
+      id: '/compare'
+      path: '/compare'
+      fullPath: '/compare'
+      preLoaderRoute: typeof CompareRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/auth': {
@@ -259,6 +279,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRoute: AuthenticatedRouteWithChildren,
   AuthRoute: AuthRoute,
+  CompareRoute: CompareRoute,
   ScholarshipsRoute: ScholarshipsRoute,
   UniversitiesRoute: UniversitiesRouteWithChildren,
 }
