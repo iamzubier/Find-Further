@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as ScholarshipsRouteImport } from './routes/scholarships'
+import { Route as EvaluateRouteImport } from './routes/evaluate'
 import { Route as CompareRouteImport } from './routes/compare'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
@@ -21,10 +22,16 @@ import { Route as AuthenticatedShortlistRouteImport } from './routes/_authentica
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedAskAiRouteImport } from './routes/_authenticated/ask-ai'
+import { Route as AuthenticatedEvaluateResultsIdRouteImport } from './routes/_authenticated/evaluate.results.$id'
 
 const ScholarshipsRoute = ScholarshipsRouteImport.update({
   id: '/scholarships',
   path: '/scholarships',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EvaluateRoute = EvaluateRouteImport.update({
+  id: '/evaluate',
+  path: '/evaluate',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CompareRoute = CompareRouteImport.update({
@@ -81,11 +88,18 @@ const AuthenticatedAskAiRoute = AuthenticatedAskAiRouteImport.update({
   path: '/ask-ai',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthenticatedEvaluateResultsIdRoute =
+  AuthenticatedEvaluateResultsIdRouteImport.update({
+    id: '/evaluate/results/$id',
+    path: '/evaluate/results/$id',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/compare': typeof CompareRoute
+  '/evaluate': typeof EvaluateRoute
   '/scholarships': typeof ScholarshipsRoute
   '/ask-ai': typeof AuthenticatedAskAiRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
@@ -94,11 +108,13 @@ export interface FileRoutesByFullPath {
   '/admin/import': typeof AdminImportRoute
   '/universities/$slug': typeof UniversitiesSlugRoute
   '/universities/': typeof UniversitiesIndexRoute
+  '/evaluate/results/$id': typeof AuthenticatedEvaluateResultsIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/compare': typeof CompareRoute
+  '/evaluate': typeof EvaluateRoute
   '/scholarships': typeof ScholarshipsRoute
   '/ask-ai': typeof AuthenticatedAskAiRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
@@ -107,6 +123,7 @@ export interface FileRoutesByTo {
   '/admin/import': typeof AdminImportRoute
   '/universities/$slug': typeof UniversitiesSlugRoute
   '/universities': typeof UniversitiesIndexRoute
+  '/evaluate/results/$id': typeof AuthenticatedEvaluateResultsIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -114,6 +131,7 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteWithChildren
   '/auth': typeof AuthRoute
   '/compare': typeof CompareRoute
+  '/evaluate': typeof EvaluateRoute
   '/scholarships': typeof ScholarshipsRoute
   '/_authenticated/ask-ai': typeof AuthenticatedAskAiRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
@@ -122,6 +140,7 @@ export interface FileRoutesById {
   '/admin/import': typeof AdminImportRoute
   '/universities/$slug': typeof UniversitiesSlugRoute
   '/universities/': typeof UniversitiesIndexRoute
+  '/_authenticated/evaluate/results/$id': typeof AuthenticatedEvaluateResultsIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -129,6 +148,7 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/compare'
+    | '/evaluate'
     | '/scholarships'
     | '/ask-ai'
     | '/dashboard'
@@ -137,11 +157,13 @@ export interface FileRouteTypes {
     | '/admin/import'
     | '/universities/$slug'
     | '/universities/'
+    | '/evaluate/results/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/auth'
     | '/compare'
+    | '/evaluate'
     | '/scholarships'
     | '/ask-ai'
     | '/dashboard'
@@ -150,12 +172,14 @@ export interface FileRouteTypes {
     | '/admin/import'
     | '/universities/$slug'
     | '/universities'
+    | '/evaluate/results/$id'
   id:
     | '__root__'
     | '/'
     | '/_authenticated'
     | '/auth'
     | '/compare'
+    | '/evaluate'
     | '/scholarships'
     | '/_authenticated/ask-ai'
     | '/_authenticated/dashboard'
@@ -164,6 +188,7 @@ export interface FileRouteTypes {
     | '/admin/import'
     | '/universities/$slug'
     | '/universities/'
+    | '/_authenticated/evaluate/results/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -171,6 +196,7 @@ export interface RootRouteChildren {
   AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
   AuthRoute: typeof AuthRoute
   CompareRoute: typeof CompareRoute
+  EvaluateRoute: typeof EvaluateRoute
   ScholarshipsRoute: typeof ScholarshipsRoute
   AdminImportRoute: typeof AdminImportRoute
   UniversitiesSlugRoute: typeof UniversitiesSlugRoute
@@ -184,6 +210,13 @@ declare module '@tanstack/react-router' {
       path: '/scholarships'
       fullPath: '/scholarships'
       preLoaderRoute: typeof ScholarshipsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/evaluate': {
+      id: '/evaluate'
+      path: '/evaluate'
+      fullPath: '/evaluate'
+      preLoaderRoute: typeof EvaluateRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/compare': {
@@ -263,6 +296,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAskAiRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/evaluate/results/$id': {
+      id: '/_authenticated/evaluate/results/$id'
+      path: '/evaluate/results/$id'
+      fullPath: '/evaluate/results/$id'
+      preLoaderRoute: typeof AuthenticatedEvaluateResultsIdRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
   }
 }
 
@@ -271,6 +311,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
   AuthenticatedShortlistRoute: typeof AuthenticatedShortlistRoute
+  AuthenticatedEvaluateResultsIdRoute: typeof AuthenticatedEvaluateResultsIdRoute
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
@@ -278,6 +319,7 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedProfileRoute: AuthenticatedProfileRoute,
   AuthenticatedShortlistRoute: AuthenticatedShortlistRoute,
+  AuthenticatedEvaluateResultsIdRoute: AuthenticatedEvaluateResultsIdRoute,
 }
 
 const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
@@ -289,6 +331,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRoute: AuthenticatedRouteWithChildren,
   AuthRoute: AuthRoute,
   CompareRoute: CompareRoute,
+  EvaluateRoute: EvaluateRoute,
   ScholarshipsRoute: ScholarshipsRoute,
   AdminImportRoute: AdminImportRoute,
   UniversitiesSlugRoute: UniversitiesSlugRoute,
@@ -297,3 +340,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
