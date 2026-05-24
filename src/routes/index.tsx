@@ -246,16 +246,22 @@ function WtfSection() {
 function CtaStrip() {
   return (
     <section className="mx-auto max-w-6xl px-4 py-12">
-      <div className="card-surface flex flex-col items-center justify-between gap-4 p-8 md:flex-row md:p-10">
-        <div>
-          <h3 className="font-heading text-2xl font-extrabold md:text-3xl">Want to see your best matches?</h3>
-          <p className="mt-1 text-muted-foreground">Free account. Profile-aware recommendations. AI advisor named Aria.</p>
+      <div
+        className="relative overflow-hidden rounded-2xl border border-border bg-cover bg-center p-8 md:p-12"
+        style={{ backgroundImage: "url('https://images.unsplash.com/photo-1523580494863-6f3031224c94?w=1600&q=80')" }}
+      >
+        <div className="absolute inset-0 bg-gradient-to-r from-black/85 via-black/65 to-black/40" aria-hidden />
+        <div className="relative flex flex-col items-start justify-between gap-5 text-white md:flex-row md:items-center">
+          <div>
+            <h3 className="font-heading text-2xl font-extrabold md:text-3xl">Want to see your best matches?</h3>
+            <p className="mt-1 text-sm text-white/85 md:text-base">Free account. Profile-aware recommendations. AI advisor named Aria.</p>
+          </div>
+          <Button asChild size="lg" className="bg-white text-black hover:bg-white/90">
+            <Link to="/auth" search={{ tab: "signup" }}>
+              Create a free account <Sparkles className="ml-2 h-4 w-4" />
+            </Link>
+          </Button>
         </div>
-        <Button asChild size="lg" className="bg-primary text-primary-foreground hover:bg-primary/90">
-          <Link to="/auth" search={{ tab: "signup" }}>
-            Create a free account <Sparkles className="ml-2 h-4 w-4" />
-          </Link>
-        </Button>
       </div>
       <p className="mt-6 text-center text-xs text-muted-foreground">
         {UNIVERSITIES.length} universities · {SCHOLARSHIPS.length} live scholarships indexed
@@ -263,3 +269,4 @@ function CtaStrip() {
     </section>
   );
 }
+
