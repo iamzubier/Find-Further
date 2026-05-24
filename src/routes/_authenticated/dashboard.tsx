@@ -69,7 +69,7 @@ function Dashboard() {
           <h2 className="font-heading text-2xl font-extrabold">Best Picks For You</h2>
           <Link to="/universities" className="text-sm text-primary hover:underline">See all</Link>
         </div>
-        <div className="grid gap-3">{picks.map(({ u, match }) => <UniversityCard key={u.id} u={u} match={match} />)}</div>
+        <div className="grid gap-3">{picks.map(({ u, m }) => <UniversityCard key={u.id} u={u} match={m.score || undefined} />)}</div>
       </section>
 
       <section className="mt-10">
