@@ -7,6 +7,8 @@ import { usToBd } from "@/lib/gpa";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/integrations/supabase/client";
 import { useCompare } from "@/lib/compare-store";
+import { loadEvalSummary, type EvalSummary } from "@/lib/evaluation-store";
+import { requirementInStudentSystem, CURRICULUMS } from "@/lib/curriculum";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -188,18 +190,50 @@ function GpaLine({ usGpa }: { usGpa: number }) {
   return <span className="text-xs text-muted-foreground">= BD HSC {bd.toFixed(2)}+ / 5.0</span>;
 }
 
+function StudentSystemLine({ usGpa, evalSum }: { usGpa: number; evalSum: EvalSummary }) {
+  const inStudent = requirementInStudentSystem(usGpa, evalSum.curriculum);
+  const ok = evalSum.converted.us4 >= usGpa;
+  return (
+    <span className={`ml-2 inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-semibold ring-1 ${ok ? "bg-emerald-500/10 text-emerald-700 ring-emerald-500/30" : "bg-rose-500/10 text-rose-700 ring-rose-500/30"}`}>
+      = {inStudent} in your {CURRICULUMS[evalSum.curriculum].scale} {ok ? "✓" : "✗"}
+    </span>
+  );
+}
+
+function YourScore({ ok, mine }: { ok: boolean; mine: string }) {
+  return <span className={`ml-2 rounded-full px-2 py-0.5 text-[11px] font-semibold ring-1 ${ok ? "bg-emerald-500/10 text-emerald-700 ring-emerald-500/30" : "bg-rose-500/10 text-rose-700 ring-rose-500/30"}`}>{mine} {ok ? "✓" : "✗"}</span>;
+}
+
 function Admissions({ uni }: any) {
   const r = uni.admission_reqs ?? {};
+  const evalSum = useMemo(() => loadEvalSummary(), []);
+  const ieltsOk = evalSum?.tests.ielts && r.ielts ? evalSum.tests.ielts >= r.ielts : null;
+  const toeflOk = evalSum?.tests.toefl && r.toefl ? evalSum.tests.toefl >= r.toefl : null;
+  const satOk = evalSum?.tests.sat && r.sat_min ? evalSum.tests.sat >= r.sat_min : null;
   const rows = [
-    { label: "Minimum GPA (US 4.0 scale)", value: r.min_gpa_us ? `${r.min_gpa_us}` : "—", extra: r.min_gpa_us ? <GpaLine usGpa={r.min_gpa_us} /> : null },
-    { label: "IELTS Academic", value: r.ielts ? `${r.ielts}+` : "—" },
-    { label: "TOEFL iBT", value: r.toefl ? `${r.toefl}+` : "—" },
-    { label: "SAT range", value: (r.sat_min && r.sat_max) ? `${r.sat_min} – ${r.sat_max}` : "—" },
+    { label: "Minimum GPA (US 4.0 scale)", value: r.min_gpa_us ? `${r.min_gpa_us}` : "—", extra: r.min_gpa_us ? (<><GpaLine usGpa={r.min_gpa_us} />{evalSum && <StudentSystemLine usGpa={r.min_gpa_us} evalSum={evalSum} />}</>) : null },
+    { label: "IELTS Academic", value: r.ielts ? `${r.ielts}+` : "—", extra: ieltsOk !== null ? <YourScore ok={ieltsOk} mine={`yours ${evalSum!.tests.ielts}`} /> : null },
+    { label: "TOEFL iBT", value: r.toefl ? `${r.toefl}+` : "—", extra: toeflOk !== null ? <YourScore ok={toeflOk} mine={`yours ${evalSum!.tests.toefl}`} /> : null },
+    { label: "SAT range", value: (r.sat_min && r.sat_max) ? `${r.sat_min} – ${r.sat_max}` : "—", extra: satOk !== null ? <YourScore ok={satOk} mine={`yours ${evalSum!.tests.sat}`} /> : null },
     { label: "ACT range", value: (r.act_min && r.act_max) ? `${r.act_min} – ${r.act_max}` : "—" },
     { label: "Language of Instruction", value: r.language ?? "—" },
   ];
   return (
     <>
+      {evalSum && (
+        <div className="card-surface mb-4 flex flex-wrap items-center justify-between gap-3 border-primary/30 bg-primary/5 p-4">
+          <p className="text-sm">
+            <b>Personalized for you:</b> Showing requirements in your <b>{CURRICULUMS[evalSum.curriculum].scale}</b> scale. Your grade: US {evalSum.converted.us4.toFixed(2)}/4.0.
+          </p>
+          <Link to="/evaluate" className="text-xs font-semibold text-primary hover:underline">Update profile →</Link>
+        </div>
+      )}
+      {!evalSum && (
+        <div className="card-surface mb-4 flex flex-wrap items-center justify-between gap-3 p-4">
+          <p className="text-sm text-muted-foreground">See requirements in <b>your</b> grading system (HSC, A-Levels, Gaokao, IB…).</p>
+          <Button asChild size="sm"><Link to="/evaluate">Evaluate my profile →</Link></Button>
+        </div>
+      )}
       <Card title="Requirements" icon={GraduationCap}>
         <div className="overflow-hidden rounded-lg border border-border">
           <table className="w-full text-sm">
@@ -351,21 +385,43 @@ const PLATFORM_BADGES: Record<string, { label: string; class: string; emoji: str
 };
 const TAGS = ["All","Academics","ECA","Scholarship","Strategy","CampusLife","FinancialAid"];
 
+const COUNTRY_NAMES: Record<string, string> = {
+  BD: "Bangladesh", IN: "India", PK: "Pakistan", LK: "Sri Lanka", NP: "Nepal",
+  CN: "China", NG: "Nigeria", AE: "UAE", MY: "Malaysia",
+};
+
 function Tips({ uni, tips }: any) {
   const [tag, setTag] = useState("All");
+  const evalSum = useMemo(() => loadEvalSummary(), []);
+  const homeCountry = evalSum?.country;
+  const homeName = homeCountry ? COUNTRY_NAMES[homeCountry] : null;
+  const [onlyMine, setOnlyMine] = useState(false);
   const { user } = useAuth();
-  const filtered = tag === "All" ? tips : tips.filter((t: any) => t.tag === tag);
+  let filtered = tag === "All" ? tips : tips.filter((t: any) => t.tag === tag);
+  if (onlyMine && homeName) {
+    const needle = homeName.toLowerCase();
+    filtered = filtered.filter((t: any) =>
+      t.tip_text?.toLowerCase().includes(needle) ||
+      t.source_url?.toLowerCase().includes(needle.replace(/\s+/g, ""))
+    );
+  }
   return (
     <>
       <Card title="Real tips from students and communities 🎯" icon={Lightbulb}>
         <p className="mb-4 text-sm text-muted-foreground">Curated from Reddit, Quora, YouTube and college forums.</p>
-        <div className="mb-4 flex flex-wrap gap-2">
+        <div className="mb-4 flex flex-wrap items-center gap-2">
           {TAGS.map(t => (
             <button key={t} onClick={() => setTag(t)}
               className={`rounded-full px-3 py-1 text-xs font-medium ring-1 ${tag===t ? "bg-primary text-primary-foreground ring-primary" : "bg-secondary text-foreground ring-border"}`}>
               {t}
             </button>
           ))}
+          {homeName && (
+            <button onClick={() => setOnlyMine(v => !v)}
+              className={`rounded-full px-3 py-1 text-xs font-semibold ring-1 ${onlyMine ? "bg-emerald-600 text-white ring-emerald-600" : "bg-emerald-500/10 text-emerald-700 ring-emerald-500/30"}`}>
+              🌍 Tips mentioning {homeName}
+            </button>
+          )}
           <SubmitTip uniSlug={uni.slug} disabled={!user} />
         </div>
         <div className="grid gap-3">
@@ -488,13 +544,14 @@ function Sidebar({ uni }: any) {
     catch { await navigator.clipboard.writeText(window.location.href); toast.success("Link copied"); }
   };
   const nextDeadline = uni.deadlines?.[0];
+  const evalSum = useMemo(() => loadEvalSummary(), []);
   return (
     <aside className="lg:sticky lg:top-32 lg:self-start">
       <div className="card-surface space-y-4 p-5">
-        {user ? <MatchRing uni={uni} /> : (
+        {evalSum ? <EvalMatchRing uni={uni} evalSum={evalSum} /> : user ? <MatchRing uni={uni} /> : (
           <div className="text-center">
-            <div className="text-sm text-muted-foreground">Build your profile to see your match score</div>
-            <Button asChild className="mt-2 w-full"><Link to="/auth" search={{ tab: "signup" }}>Sign up</Link></Button>
+            <div className="text-sm text-muted-foreground">Get your match score in 2 minutes</div>
+            <Button asChild className="mt-2 w-full bg-primary text-primary-foreground"><Link to="/evaluate">✨ Evaluate my profile</Link></Button>
           </div>
         )}
         <div className="grid grid-cols-3 gap-2">
@@ -506,6 +563,24 @@ function Sidebar({ uni }: any) {
         <Button asChild className="w-full bg-primary text-primary-foreground"><a href={uni.application_url} target="_blank" rel="noopener noreferrer">Apply now <ExternalLink className="ml-2 h-3 w-3" /></a></Button>
       </div>
     </aside>
+  );
+}
+
+function EvalMatchRing({ uni, evalSum }: { uni: any; evalSum: EvalSummary }) {
+  const r = uni.admission_reqs ?? {};
+  let s = 50;
+  if (r.min_gpa_us) s += (evalSum.converted.us4 - r.min_gpa_us) * 25;
+  if (r.ielts && evalSum.tests.ielts) s += (evalSum.tests.ielts - r.ielts) * 10;
+  if (r.sat_min && evalSum.tests.sat) s += (evalSum.tests.sat - r.sat_min) / 12;
+  if (evalSum.targetCountries.length && evalSum.targetCountries.some(c => uni.country?.toLowerCase().includes(c.toLowerCase()))) s += 8;
+  const score = Math.max(5, Math.min(99, Math.round(s)));
+  const color = score >= 75 ? "text-emerald-600" : score >= 50 ? "text-amber-600" : "text-rose-600";
+  return (
+    <div className="text-center">
+      <div className={`font-heading text-5xl font-extrabold ${color}`}>{score}%</div>
+      <div className="text-xs uppercase tracking-wide text-muted-foreground">Your match</div>
+      <Link to="/evaluate" className="mt-1 inline-block text-[11px] text-primary hover:underline">based on your evaluation · update</Link>
+    </div>
   );
 }
 

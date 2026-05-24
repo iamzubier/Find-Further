@@ -11,12 +11,13 @@ import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import {
   COUNTRIES, CURRICULUMS, COUNTRY_CURRICULUMS, COUNTRY_OPTIONS,
-  convertToAll, conversionLine,
+  convertToAll,
   type CountryCode, type CurriculumId, type RawGrade, type ConvertedGrades,
 } from "@/lib/curriculum";
 import { computeEvaluation, saveEvaluation } from "@/lib/evaluation.functions";
 import type { ScoreBreakdown, MatchedUni } from "@/lib/evaluation";
 import { useAuth } from "@/lib/auth";
+import { saveEvalSummary } from "@/lib/evaluation-store";
 import { ArrowRight, CheckCircle2, AlertTriangle, Lightbulb, Share2, Loader2 } from "lucide-react";
 
 export const Route = createFileRoute("/evaluate")({
@@ -126,7 +127,21 @@ function EvaluatePage() {
       };
       return computeFn({ data: payload });
     },
-    onSuccess: (data) => { setResult(data); window.scrollTo({ top: 0, behavior: "smooth" }); },
+    onSuccess: (data) => {
+      setResult(data);
+      saveEvalSummary({
+        country: f.country, curriculum: f.curriculum as CurriculumId,
+        raw: raw!, converted: data.converted,
+        tests: {
+          ielts: f.ielts ? +f.ielts : undefined, toefl: f.toefl ? +f.toefl : undefined,
+          sat: f.sat ? +f.sat : undefined, act: f.act ? +f.act : undefined,
+          duolingo: f.duolingo ? +f.duolingo : undefined,
+        },
+        targetCountries: f.targetCountries,
+        score: data.breakdown.total, ts: Date.now(),
+      });
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    },
     onError: (e: Error) => toast.error(e.message),
   });
 
@@ -409,7 +424,7 @@ export function ResultsView({
         <div>
           <p className="text-sm font-semibold text-primary">Your evaluation</p>
           <h1 className="mt-1 font-heading text-4xl font-extrabold">Profile score: <span className="text-primary">{breakdown.total}/100</span></h1>
-          <p className="mt-2 text-sm text-muted-foreground">{conversionLine({ curriculum: "US_GPA", gpa: converted.us4 })}</p>
+          <p className="mt-2 text-sm text-muted-foreground">US <b>{converted.us4.toFixed(2)}</b>/4.0 · UK <b>{converted.uk}</b> · German <b>{converted.german.toFixed(1)}</b> · ECTS <b>{converted.ects}</b> · AU <b>{converted.au7.toFixed(1)}</b>/7.0</p>
         </div>
         <div className="flex gap-2">
           {onReset && <Button variant="outline" onClick={onReset}>Edit answers</Button>}
