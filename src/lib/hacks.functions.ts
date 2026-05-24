@@ -5,15 +5,20 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
 const InputSchema = z.object({
   uniId: z.string().min(1).max(64),
-  uniName: z.string().min(1).max(200),
-  country: z.string().min(1).max(100),
 });
 
 export const generateAiHacks = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input) => InputSchema.parse(input))
   .handler(async ({ data }) => {
-    // Check cache first
+    // Resolve trusted uni metadata from DB — never trust client-supplied name/country.
+    const { data: uni } = await supabaseAdmin
+      .from("universities_detail")
+      .select("name, country")
+      .eq("slug", data.uniId)
+      .maybeSingle();
+    if (!uni) return { content: "University not found.", cached: false as const, error: "not_found" };
+
     const { data: cached } = await supabaseAdmin
       .from("university_hacks_ai")
       .select("content_md, generated_at")
@@ -25,7 +30,7 @@ export const generateAiHacks = createServerFn({ method: "POST" })
     const apiKey = process.env.LOVABLE_API_KEY;
     if (!apiKey) return { content: "AI is not configured.", cached: false as const, error: "no_api_key" };
 
-    const prompt = `You are advising an international undergraduate applicant about ${data.uniName} in ${data.country}.
+    const prompt = `You are advising an international undergraduate applicant about ${uni.name} in ${uni.country}.
 Generate 5–7 concrete admission tips, hacks, or insider knowledge that commonly appears on Reddit (r/ApplyingToCollege, country subs), Quora, and student forums. Focus on what international students from any country need to know.
 
 Format as a markdown bullet list. Each bullet:
