@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Switch } from "@/components/ui/switch";
 import { Search, Heart, ArrowRight, Globe, ChevronLeft, ChevronRight, Sparkles } from "lucide-react";
 import { UNIVERSITIES, COUNTRIES, PROGRAMS, type University } from "@/lib/data";
+import { matchUniversity } from "@/lib/matching";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
