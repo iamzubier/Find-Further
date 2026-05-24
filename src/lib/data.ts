@@ -18,7 +18,9 @@ export type University = {
   dealTag: DealTag;
   minGpa?: number; // BD 5.0 scale
   blurb: string;
+  campusImageUrl?: string;
 };
+
 
 export const COUNTRIES = [
   "USA", "UK", "Germany", "Finland", "Norway",
