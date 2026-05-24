@@ -84,11 +84,19 @@ function UniDetailPage() {
   );
 }
 
+const FALLBACK_CAMPUS = "https://images.unsplash.com/photo-1541339907198-e08756dedf3f?w=1600&q=80&auto=format&fit=crop";
+
 function Hero({ uni }: { uni: any }) {
+  const [imgSrc, setImgSrc] = useState<string>(uni.campus_image_url || FALLBACK_CAMPUS);
   return (
-    <div className="relative h-[420px] w-full overflow-hidden">
-      <img src={uni.campus_image_url} alt={`${uni.name} campus`} className="absolute inset-0 h-full w-full object-cover" />
-      <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-black/30" />
+    <div className="relative h-[420px] w-full overflow-hidden bg-neutral-900">
+      <img
+        src={imgSrc}
+        alt={`${uni.name} campus`}
+        className="absolute inset-0 h-full w-full object-cover"
+        onError={() => { if (imgSrc !== FALLBACK_CAMPUS) setImgSrc(FALLBACK_CAMPUS); }}
+      />
+      <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-black/20" />
       <div className="absolute inset-x-0 top-0 p-4">
         <Link to="/universities" className="inline-flex items-center gap-1 text-sm text-white/80 hover:text-white">
           <ArrowLeft className="h-4 w-4" /> All universities
@@ -98,14 +106,14 @@ function Hero({ uni }: { uni: any }) {
         <div className="flex flex-wrap items-end gap-5">
           {uni.logo_url && (
             <div className="flex h-20 w-20 items-center justify-center rounded-xl bg-white p-3 shadow-2xl ring-1 ring-white/20">
-              <img src={uni.logo_url} alt={`${uni.name} logo`} className="max-h-full max-w-full" onError={(e) => { (e.target as HTMLImageElement).style.display='none'; }} />
+              <img src={uni.logo_url} alt="" className="max-h-full max-w-full" onError={(e) => { (e.currentTarget.parentElement as HTMLElement).style.display='none'; }} />
             </div>
           )}
           <div className="text-white">
             <h1 className="font-heading text-4xl font-extrabold leading-tight md:text-5xl">{uni.name}</h1>
             <div className="mt-2 flex flex-wrap items-center gap-3 text-sm text-white/85">
-              <span className="text-xl">{uni.country_flag}</span>
-              <span><MapPin className="mr-1 inline h-3.5 w-3.5" />{uni.city}, {uni.country}</span>
+              {uni.country_flag && <span className="text-xl">{uni.country_flag}</span>}
+              <span><MapPin className="mr-1 inline h-3.5 w-3.5" />{uni.city ? `${uni.city}, ` : ""}{uni.country}</span>
               {uni.qs_rank && <span className="rounded-full bg-primary px-3 py-0.5 font-bold text-primary-foreground">QS #{uni.qs_rank}</span>}
               {uni.founded_year && <span>Founded {uni.founded_year}</span>}
             </div>
