@@ -8,7 +8,7 @@ import { SCHOLARSHIPS, daysLeft, type Scholarship } from "@/lib/data";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { LoginNudge } from "./universities";
+import { LoginNudge } from "./universities.index";
 
 export const Route = createFileRoute("/scholarships")({
   head: () => ({ meta: [
