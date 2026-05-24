@@ -121,7 +121,9 @@ function RootComponent() {
           </main>
           <Footer />
         </div>
+        <CompareTray />
         <Toaster theme="dark" />
+
       </AuthProvider>
     </QueryClientProvider>
   );
