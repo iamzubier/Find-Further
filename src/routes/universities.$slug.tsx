@@ -325,19 +325,7 @@ function Tuition({ uni }: any) {
         </div>
         {uni.fee_waivers && <p className="mt-3 text-sm text-muted-foreground"><b>Fee waivers:</b> {uni.fee_waivers}</p>}
       </Card>
-      <Card title="Scholarships" icon={Award}>
-        <div className="grid gap-3 md:grid-cols-2">
-          {uni.scholarships?.map((s: any) => (
-            <div key={s.name} className="rounded-lg border border-border p-4">
-              <div className="font-heading font-bold">{s.name}</div>
-              <div className="mt-1 text-primary font-semibold">{s.amount}</div>
-              <p className="mt-2 text-sm text-muted-foreground">{s.eligibility}</p>
-              <div className="mt-2 text-xs">Deadline: <b>{s.deadline}</b></div>
-              {s.url && <a href={s.url} target="_blank" rel="noopener noreferrer" className="mt-2 inline-flex items-center gap-1 text-sm text-primary hover:underline">Apply <ExternalLink className="h-3 w-3" /></a>}
-            </div>
-          ))}
-        </div>
-      </Card>
+      <ScholarshipsByLevel scholarships={uni.scholarships ?? []} />
       {uni.financial_aid && <Card title="Financial Aid"><p className="text-sm">{uni.financial_aid}</p></Card>}
       {uni.work_permit && <Card title="Work Permit Rules"><p className="text-sm">{uni.work_permit}</p></Card>}
     </>
