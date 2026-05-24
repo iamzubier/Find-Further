@@ -236,7 +236,17 @@ function CatalogBrowser() {
           <div key={u.id} className="card-surface flex flex-wrap items-center justify-between gap-3 p-4">
             <div className="min-w-0 flex-1">
               <div className="flex flex-wrap items-center gap-2">
-                <h3 className="font-heading text-base font-bold leading-tight">{u.name}</h3>
+                {u.slug ? (
+                  <Link
+                    to="/universities/$slug"
+                    params={{ slug: u.slug }}
+                    className="font-heading text-base font-bold leading-tight hover:text-primary hover:underline"
+                  >
+                    {u.name}
+                  </Link>
+                ) : (
+                  <h3 className="font-heading text-base font-bold leading-tight">{u.name}</h3>
+                )}
                 {u.has_curated_data && (
                   <span className="rounded-full bg-primary/15 px-2 py-0.5 text-[10px] font-semibold text-primary ring-1 ring-primary/30">
                     <Sparkles className="mr-0.5 inline h-2.5 w-2.5" /> Curated
@@ -247,16 +257,25 @@ function CatalogBrowser() {
                 {u.country}{u.state_province ? ` · ${u.state_province}` : ""}
               </div>
             </div>
-            {u.website && (
-              <a
-                href={u.website}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-xs text-primary hover:underline"
-              >
-                Visit site ↗
-              </a>
-            )}
+            <div className="flex items-center gap-3">
+              {u.slug && (
+                <Button asChild size="sm" className="h-8 bg-primary text-primary-foreground hover:bg-primary/90">
+                  <Link to="/universities/$slug" params={{ slug: u.slug }}>
+                    View page <ArrowRight className="ml-1 h-3.5 w-3.5" />
+                  </Link>
+                </Button>
+              )}
+              {u.website && (
+                <a
+                  href={u.website}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-xs text-muted-foreground hover:text-primary hover:underline"
+                >
+                  Visit site ↗
+                </a>
+              )}
+            </div>
           </div>
         ))}
         {!listQuery.isFetching && (listQuery.data?.rows.length ?? 0) === 0 && (
