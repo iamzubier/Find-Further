@@ -23,7 +23,7 @@ export const Route = createFileRoute("/universities")({
   validateSearch: (s) => SearchSchema.parse(s),
   head: () => ({ meta: [
     { title: "Universities — BeyondBorder" },
-    { name: "description", content: "Browse 5,900+ universities abroad with tuition, scholarships, and admission hacks for BD students." },
+    { name: "description", content: "Browse 10,000+ universities worldwide with tuition, scholarships, and admission hacks for BD students." },
   ]}),
   component: UniversitiesPage,
 });
@@ -36,11 +36,12 @@ const REGIONS = [
   { value: "CA", label: "Canada" },
   { value: "AU", label: "Australia / NZ" },
   { value: "ASIA", label: "Asia / Middle East" },
+  { value: "OTHER", label: "Rest of world" },
 ];
 
 function UniversitiesPage() {
   const search = Route.useSearch();
-  const [tab, setTab] = useState<"featured" | "catalog">("featured");
+  const [tab, setTab] = useState<"featured" | "catalog">("catalog");
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-10">
@@ -50,7 +51,7 @@ function UniversitiesPage() {
           <p className="mt-1 text-sm text-muted-foreground">
             {tab === "featured"
               ? "Hand-curated picks with tuition, scholarships & admission hacks."
-              : "Searchable directory of 5,900+ universities across EU, UK, US, CA, AU, Asia."}
+              : "10,000+ universities worldwide — EU, UK, US, CA, AU, Asia and beyond."}
           </p>
         </div>
         <div className="inline-flex rounded-lg border border-border bg-card p-1 text-sm">
