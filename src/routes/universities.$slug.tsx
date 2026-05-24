@@ -325,19 +325,7 @@ function Tuition({ uni }: any) {
         </div>
         {uni.fee_waivers && <p className="mt-3 text-sm text-muted-foreground"><b>Fee waivers:</b> {uni.fee_waivers}</p>}
       </Card>
-      <Card title="Scholarships" icon={Award}>
-        <div className="grid gap-3 md:grid-cols-2">
-          {uni.scholarships?.map((s: any) => (
-            <div key={s.name} className="rounded-lg border border-border p-4">
-              <div className="font-heading font-bold">{s.name}</div>
-              <div className="mt-1 text-primary font-semibold">{s.amount}</div>
-              <p className="mt-2 text-sm text-muted-foreground">{s.eligibility}</p>
-              <div className="mt-2 text-xs">Deadline: <b>{s.deadline}</b></div>
-              {s.url && <a href={s.url} target="_blank" rel="noopener noreferrer" className="mt-2 inline-flex items-center gap-1 text-sm text-primary hover:underline">Apply <ExternalLink className="h-3 w-3" /></a>}
-            </div>
-          ))}
-        </div>
-      </Card>
+      <ScholarshipsByLevel scholarships={uni.scholarships ?? []} />
       {uni.financial_aid && <Card title="Financial Aid"><p className="text-sm">{uni.financial_aid}</p></Card>}
       {uni.work_permit && <Card title="Work Permit Rules"><p className="text-sm">{uni.work_permit}</p></Card>}
     </>
@@ -650,31 +638,418 @@ function SubmitTip({ uniSlug, disabled }: { uniSlug: string; disabled: boolean }
   );
 }
 
-function Exams({ uni }: any) {
+function inferScholarshipLevel(s: any): "undergraduate" | "postgraduate" | "phd" | "all" {
+  if (s.level) {
+    const v = String(s.level).toLowerCase();
+    if (v.includes("phd") || v.includes("doctor")) return "phd";
+    if (v.includes("master") || v.includes("post") || v.includes("graduate") && !v.includes("under")) return "postgraduate";
+    if (v.includes("under") || v.includes("bachelor")) return "undergraduate";
+    if (v.includes("all")) return "all";
+  }
+  const blob = `${s.name ?? ""} ${s.eligibility ?? ""} ${s.description ?? ""}`.toLowerCase();
+  if (/phd|doctoral|doctorate/.test(blob)) return "phd";
+  if (/master|msc|m\.s\.|mba|graduate|postgrad/.test(blob)) return "postgraduate";
+  if (/undergrad|bachelor|b\.sc|b\.a\.|bsc|ba\b/.test(blob)) return "undergraduate";
+  return "all";
+}
+
+const LEVEL_BADGE_DETAIL: Record<string, { label: string; cls: string }> = {
+  undergraduate: { label: "Bachelor's", cls: "bg-emerald-500/15 text-emerald-700 ring-emerald-500/30 dark:text-emerald-300" },
+  postgraduate:  { label: "Master's",   cls: "bg-blue-500/15 text-blue-700 ring-blue-500/30 dark:text-blue-300" },
+  phd:           { label: "PhD",        cls: "bg-purple-500/15 text-purple-700 ring-purple-500/30 dark:text-purple-300" },
+  all:           { label: "All levels", cls: "bg-amber-500/15 text-amber-700 ring-amber-500/30 dark:text-amber-300" },
+};
+
+function ScholarshipsByLevel({ scholarships }: { scholarships: any[] }) {
+  const [lvl, setLvl] = useState<"undergraduate" | "postgraduate" | "phd" | "all" | "any">("undergraduate");
+  const enriched = useMemo(() => scholarships.map((s) => ({ ...s, _level: inferScholarshipLevel(s) })), [scholarships]);
+  const filtered = enriched.filter((s) => lvl === "any" || s._level === lvl || s._level === "all");
+  const tabs: { v: typeof lvl; label: string }[] = [
+    { v: "undergraduate", label: "Undergraduate" },
+    { v: "postgraduate",  label: "Master's" },
+    { v: "phd",           label: "PhD" },
+    { v: "any",           label: "All" },
+  ];
+  if (scholarships.length === 0) return null;
   return (
-    <Card title="Entrance exams & prep" icon={BookOpen}>
-      <div className="grid gap-4">
-        {uni.exams?.map((e: any) => (
-          <div key={e.name} className="rounded-lg border border-border p-4">
-            <div className="flex flex-wrap items-start justify-between gap-2">
-              <div>
-                <h3 className="font-heading font-bold">{e.name}</h3>
-                <p className="mt-1 text-xs text-muted-foreground">{e.what_it_tests}</p>
-              </div>
-              <span className="rounded-full bg-primary/15 px-3 py-1 text-xs font-semibold text-primary ring-1 ring-primary/30">{e.score_req}</span>
-            </div>
-            {e.next_dates?.length > 0 && <div className="mt-3 text-xs"><b>Next dates:</b> {e.next_dates.join(" · ")}</div>}
-            <div className="mt-3 flex flex-wrap gap-2">
-              {e.register_url && <a href={e.register_url} target="_blank" rel="noopener noreferrer"><Button size="sm" variant="outline"><ExternalLink className="mr-1 h-3 w-3" /> Register</Button></a>}
-              {e.sample_url && <a href={e.sample_url} target="_blank" rel="noopener noreferrer"><Button size="sm" variant="outline">Sample paper</Button></a>}
-              {(e.prep_links ?? []).slice(0,3).map((url: string, i: number) => (
-                <a key={url} href={url} target="_blank" rel="noopener noreferrer"><Button size="sm" variant="ghost">Prep {i+1}</Button></a>
-              ))}
-            </div>
-          </div>
+    <Card title="Scholarships" icon={Award}>
+      <div className="mb-4 inline-flex flex-wrap rounded-lg border border-border bg-card p-1 text-sm">
+        {tabs.map((t) => (
+          <button key={t.v} onClick={() => setLvl(t.v)}
+            className={`rounded-md px-3 py-1.5 ${lvl === t.v ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground"}`}>
+            {t.label}
+          </button>
         ))}
       </div>
+      {filtered.length === 0 ? (
+        <p className="text-sm text-muted-foreground">No scholarships listed for this level. Try <b>All</b>.</p>
+      ) : (
+        <div className="grid gap-3 md:grid-cols-2">
+          {filtered.map((s: any) => {
+            const b = LEVEL_BADGE_DETAIL[s._level];
+            return (
+              <div key={s.name} className="rounded-lg border border-border p-4">
+                <div className="flex items-start justify-between gap-2">
+                  <div className="font-heading font-bold">{s.name}</div>
+                  <span className={`shrink-0 rounded-full px-2 py-0.5 text-[10px] font-semibold ring-1 ${b.cls}`}>{b.label}</span>
+                </div>
+                <div className="mt-1 text-primary font-semibold">{s.amount}</div>
+                <p className="mt-2 text-sm text-muted-foreground">{s.eligibility}</p>
+                {s.deadline && <div className="mt-2 text-xs">Deadline: <b>{s.deadline}</b></div>}
+                {s.url && <a href={s.url} target="_blank" rel="noopener noreferrer" className="mt-2 inline-flex items-center gap-1 text-sm text-primary hover:underline">Apply <ExternalLink className="h-3 w-3" /></a>}
+              </div>
+            );
+          })}
+        </div>
+      )}
     </Card>
+  );
+}
+
+// ===== Reference library for entrance exams =====
+type ExamRef = {
+  fullName: string;
+  whatItTests: string;
+  validity: string;
+  maxScore?: string;
+  registerUrl: string;
+  officialPrep: { label: string; url: string };
+  khan?: string;
+  youtube: { name: string; subs: string; url: string }[];
+  books: { title: string; author: string }[];
+  prepTime: string;
+  sampleQs: { q: string; a: string }[];
+};
+
+const EXAM_LIB: Record<string, ExamRef> = {
+  SAT: {
+    fullName: "Scholastic Assessment Test",
+    whatItTests: "College-readiness test covering Reading, Writing & Language, and Math. Used by most US universities and many globally for undergraduate admission.",
+    validity: "Scores valid for 5 years",
+    maxScore: "1600",
+    registerUrl: "https://satsuite.collegeboard.org/sat/registration",
+    officialPrep: { label: "College Board / Bluebook", url: "https://satsuite.collegeboard.org/sat/preparation" },
+    khan: "https://www.khanacademy.org/digital-sat",
+    youtube: [
+      { name: "SupertutorTV", subs: "300K+", url: "https://www.youtube.com/@SupertutorTV" },
+      { name: "Scalar Learning", subs: "210K+", url: "https://www.youtube.com/@ScalarLearning" },
+      { name: "TestPrep with Mr. Mike", subs: "120K+", url: "https://www.youtube.com/@MikeTestPrep" },
+    ],
+    books: [
+      { title: "The Official SAT Study Guide", author: "College Board" },
+      { title: "Erica Meltzer's Critical Reading", author: "Erica Meltzer" },
+      { title: "PWN the SAT: Math Guide", author: "Mike McClenathan" },
+    ],
+    prepTime: "~3–6 months at 8–10 hrs/week to reach 1500+",
+    sampleQs: [
+      { q: "Math: If 3x − 7 = 2x + 5, what is x?", a: "x = 12" },
+      { q: "Reading: 'The author's tone in lines 12–18 can best be described as…' (choose: A) skeptical B) reverent C) detached D) ironic", a: "A — skeptical (author questions the conclusion)" },
+    ],
+  },
+  ACT: {
+    fullName: "American College Testing",
+    whatItTests: "US college-admission test covering English, Math, Reading, Science, and an optional essay. Accepted equivalently to the SAT.",
+    validity: "Scores valid for 5 years",
+    maxScore: "36",
+    registerUrl: "https://www.act.org/content/act/en/products-and-services/the-act/registration.html",
+    officialPrep: { label: "ACT Academy", url: "https://academy.act.org/" },
+    khan: "https://www.khanacademy.org/test-prep",
+    youtube: [
+      { name: "SupertutorTV", subs: "300K+", url: "https://www.youtube.com/@SupertutorTV" },
+      { name: "Magoosh", subs: "180K+", url: "https://www.youtube.com/@Magoosh" },
+      { name: "PrepScholar", subs: "60K+", url: "https://www.youtube.com/@PrepScholarSATACT" },
+    ],
+    books: [
+      { title: "The Official ACT Prep Guide", author: "ACT Inc." },
+      { title: "For the Love of ACT Science", author: "Michael Cerro" },
+      { title: "Ultimate Guide to the Math ACT", author: "Richard F. Corn" },
+    ],
+    prepTime: "~3 months at 6–8 hrs/week to reach 33+",
+    sampleQs: [
+      { q: "English: 'Their going to the museum tomorrow.' Choose the correct form.", a: "They're going (contraction of 'they are')" },
+      { q: "Math: What is the slope of the line through (2, 3) and (5, 11)?", a: "(11−3)/(5−2) = 8/3" },
+    ],
+  },
+  TOEFL: {
+    fullName: "Test of English as a Foreign Language",
+    whatItTests: "English proficiency for academic settings: Reading, Listening, Speaking, Writing. Required by most US/Canadian universities for non-native English speakers.",
+    validity: "Scores valid for 2 years",
+    maxScore: "120",
+    registerUrl: "https://www.ets.org/toefl/test-takers/ibt/register.html",
+    officialPrep: { label: "ETS TOEFL Prep", url: "https://www.ets.org/toefl/test-takers/ibt/prepare.html" },
+    youtube: [
+      { name: "TST Prep", subs: "270K+", url: "https://www.youtube.com/@TSTPrepTOEFL" },
+      { name: "NoteFull TOEFL Mastery", subs: "330K+", url: "https://www.youtube.com/@NoteFullTOEFLMastery" },
+      { name: "TOEFL TV (Official ETS)", subs: "190K+", url: "https://www.youtube.com/@TOEFLtv" },
+    ],
+    books: [
+      { title: "Official Guide to the TOEFL iBT", author: "ETS" },
+      { title: "TOEFL iBT Prep Plus", author: "Kaplan" },
+      { title: "Barron's TOEFL iBT", author: "Pamela J. Sharpe" },
+    ],
+    prepTime: "~6–10 weeks at 8 hrs/week to reach 100+",
+    sampleQs: [
+      { q: "Reading inference: 'Despite the storm, the ship reached port on time.' What can be inferred?", a: "The ship overcame difficult conditions to stay on schedule." },
+      { q: "Speaking: Describe a place you would like to visit and why (45 sec).", a: "Model answer covers: place, 2 specific reasons, a personal hook." },
+    ],
+  },
+  IELTS: {
+    fullName: "International English Language Testing System",
+    whatItTests: "English proficiency in Listening, Reading, Writing, Speaking. Accepted by UK, Australia, Canada, NZ, and most universities worldwide.",
+    validity: "Scores valid for 2 years",
+    maxScore: "9.0",
+    registerUrl: "https://www.ielts.org/book-a-test",
+    officialPrep: { label: "IELTS.org Free Practice", url: "https://www.ielts.org/for-test-takers/sample-test-questions" },
+    youtube: [
+      { name: "IELTS Liz", subs: "1.6M+", url: "https://www.youtube.com/@ieltsliz" },
+      { name: "IELTS Advantage", subs: "550K+", url: "https://www.youtube.com/@IELTSAdvantage" },
+      { name: "E2 IELTS", subs: "780K+", url: "https://www.youtube.com/@e2ielts" },
+    ],
+    books: [
+      { title: "Cambridge IELTS 18 (Academic)", author: "Cambridge UP" },
+      { title: "The Official Cambridge Guide to IELTS", author: "Cambridge UP" },
+      { title: "Barron's IELTS Superpack", author: "Lin Lougheed" },
+    ],
+    prepTime: "~6–8 weeks at 6–8 hrs/week to reach 7.0+",
+    sampleQs: [
+      { q: "Writing Task 1: The chart shows electricity production by source in 2010 vs 2020. Summarise (150 words).", a: "Open with overview, group similar sources, compare biggest change, end with one notable trend." },
+      { q: "Speaking Part 2: Describe a book that influenced you (1–2 min).", a: "Cover: which book, when read, why it influenced you, one specific example." },
+    ],
+  },
+  Duolingo: {
+    fullName: "Duolingo English Test",
+    whatItTests: "Adaptive online English test covering literacy, comprehension, conversation, and production. Accepted by 5,000+ universities including most US/UK schools.",
+    validity: "Scores valid for 2 years",
+    maxScore: "160",
+    registerUrl: "https://englishtest.duolingo.com/applicants",
+    officialPrep: { label: "Duolingo English Test Prep", url: "https://englishtest.duolingo.com/preparation" },
+    youtube: [
+      { name: "Duolingo English Test", subs: "120K+", url: "https://www.youtube.com/@DuolingoEnglishTest" },
+      { name: "Teacher Luke DET", subs: "60K+", url: "https://www.youtube.com/results?search_query=teacher+luke+det" },
+      { name: "ArguingWithAaron", subs: "40K+", url: "https://www.youtube.com/@ArguingWithAaron" },
+    ],
+    books: [
+      { title: "DET Ready: The Complete Guide", author: "Arizio Sweeting" },
+      { title: "Master the Duolingo English Test", author: "TST Prep" },
+      { title: "The Duolingo Practice Book", author: "Self-published — community" },
+    ],
+    prepTime: "~3–4 weeks at 5 hrs/week to reach 120+",
+    sampleQs: [
+      { q: "Read & Complete: 'Cli__te ch__ge is one of the b__gest ch__lenges f__cing humanity.' Fill blanks.", a: "Climate change is one of the biggest challenges facing humanity." },
+      { q: "Speaking sample (30s): 'Describe your hometown.'", a: "Open with location, 2 unique features, end with personal feeling." },
+    ],
+  },
+  GRE: {
+    fullName: "Graduate Record Examinations",
+    whatItTests: "Graduate-school admissions test: Verbal Reasoning, Quantitative Reasoning, Analytical Writing. Required by many US master's and PhD programs.",
+    validity: "Scores valid for 5 years",
+    maxScore: "340 (V+Q) + 6.0 AWA",
+    registerUrl: "https://www.ets.org/gre/test-takers/general-test/register.html",
+    officialPrep: { label: "ETS POWERPREP", url: "https://www.ets.org/gre/test-takers/general-test/prepare.html" },
+    youtube: [
+      { name: "Gregmat", subs: "150K+", url: "https://www.youtube.com/@gregmat" },
+      { name: "Magoosh GRE", subs: "180K+", url: "https://www.youtube.com/@Magoosh" },
+      { name: "Manhattan Prep", subs: "70K+", url: "https://www.youtube.com/@ManhattanPrep" },
+    ],
+    books: [
+      { title: "Official GRE Super Power Pack", author: "ETS" },
+      { title: "Manhattan Prep GRE 5 lb Book", author: "Manhattan Prep" },
+      { title: "GRE Vocabulary Flashcards", author: "Magoosh" },
+    ],
+    prepTime: "~2–4 months at 10 hrs/week to reach 325+",
+    sampleQs: [
+      { q: "Quant: If x² = 36, what are all possible values of x?", a: "x = 6 or x = −6" },
+      { q: "Verbal: Choose 2 words for: 'Her argument was so ____ that few could find any flaw in it.' (cogent, fallacious, persuasive, tenuous, irrefutable, weak)", a: "cogent, irrefutable" },
+    ],
+  },
+  GMAT: {
+    fullName: "Graduate Management Admission Test",
+    whatItTests: "Business school admissions test (MBA): Quantitative, Verbal, Data Insights. Adaptive computer test required by most top MBA programs.",
+    validity: "Scores valid for 5 years",
+    maxScore: "805 (GMAT Focus)",
+    registerUrl: "https://www.mba.com/exams/gmat-exam/register",
+    officialPrep: { label: "Official mba.com GMAT Prep", url: "https://www.mba.com/exams/gmat-exam/prepare" },
+    youtube: [
+      { name: "GMAT Ninja", subs: "85K+", url: "https://www.youtube.com/@GMATNinjaTutoring" },
+      { name: "TTP GMAT", subs: "40K+", url: "https://www.youtube.com/@TargetTestPrepGMAT" },
+      { name: "ExperT's Global", subs: "120K+", url: "https://www.youtube.com/@ExpertsGlobalMBA" },
+    ],
+    books: [
+      { title: "The Official Guide for GMAT", author: "GMAC" },
+      { title: "Manhattan Prep GMAT All-the-Quant", author: "Manhattan Prep" },
+      { title: "PowerScore GMAT Critical Reasoning Bible", author: "David M. Killoran" },
+    ],
+    prepTime: "~3–5 months at 10–12 hrs/week to reach 700+",
+    sampleQs: [
+      { q: "Quant: A train travels 240km in 3 hours. What is its average speed in km/h?", a: "80 km/h" },
+      { q: "Critical Reasoning: Identify the assumption in: 'Coffee improves productivity. So companies should provide free coffee.'", a: "That free coffee will be consumed enough to improve productivity (and that productivity is the company's goal)." },
+    ],
+  },
+};
+
+function statusFor(required: number | undefined, mine: number | undefined): { txt: string; cls: string } | null {
+  if (!required || !mine) return null;
+  if (mine >= required) return { txt: "✓ Competitive", cls: "text-emerald-600" };
+  return { txt: "✗ Below requirement", cls: "text-rose-600" };
+}
+
+function buildUniExamList(uni: any): { key: string; req?: string; avg?: string; reqNum?: number }[] {
+  const r = uni.admission_reqs ?? {};
+  const list: { key: string; req?: string; avg?: string; reqNum?: number }[] = [];
+  if (r.sat_min || r.sat) list.push({ key: "SAT", req: `${r.sat_min ?? r.sat}+`, avg: r.sat_avg ? String(r.sat_avg) : undefined, reqNum: Number(r.sat_min ?? r.sat) });
+  if (r.act_min || r.act) list.push({ key: "ACT", req: `${r.act_min ?? r.act}+`, avg: r.act_avg ? String(r.act_avg) : undefined, reqNum: Number(r.act_min ?? r.act) });
+  if (r.toefl) list.push({ key: "TOEFL", req: `${r.toefl}+`, reqNum: Number(r.toefl) });
+  if (r.ielts) list.push({ key: "IELTS", req: `${r.ielts}+`, reqNum: Number(r.ielts) });
+  if (r.duolingo) list.push({ key: "Duolingo", req: `${r.duolingo}+`, reqNum: Number(r.duolingo) });
+  if (r.gre) list.push({ key: "GRE", req: `${r.gre}+`, reqNum: Number(r.gre) });
+  if (r.gmat) list.push({ key: "GMAT", req: `${r.gmat}+`, reqNum: Number(r.gmat) });
+  // also fold any uni.exams entries that aren't already covered
+  (uni.exams ?? []).forEach((e: any) => {
+    const k = Object.keys(EXAM_LIB).find((x) => x.toLowerCase() === String(e.name ?? "").toLowerCase());
+    if (k && !list.find((l) => l.key === k)) list.push({ key: k, req: e.score_req });
+  });
+  // Fallback — at minimum show TOEFL + IELTS if international students apply
+  if (list.length === 0) {
+    list.push({ key: "TOEFL" }, { key: "IELTS" });
+  }
+  return list;
+}
+
+function Exams({ uni }: any) {
+  const evalSum = useMemo(() => loadEvalSummary(), []);
+  const exams = buildUniExamList(uni);
+  const myScores: Record<string, number | undefined> = {
+    SAT: evalSum?.tests.sat,
+    TOEFL: evalSum?.tests.toefl,
+    IELTS: evalSum?.tests.ielts,
+  };
+
+  // For universities with bespoke entrance exams (passed via uni.exams with sample_url / syllabus)
+  const bespoke = (uni.exams ?? []).filter((e: any) => !EXAM_LIB[String(e.name).toUpperCase()]);
+
+  return (
+    <>
+      <Card title="Entrance exams accepted at this university" icon={BookOpen}>
+        <p className="text-sm text-muted-foreground">
+          Each card shows {uni.name}'s requirement, average admitted score, official prep, top YouTube channels, recommended books, and sample questions.
+        </p>
+      </Card>
+
+      {exams.map((row) => {
+        const ref = EXAM_LIB[row.key];
+        if (!ref) return null;
+        const mine = myScores[row.key];
+        const status = statusFor(row.reqNum, mine);
+        return (
+          <Card key={row.key} title={`${row.key} — ${ref.fullName}`} icon={BookOpen}>
+            <p className="text-sm">{ref.whatItTests}</p>
+
+            {/* Score requirement block */}
+            <div className="mt-4 grid gap-3 md:grid-cols-4">
+              <Stat label="Required" value={row.req ?? "Recommended"} highlight />
+              <Stat label="Avg admitted" value={row.avg ?? "—"} />
+              <Stat label="Your score" value={mine != null ? String(mine) : "Sign in / Evaluate"} />
+              <div className="rounded-lg border border-border p-3">
+                <div className="text-xs uppercase tracking-wide text-muted-foreground">Status</div>
+                <div className={`mt-1 font-heading text-lg font-bold ${status?.cls ?? "text-muted-foreground"}`}>
+                  {status?.txt ?? "Add your score"}
+                </div>
+              </div>
+            </div>
+
+            <div className="mt-3 flex flex-wrap gap-2 text-xs text-muted-foreground">
+              <span>Validity: <b className="text-foreground">{ref.validity}</b></span>
+              {ref.maxScore && <span>· Max score: <b className="text-foreground">{ref.maxScore}</b></span>}
+              <span>· Est. prep: <b className="text-foreground">{ref.prepTime}</b></span>
+            </div>
+
+            {/* Prep resources */}
+            <div className="mt-5 grid gap-3 md:grid-cols-2">
+              <div className="rounded-lg border border-border p-4">
+                <div className="text-xs font-bold uppercase tracking-wide text-muted-foreground">Official prep</div>
+                <a href={ref.officialPrep.url} target="_blank" rel="noopener noreferrer" className="mt-1 inline-flex items-center gap-1 text-sm font-semibold text-primary hover:underline">
+                  {ref.officialPrep.label} <ExternalLink className="h-3 w-3" />
+                </a>
+                {ref.khan && (
+                  <div className="mt-2">
+                    <a href={ref.khan} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-sm text-primary hover:underline">
+                      Khan Academy (free) <ExternalLink className="h-3 w-3" />
+                    </a>
+                  </div>
+                )}
+                <a href={ref.registerUrl} target="_blank" rel="noopener noreferrer" className="mt-3 inline-block">
+                  <Button size="sm"><ExternalLink className="mr-1 h-3 w-3" /> Register for {row.key}</Button>
+                </a>
+              </div>
+
+              <div className="rounded-lg border border-border p-4">
+                <div className="text-xs font-bold uppercase tracking-wide text-muted-foreground">Top YouTube channels</div>
+                <ul className="mt-2 space-y-1.5 text-sm">
+                  {ref.youtube.map((y) => (
+                    <li key={y.url} className="flex items-center justify-between gap-2">
+                      <a href={y.url} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">{y.name}</a>
+                      <span className="text-xs text-muted-foreground">{y.subs}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+
+            <div className="mt-3 rounded-lg border border-border p-4">
+              <div className="text-xs font-bold uppercase tracking-wide text-muted-foreground">Recommended books</div>
+              <ul className="mt-2 grid gap-1 text-sm md:grid-cols-3">
+                {ref.books.map((b) => (
+                  <li key={b.title} className="rounded border border-border bg-secondary/40 p-2">
+                    <div className="font-semibold">{b.title}</div>
+                    <div className="text-xs text-muted-foreground">{b.author}</div>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* Sample questions */}
+            <div className="mt-3 rounded-lg border border-border bg-secondary/30 p-4">
+              <div className="text-xs font-bold uppercase tracking-wide text-muted-foreground">Sample questions</div>
+              <div className="mt-2 space-y-3 text-sm">
+                {ref.sampleQs.map((s, i) => (
+                  <details key={i} className="rounded border border-border bg-background p-2">
+                    <summary className="cursor-pointer font-semibold">{s.q}</summary>
+                    <div className="mt-2 text-foreground/80"><b>Answer:</b> {s.a}</div>
+                  </details>
+                ))}
+              </div>
+            </div>
+          </Card>
+        );
+      })}
+
+      {/* University-specific entrance exams */}
+      {bespoke.map((e: any) => (
+        <Card key={e.name} title={`${e.name} — ${uni.name} entrance exam`} icon={BookOpen}>
+          {e.what_it_tests && <p className="text-sm">{e.what_it_tests}</p>}
+          {e.score_req && (
+            <div className="mt-3"><span className="rounded-full bg-primary/15 px-3 py-1 text-xs font-semibold text-primary ring-1 ring-primary/30">Required: {e.score_req}</span></div>
+          )}
+          {e.syllabus && (
+            <div className="mt-4">
+              <div className="text-xs font-bold uppercase tracking-wide text-muted-foreground">Syllabus breakdown</div>
+              <ul className="mt-2 space-y-1 text-sm">
+                {e.syllabus.map((s: any) => (
+                  <li key={s.topic} className="flex justify-between rounded border border-border p-2">
+                    <span>{s.topic}</span><span className="font-semibold">{s.weight}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+          <div className="mt-4 flex flex-wrap gap-2">
+            {e.sample_url && <a href={e.sample_url} target="_blank" rel="noopener noreferrer"><Button size="sm" variant="outline">Sample paper</Button></a>}
+            {e.past_papers_url && <a href={e.past_papers_url} target="_blank" rel="noopener noreferrer"><Button size="sm" variant="outline">Past papers</Button></a>}
+            {e.register_url && <a href={e.register_url} target="_blank" rel="noopener noreferrer"><Button size="sm"><ExternalLink className="mr-1 h-3 w-3" /> Register</Button></a>}
+          </div>
+        </Card>
+      ))}
+    </>
   );
 }
 

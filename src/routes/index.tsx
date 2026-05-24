@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { Button } from "@/components/ui/button";
@@ -47,7 +47,7 @@ function Hero() {
       <div
         className="absolute inset-0 -z-10 bg-cover bg-center"
         aria-hidden
-        style={{ backgroundImage: "url('https://images.unsplash.com/photo-1562774053-701939374585?w=1920&q=80')" }}
+        style={{ backgroundImage: "url('https://images.unsplash.com/photo-1541339907198-e08756dedf3f?w=1600&q=80')" }}
       />
       <div className="absolute inset-0 -z-10 bg-gradient-to-b from-black/70 via-black/55 to-black/85" aria-hidden />
       <CrestArt variant="c" className="pointer-events-none absolute right-10 bottom-4 h-44 w-44 text-white/10" />
@@ -188,60 +188,42 @@ function Stats() {
 }
 
 function WtfSection() {
-  const [idx, setIdx] = useState(0);
-  useEffect(() => {
-    const t = setInterval(() => setIdx((i) => (i + 1) % WTF_FACTS.length), 3500);
-    return () => clearInterval(t);
-  }, []);
-  const f = WTF_FACTS[idx];
-
   return (
     <section className="mx-auto max-w-6xl px-4 py-16">
-      <div className="mb-8 flex items-end justify-between gap-4">
-        <div>
-          <h2 className="font-heading text-3xl font-extrabold md:text-5xl">
-            Wait… you didn't know this? <span>🤯</span>
-          </h2>
-          <p className="mt-2 text-muted-foreground">Shocking facts most international students assume aren't possible.</p>
-        </div>
-        <div className="hidden gap-1 md:flex">
-          {WTF_FACTS.map((_, i) => (
-            <button
-              key={i}
-              onClick={() => setIdx(i)}
-              className={`h-1.5 w-6 rounded-full transition-colors ${i === idx ? "bg-primary" : "bg-border"}`}
-              aria-label={`Card ${i + 1}`}
-            />
-          ))}
-        </div>
+      <div className="mb-8">
+        <h2 className="font-heading text-3xl font-extrabold md:text-5xl">
+          Wait… you didn't know this? <span>🤯</span>
+        </h2>
+        <p className="mt-2 text-muted-foreground">Shocking facts most international students assume aren't possible.</p>
       </div>
 
-      <div className="card-surface relative overflow-hidden p-8 md:p-12">
-        <div
-          className="pointer-events-none absolute inset-0 opacity-30"
-          style={{ background: "radial-gradient(60% 80% at 80% 20%, color-mix(in oklab, var(--color-primary) 20%, transparent), transparent 70%)" }}
-        />
-        <div key={idx} className="relative animate-in fade-in slide-in-from-bottom-2 duration-500">
-          <div className="flex items-center gap-3">
-            <span className="text-6xl md:text-7xl">{f.flag}</span>
-            <div>
-              <div className="text-sm uppercase tracking-wide text-muted-foreground">{f.country}</div>
-              <span className="mt-1 inline-block rounded-full bg-primary/15 px-3 py-1 text-xs font-semibold text-primary ring-1 ring-primary/30">
-                {f.tag}
-              </span>
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+        {WTF_FACTS.map((f) => (
+          <Link
+            key={f.country}
+            to="/universities"
+            search={{ country: f.filter.country }}
+            className="group relative min-h-[240px] overflow-hidden rounded-2xl border border-border bg-cover bg-center text-white shadow-md transition-all hover:-translate-y-0.5 hover:shadow-2xl"
+            style={{ backgroundImage: `url('${f.image}')` }}
+          >
+            <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-black/60 to-black/90" aria-hidden />
+            <div className="relative z-[1] flex h-full min-h-[240px] flex-col p-5">
+              <div className="flex items-center gap-2">
+                <span className="text-3xl">{f.flag}</span>
+                <div>
+                  <div className="text-xs uppercase tracking-wide text-white/80">{f.country}</div>
+                  <span className="mt-0.5 inline-block rounded-full bg-white/15 px-2 py-0.5 text-[10px] font-semibold backdrop-blur">{f.tag}</span>
+                </div>
+              </div>
+              <p className="mt-auto pt-6 font-heading text-lg font-extrabold leading-tight md:text-xl">
+                "{f.fact}"
+              </p>
+              <div className="mt-3 inline-flex items-center gap-1 text-xs font-medium text-white/90">
+                Show me these <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-1" />
+              </div>
             </div>
-          </div>
-          <p className="mt-6 max-w-3xl font-heading text-2xl font-extrabold leading-tight md:text-4xl">
-            "{f.fact}"
-          </p>
-          <div className="mt-6">
-            <Button asChild className="bg-primary text-primary-foreground hover:bg-primary/90">
-              <Link to="/universities" search={{ country: f.filter.country }}>
-                Show me these universities <ArrowRight className="ml-2 h-4 w-4" />
-              </Link>
-            </Button>
-          </div>
-        </div>
+          </Link>
+        ))}
       </div>
     </section>
   );
