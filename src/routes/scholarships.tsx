@@ -49,70 +49,153 @@ function ScholarshipsPage() {
   const countries = Array.from(new Set(SCHOLARSHIPS.map((s) => s.country)));
 
   return (
-    <div className="mx-auto max-w-6xl px-4 py-10">
-      <h1 className="font-heading text-4xl font-extrabold md:text-5xl">Scholarships</h1>
-      <p className="mt-1 text-sm text-muted-foreground">{filtered.length} live · sorted by deadline</p>
+    <div className="relative -mt-px overflow-hidden">
+      {/* Soft lavender/cream gradient backdrop */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-[680px]"
+        style={{
+          background:
+            "radial-gradient(60% 50% at 50% 0%, oklch(0.94 0.06 285) 0%, oklch(0.97 0.025 285) 45%, transparent 75%)",
+        }}
+      />
 
-      {/* Degree level — primary filter */}
-      <div className="mt-6 inline-flex flex-wrap rounded-lg border border-border bg-card p-1 text-sm">
-        {LEVELS.map((l) => (
-          <button
-            key={l.value}
-            onClick={() => setLevel(l.value)}
-            className={`rounded-md px-3 py-1.5 ${level === l.value ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground"}`}
+      {/* ───── Hero ───── */}
+      <section className="mx-auto max-w-5xl px-4 pt-16 pb-10 text-center md:pt-24 md:pb-14">
+        <span className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-4 py-1.5 text-[11px] font-semibold uppercase tracking-[0.18em] text-primary ring-1 ring-primary/20">
+          No counselor needed — 100% free
+        </span>
+
+        <h1 className="mx-auto mt-7 max-w-4xl font-heading text-[44px] font-black leading-[0.95] tracking-[-0.03em] text-foreground sm:text-6xl md:text-7xl lg:text-[88px]">
+          Find{" "}
+          <span
+            className="bg-clip-text text-transparent"
+            style={{
+              backgroundImage:
+                "linear-gradient(135deg, oklch(0.55 0.24 285) 0%, oklch(0.68 0.22 305) 100%)",
+            }}
           >
-            {l.label}
+            Fully Funded
+          </span>{" "}
+          Scholarships.
+        </h1>
+
+        <p className="mx-auto mt-6 max-w-2xl text-base text-muted-foreground md:text-lg">
+          {SCHOLARSHIPS.length}+ verified scholarships, deadline tracking, eligibility filters —
+          everything to win a scholarship without paying a counselor.
+        </p>
+
+        <div className="mt-9 flex flex-wrap items-center justify-center gap-3">
+          <a
+            href="#browse"
+            className="inline-flex h-12 items-center rounded-full bg-foreground px-7 text-sm font-semibold text-background shadow-lg shadow-foreground/10 transition hover:scale-[1.02]"
+          >
+            Browse Scholarships
+          </a>
+          <a
+            href="/universities"
+            className="inline-flex h-12 items-center rounded-full bg-background px-7 text-sm font-semibold text-foreground ring-1 ring-border transition hover:bg-secondary"
+          >
+            Explore Universities
+          </a>
+        </div>
+
+        {/* tiny trust row */}
+        <div className="mt-10 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-xs text-muted-foreground">
+          <span className="flex items-center gap-1.5"><span className="h-1.5 w-1.5 rounded-full bg-emerald-500" /> {filtered.length} live now</span>
+          <span className="flex items-center gap-1.5"><span className="h-1.5 w-1.5 rounded-full bg-amber-500" /> {closingSoon.length} closing in 30 days</span>
+          <span className="flex items-center gap-1.5"><span className="h-1.5 w-1.5 rounded-full bg-primary" /> Updated daily</span>
+        </div>
+      </section>
+
+      {/* ───── Browse panel ───── */}
+      <section id="browse" className="mx-auto max-w-6xl px-4 pb-16">
+        <div className="mb-8 flex items-end justify-between gap-4">
+          <h2 className="font-heading text-3xl font-black tracking-tight md:text-5xl">
+            Everything live.{" "}
+            <span className="text-muted-foreground/60">Zero cost.</span>
+          </h2>
+        </div>
+
+        {/* Degree level — primary filter */}
+        <div className="inline-flex flex-wrap rounded-full border border-border bg-card p-1 text-sm shadow-sm">
+          {LEVELS.map((l) => (
+            <button
+              key={l.value}
+              onClick={() => setLevel(l.value)}
+              className={`rounded-full px-4 py-1.5 transition ${
+                level === l.value
+                  ? "bg-foreground text-background"
+                  : "text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              {l.label}
+            </button>
+          ))}
+          <button
+            onClick={() => setLevel("any")}
+            className={`rounded-full px-4 py-1.5 transition ${
+              level === "any"
+                ? "bg-foreground text-background"
+                : "text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            Any
           </button>
-        ))}
-        <button
-          onClick={() => setLevel("any")}
-          className={`rounded-md px-3 py-1.5 ${level === "any" ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground"}`}
-        >
-          Any
-        </button>
-      </div>
+        </div>
 
-      {closingSoon.length > 0 && (
-        <div className="mt-6 flex items-start gap-3 rounded-2xl border border-destructive/40 bg-destructive/10 p-4">
-          <AlertTriangle className="mt-0.5 h-5 w-5 text-destructive" />
-          <div>
-            <div className="font-heading font-bold text-destructive">{closingSoon.length} scholarship{closingSoon.length>1?"s":""} closing within 30 days</div>
-            <div className="text-sm text-foreground/80">Don't sleep on these. Expand each card for details.</div>
+        {closingSoon.length > 0 && (
+          <div className="mt-6 flex items-start gap-3 rounded-3xl border border-destructive/30 bg-destructive/5 p-5">
+            <AlertTriangle className="mt-0.5 h-5 w-5 text-destructive" />
+            <div>
+              <div className="font-heading font-bold text-destructive">
+                {closingSoon.length} scholarship{closingSoon.length > 1 ? "s" : ""} closing within 30 days
+              </div>
+              <div className="text-sm text-foreground/80">Don't sleep on these. Expand each card for details.</div>
+            </div>
           </div>
-        </div>
-      )}
+        )}
 
-      <div className="card-surface mt-6 grid gap-2 p-3 md:grid-cols-[1fr_200px_180px]">
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-          <Input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search scholarships…" className="h-11 bg-secondary pl-9" />
+        <div className="mt-6 grid gap-2 rounded-3xl border border-border bg-card p-3 shadow-sm md:grid-cols-[1fr_200px_180px]">
+          <div className="relative">
+            <Search className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+            <Input
+              value={q}
+              onChange={(e) => setQ(e.target.value)}
+              placeholder="Search scholarships…"
+              className="h-12 rounded-full border-0 bg-secondary pl-10"
+            />
+          </div>
+          <Select value={country} onValueChange={setCountry}>
+            <SelectTrigger className="h-12 rounded-full border-0 bg-secondary"><SelectValue /></SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All countries</SelectItem>
+              {countries.map((c) => <SelectItem key={c} value={c}>{c}</SelectItem>)}
+            </SelectContent>
+          </Select>
+          <Select value={type} onValueChange={setType}>
+            <SelectTrigger className="h-12 rounded-full border-0 bg-secondary"><SelectValue /></SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All types</SelectItem>
+              <SelectItem value="Full">Full</SelectItem>
+              <SelectItem value="Partial">Partial</SelectItem>
+              <SelectItem value="Stipend">Stipend</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
-        <Select value={country} onValueChange={setCountry}>
-          <SelectTrigger className="h-11 bg-secondary"><SelectValue /></SelectTrigger>
-          <SelectContent><SelectItem value="all">All countries</SelectItem>{countries.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}</SelectContent>
-        </Select>
-        <Select value={type} onValueChange={setType}>
-          <SelectTrigger className="h-11 bg-secondary"><SelectValue /></SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All types</SelectItem>
-            <SelectItem value="Full">Full</SelectItem>
-            <SelectItem value="Partial">Partial</SelectItem>
-            <SelectItem value="Stipend">Stipend</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
 
-      {filtered.length === 0 ? (
-        <div className="card-surface mt-6 p-10 text-center text-sm text-muted-foreground">
-          No scholarships match those filters. Try switching to <b>Any</b> level.
-        </div>
-      ) : (
-        <div className="mt-6 grid gap-3">
-          {filtered.map((s) => <ScholarshipCard key={s.id} s={s} />)}
-        </div>
-      )}
+        {filtered.length === 0 ? (
+          <div className="mt-6 rounded-3xl border border-border bg-card p-10 text-center text-sm text-muted-foreground">
+            No scholarships match those filters. Try switching to <b>Any</b> level.
+          </div>
+        ) : (
+          <div className="mt-6 grid gap-3">
+            {filtered.map((s) => <ScholarshipCard key={s.id} s={s} />)}
+          </div>
+        )}
 
-      <LoginNudge text="Which of these are you actually eligible for?" />
+        <LoginNudge text="Which of these are you actually eligible for?" />
+      </section>
     </div>
   );
 }
