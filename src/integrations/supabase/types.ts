@@ -14,7 +14,117 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      profiles: {
+        Row: {
+          act: number | null
+          budget: string | null
+          countries: string[] | null
+          created_at: string
+          eca: string | null
+          education_level: string | null
+          email: string | null
+          hear_about: string | null
+          hsc_board: string | null
+          hsc_gpa: number | null
+          hsc_subjects: string | null
+          id: string
+          ielts: number | null
+          intake: string | null
+          medium: string | null
+          name: string | null
+          program: string | null
+          sat: number | null
+          scholarship_need: string | null
+          ssc_board: string | null
+          ssc_gpa: number | null
+          ssc_subjects: string | null
+          toefl: number | null
+          updated_at: string
+        }
+        Insert: {
+          act?: number | null
+          budget?: string | null
+          countries?: string[] | null
+          created_at?: string
+          eca?: string | null
+          education_level?: string | null
+          email?: string | null
+          hear_about?: string | null
+          hsc_board?: string | null
+          hsc_gpa?: number | null
+          hsc_subjects?: string | null
+          id: string
+          ielts?: number | null
+          intake?: string | null
+          medium?: string | null
+          name?: string | null
+          program?: string | null
+          sat?: number | null
+          scholarship_need?: string | null
+          ssc_board?: string | null
+          ssc_gpa?: number | null
+          ssc_subjects?: string | null
+          toefl?: number | null
+          updated_at?: string
+        }
+        Update: {
+          act?: number | null
+          budget?: string | null
+          countries?: string[] | null
+          created_at?: string
+          eca?: string | null
+          education_level?: string | null
+          email?: string | null
+          hear_about?: string | null
+          hsc_board?: string | null
+          hsc_gpa?: number | null
+          hsc_subjects?: string | null
+          id?: string
+          ielts?: number | null
+          intake?: string | null
+          medium?: string | null
+          name?: string | null
+          program?: string | null
+          sat?: number | null
+          scholarship_need?: string | null
+          ssc_board?: string | null
+          ssc_gpa?: number | null
+          ssc_subjects?: string | null
+          toefl?: number | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      shortlist: {
+        Row: {
+          created_at: string
+          id: string
+          item_data: Json
+          item_id: string
+          item_name: string
+          item_type: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          item_data?: Json
+          item_id: string
+          item_name: string
+          item_type: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          item_data?: Json
+          item_id?: string
+          item_name?: string
+          item_type?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
