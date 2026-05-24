@@ -155,9 +155,11 @@ function Overview({ uni }: any) {
           ))}
         </div>
       </Card>
-      <Card title="Campus Life">
-        <p className="leading-relaxed text-foreground/90">{uni.campus_life}</p>
-      </Card>
+      {uni.campus_life && (
+        <Card title="Campus Life">
+          <p className="leading-relaxed text-foreground/90">{uni.campus_life}</p>
+        </Card>
+      )}
       {uni.notable_alumni?.length > 0 && (
         <Card title="Notable Alumni" icon={Award}>
           <ul className="flex flex-wrap gap-2">
@@ -177,18 +179,24 @@ function Overview({ uni }: any) {
           </ul>
         </Card>
       )}
-      <Card title="Location">
-        <a href={uni.official_url} target="_blank" rel="noopener noreferrer" className="mb-3 inline-flex">
-          <Button variant="outline" size="sm"><ExternalLink className="mr-2 h-3 w-3" /> Official Website</Button>
-        </a>
-        <div className="aspect-video overflow-hidden rounded-lg border border-border">
-          <iframe
-            title={`Map of ${uni.name}`}
-            src={`https://www.google.com/maps?q=${encodeURIComponent(uni.maps_query)}&output=embed`}
-            className="h-full w-full" loading="lazy"
-          />
-        </div>
-      </Card>
+      {(uni.maps_query || uni.official_url) && (
+        <Card title="Location">
+          {uni.official_url && (
+            <a href={uni.official_url} target="_blank" rel="noopener noreferrer" className="mb-3 inline-flex">
+              <Button variant="outline" size="sm"><ExternalLink className="mr-2 h-3 w-3" /> Official Website</Button>
+            </a>
+          )}
+          {uni.maps_query && (
+            <div className="aspect-video overflow-hidden rounded-lg border border-border">
+              <iframe
+                title={`Map of ${uni.name}`}
+                src={`https://www.google.com/maps?q=${encodeURIComponent(uni.maps_query)}&output=embed`}
+                className="h-full w-full" loading="lazy"
+              />
+            </div>
+          )}
+        </Card>
+      )}
     </>
   );
 }
