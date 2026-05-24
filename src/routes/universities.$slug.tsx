@@ -1,7 +1,7 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
-import { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { getUniDetail, submitTip } from "@/lib/uni-detail.functions";
 import { usToBd } from "@/lib/gpa";
 import { useAuth } from "@/lib/auth";
