@@ -186,7 +186,7 @@ function CatalogBrowser() {
     queryFn: async () => {
       let query = supabase
         .from("universities_catalog")
-        .select("id,name,country,region,website,state_province,has_curated_data", { count: "exact" });
+        .select("id,name,country,region,website,state_province,has_curated_data,slug", { count: "exact" });
       if (region !== "all") query = query.eq("region", region);
       if (country !== "all") query = query.eq("country", country);
       if (q.trim()) query = query.ilike("name", `%${q.trim()}%`);
