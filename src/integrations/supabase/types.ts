@@ -125,6 +125,45 @@ export type Database = {
         }
         Relationships: []
       }
+      universities_catalog: {
+        Row: {
+          country: string
+          created_at: string
+          domains: string[] | null
+          has_curated_data: boolean
+          id: string
+          name: string
+          qs_rank: number | null
+          region: string | null
+          state_province: string | null
+          website: string | null
+        }
+        Insert: {
+          country: string
+          created_at?: string
+          domains?: string[] | null
+          has_curated_data?: boolean
+          id: string
+          name: string
+          qs_rank?: number | null
+          region?: string | null
+          state_province?: string | null
+          website?: string | null
+        }
+        Update: {
+          country?: string
+          created_at?: string
+          domains?: string[] | null
+          has_curated_data?: boolean
+          id?: string
+          name?: string
+          qs_rank?: number | null
+          region?: string | null
+          state_province?: string | null
+          website?: string | null
+        }
+        Relationships: []
+      }
       university_hacks: {
         Row: {
           created_at: string
@@ -178,7 +217,8 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      show_limit: { Args: never; Returns: number }
+      show_trgm: { Args: { "": string }; Returns: string[] }
     }
     Enums: {
       [_ in never]: never
