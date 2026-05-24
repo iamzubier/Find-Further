@@ -418,7 +418,7 @@ function OfficialLogo({ className = "h-5 w-5" }: { className?: string }) {
   );
 }
 
-const PLATFORMS: Record<string, { label: string; Logo: (p: { className?: string }) => JSX.Element }> = {
+const PLATFORMS: Record<string, { label: string; Logo: (p: { className?: string }) => React.ReactElement }> = {
   reddit:   { label: "Reddit",   Logo: RedditLogo },
   quora:    { label: "Quora",    Logo: QuoraLogo },
   youtube:  { label: "YouTube",  Logo: YoutubeLogo },
