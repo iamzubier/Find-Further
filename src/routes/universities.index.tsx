@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { z } from "zod";
 import { useQuery, keepPreviousData } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -11,6 +12,7 @@ import { UNIVERSITIES, COUNTRIES, PROGRAMS, type University } from "@/lib/data";
 import { matchUniversity } from "@/lib/matching";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/integrations/supabase/client";
+import { getUniversityCount } from "@/lib/admin-import.functions";
 import { toast } from "sonner";
 
 const SearchSchema = z.object({
