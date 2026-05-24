@@ -11,12 +11,13 @@ import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import {
   COUNTRIES, CURRICULUMS, COUNTRY_CURRICULUMS, COUNTRY_OPTIONS,
-  convertToAll, conversionLine,
+  convertToAll, formatRawGrade,
   type CountryCode, type CurriculumId, type RawGrade, type ConvertedGrades,
 } from "@/lib/curriculum";
 import { computeEvaluation, saveEvaluation } from "@/lib/evaluation.functions";
 import type { ScoreBreakdown, MatchedUni } from "@/lib/evaluation";
 import { useAuth } from "@/lib/auth";
+import { saveEvalSummary } from "@/lib/evaluation-store";
 import { ArrowRight, CheckCircle2, AlertTriangle, Lightbulb, Share2, Loader2 } from "lucide-react";
 
 export const Route = createFileRoute("/evaluate")({
