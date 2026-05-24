@@ -66,20 +66,23 @@
 
 @layer base {
   :root { color-scheme: light; }
-  html, body { background-color: var(--color-background); color: var(--color-foreground); }
-  * { border-color: var(--color-border); }
+  html { background-color: var(--color-background); color: var(--color-foreground); }
   body {
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='240' viewBox='0 0 220 240'><g fill='none' stroke='%23000' stroke-width='1' opacity='0.035'><path d='M60 30 L160 30 L160 110 Q160 158 110 188 Q60 158 60 110 Z'/><path d='M110 30 V188'/><path d='M60 80 H160'/><circle cx='110' cy='88' r='10'/></g></svg>");
+    background-repeat: repeat;
     font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
     font-feature-settings: "ss01", "ss02";
   }
+  * { border-color: var(--color-border); }
   h1, h2, h3, h4, h5 {
     font-family: var(--font-heading);
     font-weight: 400;
     letter-spacing: -0.015em;
     line-height: 1.05;
   }
-  /* Editorial heading: serif is naturally light-weight */
   h1 { font-weight: 400; }
 }
 
