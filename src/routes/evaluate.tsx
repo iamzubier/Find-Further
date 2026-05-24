@@ -11,7 +11,7 @@ import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import {
   COUNTRIES, CURRICULUMS, COUNTRY_CURRICULUMS, COUNTRY_OPTIONS,
-  convertToAll, formatRawGrade,
+  convertToAll,
   type CountryCode, type CurriculumId, type RawGrade, type ConvertedGrades,
 } from "@/lib/curriculum";
 import { computeEvaluation, saveEvaluation } from "@/lib/evaluation.functions";
