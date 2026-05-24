@@ -93,10 +93,11 @@ export const saveEvaluation = createServerFn({ method: "POST" })
 export const loadEvaluation = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .inputValidator((i) => z.object({ id: z.string().uuid() }).parse(i))
-  .handler(async ({ data }) => {
+  .handler(async ({ data, context }) => {
     const { data: row, error } = await supabaseAdmin
       .from("evaluations").select("*").eq("id", data.id).maybeSingle();
     if (error || !row) throw new Error("Evaluation not found");
+    if (row.user_id !== context.userId) throw new Error("Unauthorized");
 
     const payload = {
       home_country: row.home_country,
