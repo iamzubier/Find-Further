@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Menu, X, Sparkles } from "lucide-react";
 import { useState } from "react";
+import { Logo } from "@/components/Logo";
 
 export function Navbar({ profileStrength }: { profileStrength?: number }) {
   const { user, loading } = useAuth();
