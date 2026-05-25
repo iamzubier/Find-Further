@@ -240,6 +240,31 @@ function AdminImportPage() {
         )}
       </Card>
 
+      <Card title="Fix Missing Images (Official Sites)" icon={<Globe className="h-5 w-5" />}
+        desc="For universities still missing a campus image (null or generic Unsplash), fetch the og:image meta tag from their official website and update campus_image_url. No fallback — leaves null if og:image is missing.">
+        <Button onClick={handleFixOg} disabled={busy !== null}>
+          {busy === "og" ? "Running…" : "Fix Missing Images (Official Sites)"}
+        </Button>
+        {ogProgress && (
+          <div className="mt-4 space-y-2">
+            <div className="h-2 w-full overflow-hidden rounded bg-secondary">
+              <div
+                className="h-full bg-primary transition-all"
+                style={{ width: `${ogProgress.total ? (ogProgress.processed / ogProgress.total) * 100 : 0}%` }}
+              />
+            </div>
+            <div className="flex flex-wrap gap-4 text-xs text-muted-foreground tabular-nums">
+              <span>{ogProgress.processed} / {ogProgress.total}</span>
+              <span>Updated: <b className="text-foreground">{ogProgress.updated}</b></span>
+              <span>Skipped (no og:image): <b className="text-foreground">{ogProgress.skipped}</b></span>
+              <span>Failed: <b className="text-foreground">{ogProgress.failed}</b></span>
+            </div>
+          </div>
+        )}
+      </Card>
+
+
+
 
       <Card title="1. Hipolabs Universities API" icon={<Database className="h-5 w-5" />}
         desc="Fetch ~10k universities from 15 countries. Free public API.">
