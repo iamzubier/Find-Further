@@ -186,16 +186,12 @@ function Stats() {
   ];
   return (
     <section className="mx-auto max-w-6xl px-4 py-6">
-      <div
-        className="relative overflow-hidden rounded-2xl border border-border bg-cover bg-center p-6 md:p-8"
-        style={{ backgroundImage: "url('https://images.unsplash.com/photo-1517486808906-6ca8b3f04846?w=1600&q=80')" }}
-      >
-        <div className="absolute inset-0 bg-gradient-to-r from-black/85 via-black/70 to-black/55" aria-hidden />
-        <div className="relative grid gap-6 md:grid-cols-3">
+      <div className="card-surface p-6 md:p-8">
+        <div className="grid gap-6 md:grid-cols-3">
           {stats.map((s) => (
-            <div key={s.label} className="flex items-baseline justify-between gap-3 border-b border-white/15 pb-3 md:border-b-0 md:border-r md:pb-0 md:pr-6 last:border-0">
-              <div className="font-heading text-4xl font-extrabold text-white md:text-5xl">{s.num}</div>
-              <div className="text-sm uppercase tracking-wide text-white/75">{s.label}</div>
+            <div key={s.label} className="flex items-baseline justify-between gap-3 border-b border-border pb-3 md:border-b-0 md:border-r md:pb-0 md:pr-6 last:border-0">
+              <div className="font-heading text-4xl font-extrabold text-foreground md:text-5xl">{s.num}</div>
+              <div className="text-sm uppercase tracking-wide text-muted-foreground">{s.label}</div>
             </div>
           ))}
         </div>
