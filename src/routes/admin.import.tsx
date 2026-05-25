@@ -187,6 +187,31 @@ function AdminImportPage() {
     finally { setBusy(null); }
   }
 
+  async function handleFixAllImages() {
+    setBusy("all");
+    setAllProgress({ processed: 0, total: 0, logos: 0, campus: 0, fallback: 0, failed: 0 });
+    try {
+      const limit = 8;
+      let processed = 0, logos = 0, campus = 0, fallback = 0, failed = 0, total = 0;
+      let safety = 0;
+      // Updated rows leave the filter, so we don't advance offset.
+      while (safety++ < 3000) {
+        const r = await fixAll({ data: { key, offset: 0, limit } });
+        logos += r.logosUpdated;
+        campus += r.campusUpdated;
+        fallback += r.fallbackUsed;
+        failed += r.failed;
+        total = r.total + logos + campus; // approximate
+        processed += r.batch;
+        setAllProgress({ processed, total, logos, campus, fallback, failed });
+        if (r.done || r.batch === 0) break;
+      }
+      toast.success(`Done: ${logos} logos, ${campus} campus images (${fallback} fallback), ${failed} failed`);
+    } catch (e) { toast.error((e as Error).message); }
+    finally { setBusy(null); }
+  }
+
+
   function pickField(row: Record<string, string>, keys: string[]): string | undefined {
     for (const k of keys) {
       for (const rk of Object.keys(row)) {
