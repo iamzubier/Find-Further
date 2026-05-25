@@ -157,46 +157,94 @@ export type Database = {
       }
       scholarships: {
         Row: {
+          academic_profile_weight: string | null
+          accepts_moi_waiver: boolean | null
+          allowance_breakdown: Json | null
           amount_display: string | null
           annual_value_usd: number | null
+          application_fee_usd: number | null
           created_at: string
+          cycle_status: string | null
           deadline: string | null
           degree_level: string | null
           description: string | null
           eligible_countries: string[] | null
+          expected_next_open_month: string | null
+          funding_type: string | null
+          hidden_costs_for_student: string | null
+          hidden_obligations: string | null
           host_country: string | null
+          hydrated_at: string | null
           id: string
+          insider_tips: Json | null
           name: string
           official_url: string | null
+          provider: string | null
+          provider_type: string | null
+          required_documents_checklist: string[] | null
+          slug: string | null
           updated_at: string
+          upfront_costs_covered: Json | null
         }
         Insert: {
+          academic_profile_weight?: string | null
+          accepts_moi_waiver?: boolean | null
+          allowance_breakdown?: Json | null
           amount_display?: string | null
           annual_value_usd?: number | null
+          application_fee_usd?: number | null
           created_at?: string
+          cycle_status?: string | null
           deadline?: string | null
           degree_level?: string | null
           description?: string | null
           eligible_countries?: string[] | null
+          expected_next_open_month?: string | null
+          funding_type?: string | null
+          hidden_costs_for_student?: string | null
+          hidden_obligations?: string | null
           host_country?: string | null
+          hydrated_at?: string | null
           id?: string
+          insider_tips?: Json | null
           name: string
           official_url?: string | null
+          provider?: string | null
+          provider_type?: string | null
+          required_documents_checklist?: string[] | null
+          slug?: string | null
           updated_at?: string
+          upfront_costs_covered?: Json | null
         }
         Update: {
+          academic_profile_weight?: string | null
+          accepts_moi_waiver?: boolean | null
+          allowance_breakdown?: Json | null
           amount_display?: string | null
           annual_value_usd?: number | null
+          application_fee_usd?: number | null
           created_at?: string
+          cycle_status?: string | null
           deadline?: string | null
           degree_level?: string | null
           description?: string | null
           eligible_countries?: string[] | null
+          expected_next_open_month?: string | null
+          funding_type?: string | null
+          hidden_costs_for_student?: string | null
+          hidden_obligations?: string | null
           host_country?: string | null
+          hydrated_at?: string | null
           id?: string
+          insider_tips?: Json | null
           name?: string
           official_url?: string | null
+          provider?: string | null
+          provider_type?: string | null
+          required_documents_checklist?: string[] | null
+          slug?: string | null
           updated_at?: string
+          upfront_costs_covered?: Json | null
         }
         Relationships: []
       }
