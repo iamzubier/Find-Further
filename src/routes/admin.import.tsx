@@ -134,13 +134,23 @@ function AdminImportPage() {
       const text = await file.text();
       const rows = parseCsv(text);
       if (!rows.length) throw new Error("Empty CSV");
-      const r = kind === "qs"
-        ? await qs({ data: { key, rows } })
-        : await tu({ data: { key, rows } });
-      toast.success(`Processed ${rows.length} rows: ${JSON.stringify(r)}`);
+      const BATCH = 500;
+      let totalInserted = 0, totalUpdated = 0, totalFailed = 0;
+      for (let i = 0; i < rows.length; i += BATCH) {
+        const chunk = rows.slice(i, i + BATCH);
+        const r = kind === "qs"
+          ? await qs({ data: { key, rows: chunk } })
+          : await tu({ data: { key, rows: chunk } });
+        const rr = r as { inserted?: number; updated?: number; failed?: number | unknown[] };
+        totalInserted += rr.inserted ?? 0;
+        totalUpdated += rr.updated ?? 0;
+        totalFailed += Array.isArray(rr.failed) ? rr.failed.length : (rr.failed ?? 0);
+      }
+      toast.success(`Processed ${rows.length} rows — ${totalInserted} inserted, ${totalUpdated} updated, ${totalFailed} failed`);
     } catch (e) { toast.error((e as Error).message); }
     finally { setBusy(null); }
   }
+
 
   async function handleFixImages() {
     setBusy("wiki");
