@@ -125,6 +125,32 @@ function AdminImportPage() {
     finally { setBusy(null); }
   }
 
+  async function handleFixOg() {
+    setBusy("og");
+    setOgProgress({ processed: 0, total: 0, updated: 0, skipped: 0, failed: 0 });
+    try {
+      const limit = 10;
+      let offset = 0;
+      let updated = 0, skipped = 0, failed = 0, total = 0, processed = 0;
+      let safety = 0;
+      // Rows leaving the filter as we update them; advance offset only by non-updated.
+      while (safety++ < 2000) {
+        const r = await fixOg({ data: { key, offset, limit } });
+        updated += r.updated; skipped += r.skipped; failed += r.failed;
+        total = r.total;
+        processed += r.batch;
+        setOgProgress({ processed, total: total + updated, updated, skipped, failed });
+        if (r.batch === 0) break;
+        // Updated rows drop out of the result set; only skipped/failed remain, so advance by those.
+        offset += r.skipped + r.failed;
+        if (r.updated === 0 && r.skipped + r.failed < limit) break;
+      }
+      toast.success(`Done: ${updated} updated, ${skipped} skipped (no og:image), ${failed} failed`);
+    } catch (e) { toast.error((e as Error).message); }
+    finally { setBusy(null); }
+  }
+
+
   if (!verified) {
     return (
       <div className="mx-auto max-w-md px-4 py-20">
