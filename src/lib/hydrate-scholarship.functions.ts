@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
+import { fetchCountryBannerImage } from "@/lib/image-fetch.server";
 
 const InputSchema = z.object({
   slug: z.string().min(1).max(160),
@@ -151,12 +152,16 @@ export const hydrateScholarship = createServerFn({ method: "POST" })
       return { ok: false, error: "Network error contacting AI gateway", slug: data.slug };
     }
 
+    // Fetch a stunning country banner photo (best-effort).
+    const hostCountry = ai.host_country ?? country;
+    const bannerUrl = await fetchCountryBannerImage(hostCountry);
+
     // Normalise + upsert
     const row: Record<string, unknown> = {
       slug: data.slug,
       name: ai.name ?? name,
       provider: ai.provider ?? null,
-      host_country: ai.host_country ?? country,
+      host_country: hostCountry,
       description: ai.description ?? null,
       funding_type: ["fully_funded", "tuition_waiver", "partial_bursary", "stipend_only"].includes(ai.funding_type) ? ai.funding_type : null,
       provider_type: ["government", "university_internal", "private_corporate", "ngo_foundation"].includes(ai.provider_type) ? ai.provider_type : null,
@@ -174,6 +179,7 @@ export const hydrateScholarship = createServerFn({ method: "POST" })
       deadline: /^\d{4}-\d{2}-\d{2}$/.test(ai.exact_deadline_date ?? "") ? ai.exact_deadline_date : null,
       expected_next_open_month: ai.expected_next_open_month ?? null,
       official_url: ai.official_url ?? null,
+      banner_image_url: bannerUrl,
       eligible_countries: Array.isArray(ai.eligible_countries) ? ai.eligible_countries.slice(0, 200) : [],
       required_documents_checklist: Array.isArray(ai.required_documents_checklist) ? ai.required_documents_checklist.slice(0, 30) : [],
       insider_tips: Array.isArray(ai.insider_reddit_hacks) ? ai.insider_reddit_hacks.slice(0, 8) : [],

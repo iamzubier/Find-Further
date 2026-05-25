@@ -20,6 +20,7 @@ import { Route as UniversitiesSlugRouteImport } from './routes/universities.$slu
 import { Route as ScholarshipsSlugRouteImport } from './routes/scholarships.$slug'
 import { Route as AdminSeedScholarshipsRouteImport } from './routes/admin.seed-scholarships'
 import { Route as AdminImportRouteImport } from './routes/admin.import'
+import { Route as AdminImageBackfillRouteImport } from './routes/admin.image-backfill'
 import { Route as AuthenticatedShortlistRouteImport } from './routes/_authenticated/shortlist'
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
@@ -80,6 +81,11 @@ const AdminImportRoute = AdminImportRouteImport.update({
   path: '/admin/import',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminImageBackfillRoute = AdminImageBackfillRouteImport.update({
+  id: '/admin/image-backfill',
+  path: '/admin/image-backfill',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedShortlistRoute = AuthenticatedShortlistRouteImport.update({
   id: '/shortlist',
   path: '/shortlist',
@@ -116,6 +122,7 @@ export interface FileRoutesByFullPath {
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/shortlist': typeof AuthenticatedShortlistRoute
+  '/admin/image-backfill': typeof AdminImageBackfillRoute
   '/admin/import': typeof AdminImportRoute
   '/admin/seed-scholarships': typeof AdminSeedScholarshipsRoute
   '/scholarships/$slug': typeof ScholarshipsSlugRoute
@@ -133,6 +140,7 @@ export interface FileRoutesByTo {
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/shortlist': typeof AuthenticatedShortlistRoute
+  '/admin/image-backfill': typeof AdminImageBackfillRoute
   '/admin/import': typeof AdminImportRoute
   '/admin/seed-scholarships': typeof AdminSeedScholarshipsRoute
   '/scholarships/$slug': typeof ScholarshipsSlugRoute
@@ -152,6 +160,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
   '/_authenticated/shortlist': typeof AuthenticatedShortlistRoute
+  '/admin/image-backfill': typeof AdminImageBackfillRoute
   '/admin/import': typeof AdminImportRoute
   '/admin/seed-scholarships': typeof AdminSeedScholarshipsRoute
   '/scholarships/$slug': typeof ScholarshipsSlugRoute
@@ -171,6 +180,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/profile'
     | '/shortlist'
+    | '/admin/image-backfill'
     | '/admin/import'
     | '/admin/seed-scholarships'
     | '/scholarships/$slug'
@@ -188,6 +198,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/profile'
     | '/shortlist'
+    | '/admin/image-backfill'
     | '/admin/import'
     | '/admin/seed-scholarships'
     | '/scholarships/$slug'
@@ -206,6 +217,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard'
     | '/_authenticated/profile'
     | '/_authenticated/shortlist'
+    | '/admin/image-backfill'
     | '/admin/import'
     | '/admin/seed-scholarships'
     | '/scholarships/$slug'
@@ -221,6 +233,7 @@ export interface RootRouteChildren {
   AuthRoute: typeof AuthRoute
   CompareRoute: typeof CompareRoute
   EvaluateRoute: typeof EvaluateRoute
+  AdminImageBackfillRoute: typeof AdminImageBackfillRoute
   AdminImportRoute: typeof AdminImportRoute
   AdminSeedScholarshipsRoute: typeof AdminSeedScholarshipsRoute
   ScholarshipsSlugRoute: typeof ScholarshipsSlugRoute
@@ -308,6 +321,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminImportRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/image-backfill': {
+      id: '/admin/image-backfill'
+      path: '/admin/image-backfill'
+      fullPath: '/admin/image-backfill'
+      preLoaderRoute: typeof AdminImageBackfillRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated/shortlist': {
       id: '/_authenticated/shortlist'
       path: '/shortlist'
@@ -372,6 +392,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthRoute: AuthRoute,
   CompareRoute: CompareRoute,
   EvaluateRoute: EvaluateRoute,
+  AdminImageBackfillRoute: AdminImageBackfillRoute,
   AdminImportRoute: AdminImportRoute,
   AdminSeedScholarshipsRoute: AdminSeedScholarshipsRoute,
   ScholarshipsSlugRoute: ScholarshipsSlugRoute,

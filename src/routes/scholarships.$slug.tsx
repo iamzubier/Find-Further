@@ -71,6 +71,7 @@ type DbScholarship = {
   required_documents_checklist: string[] | null;
   insider_tips: string[] | null;
   hydrated_at: string | null;
+  banner_image_url: string | null;
 };
 
 export const Route = createFileRoute("/scholarships/$slug")({
@@ -244,6 +245,7 @@ type View = EnrichedScholarship & {
   insider_tips?: string[];
   expected_next_open_month?: string;
   applyUrl?: string;
+  banner_image_url?: string | null;
 };
 
 function buildView(staticS: Scholarship | undefined, db: DbScholarship | null): View {
@@ -282,6 +284,7 @@ function buildView(staticS: Scholarship | undefined, db: DbScholarship | null): 
     insider_tips: db.insider_tips ?? undefined,
     expected_next_open_month: db.expected_next_open_month ?? undefined,
     applyUrl: db.official_url ?? enriched.applyUrl,
+    banner_image_url: (db as any).banner_image_url ?? null,
   };
 }
 
@@ -377,10 +380,10 @@ function Hero({ v }: { v: View }) {
   };
 
   return (
-    <div className="relative w-full overflow-hidden border-b border-border bg-neutral-900">
+    <div className="relative w-full overflow-hidden border-b border-border bg-neutral-900" style={{ minHeight: 400 }}>
       <div className="absolute inset-0">
-        <SmartCampusImage src={null} name={`${v.country} library`} noOverlay loading="eager" />
-        <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-black/55 to-black/85" />
+        <SmartCampusImage src={v.banner_image_url ?? null} name={v.country || v.name} noOverlay loading="eager" />
+        <div className="absolute inset-0 bg-gradient-to-b from-slate-900/55 via-slate-900/75 to-slate-900/95" />
       </div>
 
       <div className="relative mx-auto max-w-6xl px-4 py-10 text-white">
