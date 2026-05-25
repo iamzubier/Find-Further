@@ -195,15 +195,29 @@ const FALLBACK_CAMPUS = "https://images.unsplash.com/photo-1541339907198-e08756d
 
 function Hero({ uni }: { uni: any }) {
   return (
-    <div className="relative h-[420px] min-h-[400px] w-full overflow-hidden bg-neutral-900">
-      <SmartCampusImage src={uni.campus_image_url} name={uni.name} loading="eager" noOverlay />
-      <div className="absolute inset-0 bg-gradient-to-b from-black/20 to-black/85" />
-      <div className="absolute inset-x-0 top-0 p-4">
-        <Link to="/universities" className="inline-flex items-center gap-1 text-sm text-white/80 hover:text-white">
+    <header className="relative h-[420px] min-h-[400px] w-full overflow-hidden bg-slate-900">
+      {/* Background image */}
+      <div className="absolute inset-0 -z-20 h-full w-full">
+        <SmartCampusImage
+          src={uni.campus_image_url}
+          name={uni.name}
+          loading="eager"
+          noOverlay
+          className="object-cover"
+        />
+      </div>
+      {/* Gradient overlay — guarantees text legibility */}
+      <div className="absolute inset-0 -z-10 bg-gradient-to-t from-slate-950 via-slate-900/70 to-slate-900/30" />
+
+      {/* Back link */}
+      <div className="absolute inset-x-0 top-0 z-10 p-4">
+        <Link to="/universities" className="inline-flex items-center gap-1 text-sm text-white/90 hover:text-white drop-shadow">
           <ArrowLeft className="h-4 w-4" /> All universities
         </Link>
       </div>
-      <div className="absolute inset-x-0 bottom-0 mx-auto max-w-6xl px-4 pb-8">
+
+      {/* Bottom-anchored content */}
+      <div className="relative z-10 mx-auto flex h-full max-w-6xl flex-col justify-end px-6 pb-8 md:px-12">
         <div className="flex flex-wrap items-end gap-5">
           <SmartLogo
             name={uni.name}
@@ -213,18 +227,27 @@ function Hero({ uni }: { uni: any }) {
             className="ring-4 ring-white shadow-2xl"
           />
 
-          <div className="text-white">
-            <h1 className="font-heading text-4xl font-extrabold leading-tight md:text-5xl">{uni.name}</h1>
-            <div className="mt-2 flex flex-wrap items-center gap-3 text-sm text-white/85">
+          <div>
+            <h1 className="font-heading text-4xl font-bold leading-tight text-white drop-shadow-md md:text-5xl">
+              {uni.name}
+            </h1>
+            <div className="mt-2 flex flex-wrap items-center gap-3 text-lg text-slate-200">
               {uni.country_flag && <span className="text-xl">{uni.country_flag}</span>}
-              <span><MapPin className="mr-1 inline h-3.5 w-3.5" />{uni.city ? `${uni.city}, ` : ""}{uni.country}</span>
-              {uni.qs_rank && <span className="rounded-full bg-primary px-3 py-0.5 font-bold text-primary-foreground">QS #{uni.qs_rank}</span>}
-              {uni.founded_year && <span>Founded {uni.founded_year}</span>}
+              <span className="inline-flex items-center gap-1.5">
+                <MapPin className="h-4 w-4" />
+                {uni.city ? `${uni.city}, ` : ""}{uni.country}
+              </span>
+              {uni.qs_rank && (
+                <span className="rounded-full bg-primary px-3 py-0.5 text-sm font-bold text-primary-foreground">
+                  QS #{uni.qs_rank}
+                </span>
+              )}
+              {uni.founded_year && <span className="text-sm text-slate-300">Founded {uni.founded_year}</span>}
             </div>
           </div>
         </div>
       </div>
-    </div>
+    </header>
   );
 }
 
