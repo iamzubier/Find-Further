@@ -341,19 +341,23 @@ function HydrationError({ slug, message }: { slug: string; message: string }) {
 /* ─────────────────── Hero ─────────────────── */
 
 function useCountdown(deadlineIso: string) {
-  const [now, setNow] = useState(() => Date.now());
+  const [now, setNow] = useState<number | null>(null);
   useEffect(() => {
+    setNow(Date.now());
     const id = setInterval(() => setNow(Date.now()), 1000);
     return () => clearInterval(id);
   }, []);
   const target = new Date(deadlineIso).getTime();
-  const diff = Math.max(0, target - now);
+  // Until the client has mounted, render a stable zero state so SSR markup
+  // matches the first client render (no hydration mismatch).
+  const diff = now === null ? 0 : Math.max(0, target - now);
   return {
     days: Math.floor(diff / 86400000),
     hours: Math.floor((diff / 3600000) % 24),
     minutes: Math.floor((diff / 60000) % 60),
     seconds: Math.floor((diff / 1000) % 60),
-    closed: target - now <= 0,
+    closed: now !== null && target - now <= 0,
+    ready: now !== null,
   };
 }
 

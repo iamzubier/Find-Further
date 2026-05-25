@@ -94,24 +94,30 @@ export const hydrateUniversity = createServerFn({ method: "POST" })
 
     const prompt = `Search the live web for the university "${name}" in ${country}. Return a strict JSON object containing verified 2026 admission data for international undergraduate applicants. Include 4 to 6 community admission tips synthesised from Reddit, Quora, and YouTube discussions (each with a believable upvote count and a relevant tag). If exact figures are unavailable, give the best public estimate. Do not refuse — always return the tool call.`;
 
+    // Fire AI gateway + campus image fetch in parallel.
+    const aiPromise = fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${LOVABLE_API_KEY}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        model: "google/gemini-3-flash-preview",
+        messages: [
+          { role: "system", content: "You are a university admissions data extractor. Always call the return_university_profile tool with the best available data for the requested institution." },
+          { role: "user", content: prompt },
+        ],
+        tools: [AI_TOOL],
+        tool_choice: { type: "function", function: { name: "return_university_profile" } },
+      }),
+    });
+    const campusImagePromise = fetchUniversityCampusImage(name);
+
     let aiJson: any = null;
+    let campusImageUrl: string | null = null;
     try {
-      const res = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${LOVABLE_API_KEY}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          model: "google/gemini-3-flash-preview",
-          messages: [
-            { role: "system", content: "You are a university admissions data extractor. Always call the return_university_profile tool with the best available data for the requested institution." },
-            { role: "user", content: prompt },
-          ],
-          tools: [AI_TOOL],
-          tool_choice: { type: "function", function: { name: "return_university_profile" } },
-        }),
-      });
+      const [res, campus] = await Promise.all([aiPromise, campusImagePromise]);
+      campusImageUrl = campus;
 
       if (!res.ok) {
         const errText = await res.text().catch(() => "");
@@ -138,9 +144,6 @@ export const hydrateUniversity = createServerFn({ method: "POST" })
     const admissionReqs: Record<string, unknown> = {};
     if (typeof aiJson.ielts_min === "number") admissionReqs.ielts = aiJson.ielts_min;
     if (typeof aiJson.toefl_min === "number") admissionReqs.toefl = aiJson.toefl_min;
-
-    // Fetch a campus image (Unsplash → Wikipedia fallback). Best-effort.
-    const campusImageUrl = await fetchUniversityCampusImage(name);
 
     const detailRow = {
       slug: data.slug,
