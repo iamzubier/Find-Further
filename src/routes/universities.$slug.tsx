@@ -48,7 +48,7 @@ export const Route = createFileRoute("/universities/$slug")({
   component: UniDetailPage,
 });
 
-const TABS = ["Overview","Admissions","Tuition & Aid","Programs","Entrance Exams","Community Tips"] as const;
+const TABS = ["Overview","Admissions","Tuition & Aid","Programs","Entrance Exams","How to Get In"] as const;
 
 const HYDRATION_MESSAGES = [
   "Connecting to global registry...",
@@ -182,7 +182,7 @@ function UniDetailPage() {
           {tab === "Admissions" && <Admissions uni={uni} />}
           {tab === "Tuition & Aid" && <Tuition uni={uni} />}
           {tab === "Programs" && <Programs uni={uni} />}
-          {tab === "Community Tips" && <Tips uni={uni} tips={data.tips} />}
+          {tab === "How to Get In" && <Tips uni={uni} tips={data.tips} />}
           {tab === "Entrance Exams" && <Exams uni={uni} />}
         </main>
         <Sidebar uni={uni} />
