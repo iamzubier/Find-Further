@@ -1,41 +1,41 @@
 import { useState, useEffect, CSSProperties } from "react";
 
 /**
- * SmartCampusImage — bulletproof campus/hero photo.
- *
- * If `src` is missing or fails to load, we fall back to a deterministic pick
- * from a curated set of reliable Unsplash photo IDs (selected by the length of
- * `name` so the same university always shows the same fallback).
+ * SmartCampusImage — dynamic campus/hero photo with an elegant
+ * letter-derived gradient fallback when no image URL is available.
  *
  * Renders an absolutely positioned <img> with object-cover sizing — drop it
  * inside a positioned parent (relative + a defined height) and it will fill it.
- * A faint white overlay keeps the bright premium-directory aesthetic.
  */
 
-const FALLBACKS = [
-  "https://images.unsplash.com/photo-1541339907198-e08756dedf3f?w=1200&q=80",
-  "https://images.unsplash.com/photo-1498243691581-b145c3f54a5a?w=1200&q=80",
-  "https://images.unsplash.com/photo-1596422846543-75c6fc197f07?w=1200&q=80",
-  "https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=1200&q=80",
-];
+function firstLetter(name: string): string {
+  const t = (name || "").trim();
+  const m = t.match(/[A-Za-z]/);
+  return (m?.[0] ?? "A").toUpperCase();
+}
 
-export function pickFallbackCampus(name: string): string {
-  const len = (name || "").length;
-  return FALLBACKS[len % FALLBACKS.length];
+/**
+ * Return a deterministic gradient based on the first letter of the name.
+ * A–G → deep navy, H–P → slate, Q–Z → forest green.
+ */
+export function gradientForName(name: string): string {
+  const l = firstLetter(name);
+  if (l >= "A" && l <= "G") {
+    return "linear-gradient(135deg,#0c2340 0%,#1e3a5f 55%,#3b6fa0 100%)";
+  }
+  if (l >= "H" && l <= "P") {
+    return "linear-gradient(135deg,#1e293b 0%,#334155 55%,#64748b 100%)";
+  }
+  return "linear-gradient(135deg,#064e3b 0%,#0d7a5f 55%,#166534 100%)";
 }
 
 export interface SmartCampusImageProps {
-  /** Campus image URL — typically from the universities_detail.campus_image_url field */
   src?: string | null;
-  /** University name — used to pick a deterministic fallback */
   name: string;
-  /** Alt text. Defaults to "<name> campus". */
   alt?: string;
   className?: string;
   style?: CSSProperties;
-  /** If true, render as a plain block image (not absolutely positioned). */
   inline?: boolean;
-  /** If true, omit the subtle light overlay (e.g. when parent has its own dark gradient). */
   noOverlay?: boolean;
   loading?: "lazy" | "eager";
 }
@@ -50,16 +50,35 @@ export function SmartCampusImage({
   noOverlay = false,
   loading = "lazy",
 }: SmartCampusImageProps) {
-  const fallback = pickFallbackCampus(name);
-  const [currentSrc, setCurrentSrc] = useState<string>(src && src.trim() ? src : fallback);
+  const initial = src && src.trim() ? src : null;
+  const [currentSrc, setCurrentSrc] = useState<string | null>(initial);
 
   useEffect(() => {
-    setCurrentSrc(src && src.trim() ? src : fallback);
-  }, [src, fallback]);
+    setCurrentSrc(src && src.trim() ? src : null);
+  }, [src]);
 
-  const baseImgClass = inline
-    ? `block h-full w-full object-cover ${className}`
-    : `absolute inset-0 h-full w-full object-cover ${className}`;
+  const positionClass = inline ? "block h-full w-full" : "absolute inset-0 h-full w-full";
+
+  // Letter-based gradient fallback when no image is available.
+  if (!currentSrc) {
+    return (
+      <>
+        <div
+          aria-label={alt ?? `${name} hero`}
+          role="img"
+          className={`${positionClass} ${className}`}
+          style={{ background: gradientForName(name), ...style }}
+        />
+        {!noOverlay && (
+          <div
+            aria-hidden
+            className="pointer-events-none absolute inset-0"
+            style={{ backgroundColor: "rgba(255,255,255,0.04)" }}
+          />
+        )}
+      </>
+    );
+  }
 
   return (
     <>
@@ -67,21 +86,25 @@ export function SmartCampusImage({
         src={currentSrc}
         alt={alt ?? `${name} campus`}
         loading={loading}
-        className={baseImgClass}
+        className={`${positionClass} object-cover ${className}`}
         style={style}
-        onError={() => {
-          if (currentSrc !== fallback) setCurrentSrc(fallback);
-        }}
+        onError={() => setCurrentSrc(null)}
       />
       {!noOverlay && (
         <div
           aria-hidden
-          className={inline ? "pointer-events-none absolute inset-0" : "pointer-events-none absolute inset-0"}
+          className="pointer-events-none absolute inset-0"
           style={{ backgroundColor: "rgba(255,255,255,0.05)" }}
         />
       )}
     </>
   );
+}
+
+/** Back-compat shim kept for any older imports. Returns null now — callers
+ *  should rely on the gradient fallback baked into SmartCampusImage. */
+export function pickFallbackCampus(_name: string): string | null {
+  return null;
 }
 
 export default SmartCampusImage;
