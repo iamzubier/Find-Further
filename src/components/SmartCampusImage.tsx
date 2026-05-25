@@ -52,9 +52,11 @@ export function SmartCampusImage({
 }: SmartCampusImageProps) {
   const initial = src && src.trim() ? src : null;
   const [currentSrc, setCurrentSrc] = useState<string | null>(initial);
+  const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
     setCurrentSrc(src && src.trim() ? src : null);
+    setLoaded(false);
   }, [src]);
 
   const positionClass = inline ? "block h-full w-full" : "absolute inset-0 h-full w-full";
@@ -82,11 +84,21 @@ export function SmartCampusImage({
 
   return (
     <>
+      {/* Shimmer skeleton — visible until the optimized WebP downloads. */}
+      {!loaded && (
+        <div
+          aria-hidden
+          className={`${positionClass} animate-pulse bg-gray-200 dark:bg-gray-800`}
+          style={style}
+        />
+      )}
       <img
         src={currentSrc}
         alt={alt ?? `${name} campus`}
         loading={loading}
-        className={`${positionClass} object-cover ${className}`}
+        decoding="async"
+        onLoad={() => setLoaded(true)}
+        className={`${positionClass} object-cover transition-opacity duration-500 ${loaded ? "opacity-100" : "opacity-0"} ${className}`}
         style={style}
         onError={() => setCurrentSrc(null)}
       />
