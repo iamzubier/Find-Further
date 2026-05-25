@@ -6,8 +6,10 @@ import {
   SCHOLARSHIPS,
   daysLeft,
   findScholarshipBySlug,
+  scholarshipSlug,
   type Scholarship,
 } from "@/lib/data";
+
 import { enrich, fundingLabel, providerLabel, type EnrichedScholarship } from "@/lib/scholarship-enrich";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
