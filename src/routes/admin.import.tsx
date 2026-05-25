@@ -70,8 +70,9 @@ function AdminImportPage() {
   const [allProgress, setAllProgress] = useState<{ processed: number; total: number; logos: number; campus: number; fallback: number; failed: number } | null>(null);
   const qsSync = useServerFn(qsSyncBatch);
   const [qsState, setQsState] = useState<{
-    processed: number; total: number; updated: number; unmatched: string[]; failed: number; dragging: boolean;
-  }>({ processed: 0, total: 0, updated: 0, unmatched: [], failed: 0, dragging: false });
+    processed: number; total: number; updated: number; inserted: number; failed: number; dragging: boolean;
+  }>({ processed: 0, total: 0, updated: 0, inserted: 0, failed: 0, dragging: false });
+
 
   const schSync = useServerFn(scholarshipsImportBatch);
   type SchTarget = "name" | "host_country" | "degree_level" | "annual_value_usd" | "amount_display" | "deadline" | "official_url" | "eligible_countries" | "description";
