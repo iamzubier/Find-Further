@@ -291,7 +291,11 @@ function CatalogBrowser() {
         <span>Page {page + 1} of {pages}</span>
       </div>
 
-      {!listQuery.isFetching && grouped.length === 0 && (
+      {!listQuery.isFetching && grouped.length === 0 && q.trim().length >= 2 && (
+        <HipolabsFallback query={q.trim()} />
+      )}
+
+      {!listQuery.isFetching && grouped.length === 0 && q.trim().length < 2 && (
         <div className="card-surface mt-6 p-12 text-center text-sm text-muted-foreground">
           No universities match those filters.
         </div>
