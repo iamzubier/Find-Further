@@ -143,7 +143,7 @@ function FeatureTrio() {
   ];
 
   return (
-    <section className="mx-auto max-w-6xl px-4 pt-14 pb-4">
+    <section className="mx-auto max-w-6xl px-4 pt-28 pb-12">
       <div className="mb-6 flex items-end justify-between">
         <h2 className="font-heading text-3xl font-bold md:text-4xl">
           One umbrella. <em className="font-medium">Three doors in.</em>
