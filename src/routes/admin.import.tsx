@@ -70,6 +70,29 @@ function AdminImportPage() {
     processed: number; total: number; updated: number; unmatched: string[]; failed: number; dragging: boolean;
   }>({ processed: 0, total: 0, updated: 0, unmatched: [], failed: 0, dragging: false });
 
+  const schSync = useServerFn(scholarshipsImportBatch);
+  type SchTarget = "name" | "host_country" | "degree_level" | "annual_value_usd" | "amount_display" | "deadline" | "official_url" | "eligible_countries" | "description";
+  const SCH_TARGETS: { key: SchTarget; label: string; required?: boolean }[] = [
+    { key: "name", label: "Name", required: true },
+    { key: "host_country", label: "Host country" },
+    { key: "degree_level", label: "Degree level" },
+    { key: "annual_value_usd", label: "Annual value (USD, numeric)" },
+    { key: "amount_display", label: "Amount (display string)" },
+    { key: "deadline", label: "Deadline" },
+    { key: "official_url", label: "Official URL" },
+    { key: "eligible_countries", label: "Eligible countries (comma/semicolon list)" },
+    { key: "description", label: "Description" },
+  ];
+  const [schState, setSchState] = useState<{
+    dragging: boolean;
+    headers: string[];
+    rows: Record<string, string>[];
+    mapping: Partial<Record<SchTarget, string>>;
+    processed: number; total: number; inserted: number; updated: number; failed: number;
+    importing: boolean;
+  }>({ dragging: false, headers: [], rows: [], mapping: {}, processed: 0, total: 0, inserted: 0, updated: 0, failed: 0, importing: false });
+
+
 
 
 
