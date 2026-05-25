@@ -88,32 +88,10 @@ function UniDetailPage() {
 
 const FALLBACK_CAMPUS = "https://images.unsplash.com/photo-1541339907198-e08756dedf3f?w=1600&q=80&auto=format&fit=crop";
 
-function UniHeroLogo({ logoUrl, name }: { logoUrl?: string | null; name: string }) {
-  const [errored, setErrored] = useState(false);
-  const initials = name.split(/\s+/).filter(w => /^[A-Za-z]/.test(w)).slice(0, 2).map(w => w[0]!.toUpperCase()).join("") || name.slice(0, 2).toUpperCase();
-  const showImg = logoUrl && !errored;
-  return (
-    <div className="flex h-20 w-20 flex-none items-center justify-center overflow-hidden rounded-xl bg-white p-3 shadow-2xl ring-1 ring-white/20">
-      {showImg ? (
-        <img src={logoUrl} alt={`${name} logo`} className="max-h-full max-w-full object-contain" onError={() => setErrored(true)} />
-      ) : (
-        <span className="font-heading text-2xl font-extrabold text-foreground">{initials}</span>
-      )}
-    </div>
-  );
-}
-
-
 function Hero({ uni }: { uni: any }) {
-  const [imgSrc, setImgSrc] = useState<string>(uni.campus_image_url || FALLBACK_CAMPUS);
   return (
     <div className="relative h-[420px] w-full overflow-hidden bg-neutral-900">
-      <img
-        src={imgSrc}
-        alt={`${uni.name} campus`}
-        className="absolute inset-0 h-full w-full object-cover"
-        onError={() => { if (imgSrc !== FALLBACK_CAMPUS) setImgSrc(FALLBACK_CAMPUS); }}
-      />
+      <SmartCampusImage src={uni.campus_image_url} name={uni.name} loading="eager" noOverlay />
       <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-black/20" />
       <div className="absolute inset-x-0 top-0 p-4">
         <Link to="/universities" className="inline-flex items-center gap-1 text-sm text-white/80 hover:text-white">
@@ -122,7 +100,13 @@ function Hero({ uni }: { uni: any }) {
       </div>
       <div className="absolute inset-x-0 bottom-0 mx-auto max-w-6xl px-4 pb-8">
         <div className="flex flex-wrap items-end gap-5">
-          <UniHeroLogo logoUrl={uni.logo_url} name={uni.name} />
+          <SmartLogo
+            name={uni.name}
+            logoUrl={uni.logo_url}
+            website={uni.official_url}
+            size={80}
+            className="shadow-2xl"
+          />
 
           <div className="text-white">
             <h1 className="font-heading text-4xl font-extrabold leading-tight md:text-5xl">{uni.name}</h1>
