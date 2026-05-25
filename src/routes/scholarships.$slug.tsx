@@ -838,5 +838,292 @@ function InsiderTips({ v }: { v: View }) {
   );
 }
 
+/* ─────────────────── Who Can Apply ─────────────────── */
+
+function WhoCanApply({ v }: { v: View }) {
+  const gpaUS = v.minGpa ?? 3.5;
+  return (
+    <section className="rounded-md border border-border bg-white p-6">
+      <div className="flex items-center gap-2">
+        <Users className="h-5 w-5 text-primary" />
+        <h2 className="font-heading text-2xl font-bold text-foreground">Eligibility</h2>
+      </div>
+      <div className="mt-5 grid gap-4 md:grid-cols-2">
+        <div>
+          <h3 className="text-xs font-bold uppercase tracking-wide text-muted-foreground">GPA cross-map</h3>
+          <dl className="mt-2 space-y-1.5 text-sm">
+            <Row label="US 4.0 scale" value={`${gpaUS.toFixed(1)}+`} />
+            <Row label="UK degree class" value={gpaUS >= 3.7 ? "First Class" : gpaUS >= 3.3 ? "2:1" : "2:2"} />
+            <Row label="HSC (BD, 5.0)" value={`${Math.min(5, gpaUS * 1.25).toFixed(2)}+`} />
+            <Row label="CBSE (India, %)" value={`${Math.round(gpaUS * 20)}%+`} />
+            <Row label="SA (Matric, %)" value={`${Math.round(gpaUS * 18 + 10)}%+`} />
+          </dl>
+        </div>
+        <div>
+          <h3 className="text-xs font-bold uppercase tracking-wide text-muted-foreground">Eligible nationals</h3>
+          <p className="mt-2 text-sm text-foreground/85">
+            {v.eligibleCountries?.length
+              ? v.eligibleCountries.slice(0, 12).join(", ")
+              : "Open to applicants from most developing & partner countries — check the official portal for the exact list."}
+          </p>
+          <h3 className="mt-4 text-xs font-bold uppercase tracking-wide text-muted-foreground">Level</h3>
+          <p className="mt-2 text-sm text-foreground/85 capitalize">{v.level}</p>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ─────────────────── Common Errors ─────────────────── */
+
+function CommonErrors() {
+  const errors = [
+    "Uploading transcripts that aren't officially attested (boards reject scanned copies).",
+    "Generic SOP — selectors spot template language within 2 paragraphs.",
+    "Asking recommenders too late (give them 4+ weeks and a brag-sheet).",
+    "Mismatched name spelling across passport, transcript, and application.",
+    "Submitting in the final 6 hours — portals crash under load.",
+  ];
+  return (
+    <section className="mt-6 rounded-md border border-destructive/30 bg-destructive/5 p-6">
+      <div className="flex items-center gap-2 text-destructive">
+        <AlertCircle className="h-5 w-5" />
+        <h3 className="font-heading text-lg font-bold">Common mistakes that get applicants rejected</h3>
+      </div>
+      <ul className="mt-3 space-y-2 text-sm text-foreground/90">
+        {errors.map((e) => (
+          <li key={e} className="flex items-start gap-2">
+            <X className="mt-0.5 h-4 w-4 shrink-0 text-destructive" />
+            <span>{e}</span>
+          </li>
+        ))}
+      </ul>
+    </section>
+  );
+}
+
+/* ─────────────────── Recipient Tips (DB-backed) ─────────────────── */
+
+function RecipientTips({ v }: { v: View }) {
+  const { data: tips } = useQuery({
+    queryKey: ["scholarship-tips", v.slug ?? v.id],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("scholarship_tips")
+        .select("*")
+        .eq("scholarship_slug", v.slug ?? "")
+        .order("source_upvotes", { ascending: false })
+        .limit(20);
+      return data ?? [];
+    },
+  });
+
+  if (tips && tips.length > 0) {
+    return (
+      <section>
+        <header className="mb-5">
+          <div className="flex items-center gap-2">
+            <MessageSquareQuote className="h-5 w-5 text-primary" />
+            <h2 className="font-heading text-2xl font-bold text-foreground">Tips from recipients</h2>
+          </div>
+          <p className="mt-1 text-sm text-muted-foreground">
+            From {tips.length} community submission{tips.length > 1 ? "s" : ""} — Reddit, Quora, alumni networks.
+          </p>
+        </header>
+        <div className="grid gap-4 md:grid-cols-2">
+          {tips.map((t: any) => (
+            <article key={t.id} className="rounded-md border border-border bg-white p-5">
+              {t.tag && (
+                <span className="mb-2 inline-block rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-primary">
+                  {t.tag}
+                </span>
+              )}
+              <blockquote className="border-l-4 border-primary pl-4 text-sm leading-relaxed text-foreground/90">
+                "{t.tip_text}"
+              </blockquote>
+              <div className="mt-2 text-[11px] text-muted-foreground">
+                {t.source_platform ?? "Community"}
+                {t.applicant_country && ` · ${t.applicant_country}`}
+                {t.year_posted && ` · ${t.year_posted}`}
+              </div>
+            </article>
+          ))}
+        </div>
+      </section>
+    );
+  }
+  return <InsiderTips v={v} />;
+}
+
+/* ─────────────────── Success Stories ─────────────────── */
+
+function SuccessStories({ v }: { v: View }) {
+  const { data: stories } = useQuery({
+    queryKey: ["scholarship-stories", v.slug ?? v.id],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("scholarship_success_stories")
+        .select("*")
+        .eq("scholarship_slug", v.slug ?? "")
+        .order("year_awarded", { ascending: false })
+        .limit(8);
+      return data ?? [];
+    },
+  });
+
+  return (
+    <section>
+      <header className="mb-5">
+        <div className="flex items-center gap-2">
+          <Trophy className="h-5 w-5 text-primary" />
+          <h2 className="font-heading text-2xl font-bold text-foreground">Success stories</h2>
+        </div>
+        <p className="mt-1 text-sm text-muted-foreground">
+          Anonymised profiles of past recipients — see what actually got them in.
+        </p>
+      </header>
+      {!stories || stories.length === 0 ? (
+        <div className="rounded-md border border-dashed border-border bg-white p-10 text-center text-sm text-muted-foreground">
+          No verified success stories indexed yet for this award. Check back after the next cycle.
+        </div>
+      ) : (
+        <div className="grid gap-5 md:grid-cols-2">
+          {stories.map((s: any) => (
+            <article key={s.id} className="rounded-md border border-border bg-white p-5">
+              <div className="flex items-center justify-between gap-2">
+                <h3 className="font-heading text-base font-bold text-foreground">
+                  Anonymous recipient · {s.applicant_country ?? "Unknown"}
+                </h3>
+                {s.year_awarded && (
+                  <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-bold text-emerald-700">
+                    {s.year_awarded}
+                  </span>
+                )}
+              </div>
+              <dl className="mt-3 grid grid-cols-2 gap-2 border-y border-border py-3 text-xs">
+                {s.major && <Row label="Major" value={s.major} />}
+                {s.curriculum && <Row label="Curriculum" value={s.curriculum} />}
+                {s.gpa_raw && <Row label="GPA" value={s.gpa_raw} />}
+                {s.ielts_score && <Row label="IELTS" value={s.ielts_score} />}
+              </dl>
+              {s.eca_summary && (
+                <p className="mt-3 text-xs italic text-muted-foreground">ECA: {s.eca_summary}</p>
+              )}
+              {s.story && <p className="mt-3 text-sm leading-relaxed text-foreground/90">{s.story}</p>}
+              {s.tips_from_winner && (
+                <p className="mt-3 rounded border-l-2 border-primary bg-primary/5 p-3 text-xs text-foreground/90">
+                  <b>Their advice:</b> {s.tips_from_winner}
+                </p>
+              )}
+            </article>
+          ))}
+        </div>
+      )}
+    </section>
+  );
+}
+
+/* ─────────────────── Odds Calculator ─────────────────── */
+
+function OddsCalculator({ v }: { v: View }) {
+  const { user } = useAuth();
+  const { data: profile } = useQuery({
+    queryKey: ["profile-for-odds", user?.id],
+    queryFn: async () => {
+      if (!user) return null;
+      const { data } = await supabase.from("profiles").select("*").eq("id", user.id).maybeSingle();
+      return data;
+    },
+    enabled: !!user,
+  });
+
+  const [gpa, setGpa] = useState("");
+  const [ielts, setIelts] = useState("");
+  const [eca, setEca] = useState("3");
+
+  useEffect(() => {
+    if (profile) {
+      if (profile.hsc_gpa) setGpa(String((profile.hsc_gpa / 5) * 4));
+      if (profile.ielts) setIelts(String(profile.ielts));
+    }
+  }, [profile]);
+
+  const target = v.minGpa ?? 3.5;
+  const gpaN = parseFloat(gpa) || 0;
+  const ieltsN = parseFloat(ielts) || 0;
+  const ecaN = parseInt(eca, 10) || 0;
+
+  // Simple weighted score (0-100)
+  const gpaScore = Math.min(100, (gpaN / target) * 70);
+  const ieltsScore = v.accepts_moi_waiver ? 80 : Math.min(100, (ieltsN / 7.5) * 100);
+  const ecaScore = (ecaN / 5) * 100;
+  const overall = Math.round(gpaScore * 0.55 + ieltsScore * 0.25 + ecaScore * 0.2);
+  const clamped = Math.max(2, Math.min(95, overall));
+
+  const verdict =
+    clamped >= 75 ? { label: "Strong match", tone: "text-emerald-700 bg-emerald-50 border-emerald-200" }
+    : clamped >= 50 ? { label: "Competitive", tone: "text-amber-700 bg-amber-50 border-amber-200" }
+    : { label: "Stretch goal", tone: "text-destructive bg-destructive/5 border-destructive/30" };
+
+  const improvements: string[] = [];
+  if (gpaN < target) improvements.push(`Lift GPA to ${target.toFixed(1)}+ (you're at ${gpaN.toFixed(2)}). One strong semester can move the needle.`);
+  if (!v.accepts_moi_waiver && ieltsN < 7) improvements.push(`Aim for IELTS 7.0+ overall, no band below 6.5. Worth $300 for the test re-take.`);
+  if (ecaN < 4) improvements.push(`Add depth to 1-2 ECAs — long commitment beats scattered participation. Selectors look for a story.`);
+  improvements.push(`Line up 2 recommenders 6 weeks early and brief them on this specific award.`);
+  improvements.push(`Draft your SOP around a single thread: why this country, why now, why you.`);
+
+  return (
+    <section className="rounded-md border border-border bg-white p-6">
+      <div className="flex items-center gap-2">
+        <Calculator className="h-5 w-5 text-primary" />
+        <h2 className="font-heading text-2xl font-bold text-foreground">Your odds</h2>
+      </div>
+      <p className="mt-1 text-sm text-muted-foreground">
+        {user ? "Pre-filled from your profile — adjust to model 'what if I improve' scenarios." : "Enter your stats to estimate matching probability."}
+      </p>
+
+      <div className="mt-6 grid gap-4 md:grid-cols-3">
+        <div>
+          <label className="text-xs font-semibold uppercase text-muted-foreground">GPA (US 4.0)</label>
+          <Input type="number" step="0.01" value={gpa} onChange={(e) => setGpa(e.target.value)} placeholder="3.7" className="mt-1" />
+        </div>
+        <div>
+          <label className="text-xs font-semibold uppercase text-muted-foreground">IELTS</label>
+          <Input type="number" step="0.1" value={ielts} onChange={(e) => setIelts(e.target.value)} placeholder="7.0" className="mt-1" disabled={v.accepts_moi_waiver} />
+          {v.accepts_moi_waiver && <p className="mt-1 text-[10px] text-emerald-700">MOI accepted — IELTS skipped</p>}
+        </div>
+        <div>
+          <label className="text-xs font-semibold uppercase text-muted-foreground">ECA depth (1-5)</label>
+          <Input type="number" min="1" max="5" value={eca} onChange={(e) => setEca(e.target.value)} className="mt-1" />
+        </div>
+      </div>
+
+      <div className="mt-6 rounded-md border border-border bg-neutral-50 p-5">
+        <div className="flex items-end justify-between gap-4">
+          <div>
+            <div className="text-xs uppercase tracking-wide text-muted-foreground">Match probability</div>
+            <div className="font-heading text-5xl font-extrabold tabular-nums text-foreground">{clamped}%</div>
+          </div>
+          <span className={`rounded-full border px-3 py-1 text-xs font-bold ${verdict.tone}`}>{verdict.label}</span>
+        </div>
+        <Progress value={clamped} className="mt-3 h-2" />
+      </div>
+
+      <div className="mt-6">
+        <h3 className="font-heading text-sm font-bold uppercase tracking-wide text-foreground">How to raise your odds</h3>
+        <ul className="mt-3 space-y-2 text-sm text-foreground/90">
+          {improvements.map((tip) => (
+            <li key={tip} className="flex items-start gap-2">
+              <Check className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
+              <span>{tip}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </section>
+  );
+}
+
 // Force-include for the static list so tree-shaking doesn't drop the import
 void SCHOLARSHIPS;
+
