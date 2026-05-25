@@ -1,8 +1,10 @@
-import { createFileRoute, Link, notFound } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
+import { queryOptions, useSuspenseQuery, useQueryClient } from "@tanstack/react-query";
 import React, { useEffect, useMemo, useState } from "react";
+import { z } from "zod";
 import { getUniDetail, submitTip } from "@/lib/uni-detail.functions";
+import { hydrateUniversity } from "@/lib/hydrate-university.functions";
 import { usToBd } from "@/lib/gpa";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/integrations/supabase/client";
@@ -14,7 +16,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
-import { Heart, GitCompare, Share2, ExternalLink, ArrowLeft, MapPin, Calendar, GraduationCap, DollarSign, BookOpen, Lightbulb, Award, Search, ThumbsUp } from "lucide-react";
+import { Heart, GitCompare, Share2, ExternalLink, ArrowLeft, MapPin, Calendar, GraduationCap, DollarSign, BookOpen, Lightbulb, Award, Search, ThumbsUp, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 import { SmartLogo } from "@/components/SmartLogo";
 import { SmartCampusImage } from "@/components/SmartCampusImage";
@@ -24,36 +26,139 @@ const detailQuery = (slug: string) => queryOptions({
   queryFn: () => getUniDetail({ data: { slug } }),
 });
 
+const SlugSearchSchema = z.object({
+  name: z.string().optional(),
+  country: z.string().optional(),
+});
+
 export const Route = createFileRoute("/universities/$slug")({
+  validateSearch: (s) => SlugSearchSchema.parse(s),
   loader: async ({ params, context }) => {
-    const data = await context.queryClient.ensureQueryData(detailQuery(params.slug));
-    if (!data.uni) throw notFound();
-    return data;
+    return await context.queryClient.ensureQueryData(detailQuery(params.slug));
   },
   head: ({ loaderData }) => ({
     meta: loaderData?.uni ? [
       { title: `${loaderData.uni.name} — Admissions, Tuition & Hacks | BeyondBorder` },
       { name: "description", content: `Complete guide to ${loaderData.uni.name}, ${loaderData.uni.country}: tuition, scholarships, deadlines, real student tips, and grade conversions for your curriculum.` },
       { property: "og:image", content: loaderData.uni.campus_image_url ?? "" },
-    ] : [],
+    ] : [
+      { title: "Loading university profile… | BeyondBorder" },
+    ],
   }),
-  notFoundComponent: () => (
-    <div className="mx-auto max-w-2xl px-4 py-24 text-center">
-      <h1 className="font-heading text-3xl font-extrabold">University not in detail catalog</h1>
-      <p className="mt-2 text-muted-foreground">We have rich pages for 30 top universities. More coming.</p>
-      <Button asChild className="mt-6"><Link to="/universities">← Browse all universities</Link></Button>
-    </div>
-  ),
   component: UniDetailPage,
 });
 
 const TABS = ["Overview","Admissions","Tuition & Aid","Programs","Entrance Exams","Community Tips"] as const;
 
+const HYDRATION_MESSAGES = [
+  "Connecting to global registry...",
+  "Extracting live 2026 tuition fees...",
+  "Scraping community admission hacks...",
+  "Finalizing institutional profile...",
+];
+
+function HydrationShimmer() {
+  const [idx, setIdx] = useState(0);
+  useEffect(() => {
+    const t = setInterval(() => setIdx((i) => (i + 1) % HYDRATION_MESSAGES.length), 1000);
+    return () => clearInterval(t);
+  }, []);
+  return (
+    <div className="min-h-screen bg-background pb-32">
+      <div className="relative h-[420px] w-full overflow-hidden bg-gradient-to-br from-neutral-100 to-neutral-200">
+        <div className="absolute inset-0 animate-pulse bg-[linear-gradient(110deg,transparent_35%,rgba(255,255,255,0.6)_50%,transparent_65%)] bg-[length:200%_100%]" />
+        <div className="absolute inset-x-0 bottom-0 mx-auto max-w-6xl px-4 pb-8">
+          <div className="flex items-end gap-5">
+            <div className="h-20 w-20 animate-pulse rounded-lg bg-white/70 ring-4 ring-white" />
+            <div className="flex-1">
+              <div className="h-10 w-2/3 animate-pulse rounded bg-white/70" />
+              <div className="mt-3 h-4 w-1/3 animate-pulse rounded bg-white/60" />
+            </div>
+          </div>
+        </div>
+      </div>
+      <div className="mx-auto mt-10 max-w-2xl px-4 text-center">
+        <div className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-4 py-2 shadow-sm">
+          <Sparkles className="h-4 w-4 animate-pulse text-primary" />
+          <span key={idx} className="text-sm font-medium text-foreground transition-opacity duration-300">
+            {HYDRATION_MESSAGES[idx]}
+          </span>
+        </div>
+        <p className="mt-3 text-xs text-muted-foreground">Building this profile live from public sources — usually 3–5 seconds.</p>
+      </div>
+      <div className="mx-auto mt-10 grid max-w-6xl gap-8 px-4 lg:grid-cols-[1fr_320px]">
+        <div className="space-y-4">
+          {[1, 2, 3].map((i) => (
+            <div key={i} className="card-surface p-6">
+              <div className="h-5 w-1/3 animate-pulse rounded bg-neutral-200" />
+              <div className="mt-4 h-3 w-full animate-pulse rounded bg-neutral-100" />
+              <div className="mt-2 h-3 w-5/6 animate-pulse rounded bg-neutral-100" />
+              <div className="mt-2 h-3 w-3/4 animate-pulse rounded bg-neutral-100" />
+            </div>
+          ))}
+        </div>
+        <div className="card-surface h-64 animate-pulse p-6" />
+      </div>
+    </div>
+  );
+}
+
+function HydrationError({ message, slug }: { message: string; slug: string }) {
+  return (
+    <div className="mx-auto max-w-2xl px-4 py-24 text-center">
+      <h1 className="font-heading text-3xl font-extrabold">Couldn't build this profile</h1>
+      <p className="mt-2 text-muted-foreground">{message}</p>
+      <p className="mt-1 text-xs text-muted-foreground">Slug: {slug}</p>
+      <Button asChild className="mt-6"><Link to="/universities">← Browse all universities</Link></Button>
+    </div>
+  );
+}
+
 function UniDetailPage() {
   const { slug } = Route.useParams();
-  const { data } = useSuspenseQuery(detailQuery(slug));
-  const uni = data.uni!;
+  const searchParams = Route.useSearch();
+  const { data, refetch } = useSuspenseQuery(detailQuery(slug));
+  const queryClient = useQueryClient();
+  const hydrate = useServerFn(hydrateUniversity);
+  const [hydrating, setHydrating] = useState(false);
+  const [hydrationError, setHydrationError] = useState<string | null>(null);
   const [tab, setTab] = useState<typeof TABS[number]>("Overview");
+
+  const needsHydration = !data.uni;
+
+  useEffect(() => {
+    if (!needsHydration || hydrating) return;
+    let cancelled = false;
+    setHydrating(true);
+    setHydrationError(null);
+    (async () => {
+      try {
+        const res = await hydrate({ data: { slug, name: searchParams.name, country: searchParams.country } });
+        if (cancelled) return;
+        if (!res.ok) {
+          setHydrationError(res.error ?? "AI lookup failed.");
+          setHydrating(false);
+          return;
+        }
+        await queryClient.invalidateQueries({ queryKey: ["uni-detail", slug] });
+        await refetch();
+        setHydrating(false);
+      } catch (e: any) {
+        if (cancelled) return;
+        setHydrationError(e?.message ?? "Network error.");
+        setHydrating(false);
+      }
+    })();
+    return () => { cancelled = true; };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [needsHydration, slug]);
+
+  if (needsHydration) {
+    if (hydrationError) return <HydrationError message={hydrationError} slug={slug} />;
+    return <HydrationShimmer />;
+  }
+
+  const uni = data.uni!;
 
   return (
     <div className="pb-32">
