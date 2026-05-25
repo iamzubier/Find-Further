@@ -48,7 +48,7 @@ export const Route = createFileRoute("/universities/$slug")({
   component: UniDetailPage,
 });
 
-const TABS = ["Overview","Admissions","Tuition & Aid","Programs","Entrance Exams","Community Tips"] as const;
+const TABS = ["Overview","Admissions","Tuition & Aid","Programs","Entrance Exams","How to Get In"] as const;
 
 const HYDRATION_MESSAGES = [
   "Connecting to global registry...",
