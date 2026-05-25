@@ -324,7 +324,7 @@ function ScholarshipsHub() {
         ) : (
           <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
             {active.map((s) => (
-              <ScholarshipCard key={s.id} s={s} variant="active" />
+              <ScholarshipCard key={s.id} s={s} variant="active" bannerUrl={bannerMap.get(scholarshipSlug(s)) ?? null} />
             ))}
           </div>
         )}
@@ -341,7 +341,7 @@ function ScholarshipsHub() {
           />
           <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
             {prepMode.map((s) => (
-              <ScholarshipCard key={s.id} s={s} variant="prep" />
+              <ScholarshipCard key={s.id} s={s} variant="prep" bannerUrl={bannerMap.get(scholarshipSlug(s)) ?? null} />
             ))}
           </div>
         </section>
