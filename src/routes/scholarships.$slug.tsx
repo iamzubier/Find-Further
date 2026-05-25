@@ -148,16 +148,87 @@ function ScholarshipDetailPage() {
     <div className="pb-24">
       <Hero v={view} />
 
-      <div className="mx-auto max-w-6xl px-4 py-10 space-y-10">
-        <FinancialDashboard v={view} />
-        <LanguageMeritMatrix v={view} />
-        <Timeline v={view} />
-        <DocChecklist v={view} />
-        <InsiderTips v={view} />
+      <div className="mx-auto max-w-6xl px-4 py-10">
+        <Tabs defaultValue="overview" className="w-full">
+          <TabsList className="mb-8 grid h-auto w-full grid-cols-2 gap-1 bg-neutral-100 p-1 md:grid-cols-4 lg:grid-cols-8">
+            <TabsTrigger value="overview" className="text-xs">Overview</TabsTrigger>
+            <TabsTrigger value="covers" className="text-xs">What It Covers</TabsTrigger>
+            <TabsTrigger value="who" className="text-xs">Who Can Apply</TabsTrigger>
+            <TabsTrigger value="how" className="text-xs">How To Apply</TabsTrigger>
+            <TabsTrigger value="docs" className="text-xs">Documents</TabsTrigger>
+            <TabsTrigger value="tips" className="text-xs">Tips</TabsTrigger>
+            <TabsTrigger value="stories" className="text-xs">Stories</TabsTrigger>
+            <TabsTrigger value="odds" className="text-xs">Odds</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="overview" className="space-y-6">
+            <Overview v={view} />
+          </TabsContent>
+          <TabsContent value="covers">
+            <FinancialDashboard v={view} />
+          </TabsContent>
+          <TabsContent value="who">
+            <WhoCanApply v={view} />
+            <div className="mt-6"><LanguageMeritMatrix v={view} /></div>
+          </TabsContent>
+          <TabsContent value="how">
+            <Timeline v={view} />
+            <CommonErrors />
+          </TabsContent>
+          <TabsContent value="docs">
+            <DocChecklist v={view} />
+          </TabsContent>
+          <TabsContent value="tips">
+            <RecipientTips v={view} />
+          </TabsContent>
+          <TabsContent value="stories">
+            <SuccessStories v={view} />
+          </TabsContent>
+          <TabsContent value="odds">
+            <OddsCalculator v={view} />
+          </TabsContent>
+        </Tabs>
       </div>
     </div>
   );
 }
+
+/* ─────────────────── Overview ─────────────────── */
+
+function Overview({ v }: { v: View }) {
+  return (
+    <div className="grid gap-6 md:grid-cols-3">
+      <div className="md:col-span-2 rounded-md border border-border bg-white p-6">
+        <h2 className="font-heading text-2xl font-bold text-foreground">About this award</h2>
+        <p className="mt-3 text-sm leading-relaxed text-foreground/85">
+          {v.description || `${v.name} is a ${fundingLabel(v.funding_type).toLowerCase()} ${providerLabel(v.provider_type).toLowerCase()} award hosted in ${v.country}.`}
+        </p>
+        <dl className="mt-6 grid grid-cols-2 gap-4 border-t border-border pt-4 text-sm">
+          <Row label="Provider" value={v.provider} />
+          <Row label="Host country" value={v.country} />
+          <Row label="Funding" value={fundingLabel(v.funding_type)} />
+          <Row label="Type" value={providerLabel(v.provider_type)} />
+          <Row label="Cycle" value={v.cycle_status === "closed_prep_mode" ? "Prep mode" : v.cycle_status === "rolling_admissions" ? "Rolling" : "Open"} />
+          <Row label="Annual value" value={v.amount || "Varies"} />
+        </dl>
+      </div>
+      <div className="rounded-md border border-amber-200 bg-amber-50/30 p-6">
+        <div className="flex items-center gap-2 text-amber-800">
+          <Sparkles className="h-4 w-4" />
+          <h3 className="font-heading text-sm font-bold uppercase tracking-wide">The wow fact</h3>
+        </div>
+        <p className="mt-3 text-sm leading-relaxed text-amber-900">
+          {v.application_fee_usd === 0
+            ? `Zero application fee — most peers pay $50-150 just to be considered.`
+            : v.accepts_moi_waiver
+            ? `Accepts MOI letter in lieu of IELTS — saves ~$250 + 6 weeks of test prep.`
+            : `Competitive merit award. Strong recommenders matter more than raw GPA.`}
+        </p>
+      </div>
+    </div>
+  );
+}
+
 
 /* ─────────────────── View model ─────────────────── */
 
