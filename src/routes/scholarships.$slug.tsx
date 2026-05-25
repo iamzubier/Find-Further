@@ -134,7 +134,7 @@ function ScholarshipDetailPage() {
   }
 
   // Build a unified enriched view: static enrichment, with DB overrides if present.
-  const view = buildView(staticS, dbQuery.data);
+  const view = buildView(staticS, dbQuery.data ?? null);
 
   return (
     <div className="pb-24">
