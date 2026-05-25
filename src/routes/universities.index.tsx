@@ -369,13 +369,9 @@ export function UniversityCard({ u, match }: { u: University; match?: number }) 
     toast.success(`Added to compare (${n}/3)`);
   };
 
-  const img = u.campusImageUrl || CARD_FALLBACK;
-
   return (
-    <div
-      className="group relative min-h-[280px] overflow-hidden rounded-2xl border border-border bg-cover bg-center text-white shadow-md transition-all hover:-translate-y-0.5 hover:shadow-2xl"
-      style={{ backgroundImage: `url('${img}')` }}
-    >
+    <div className="group relative min-h-[280px] overflow-hidden rounded-md border border-border text-white shadow-md transition-all hover:-translate-y-0.5 hover:shadow-2xl">
+      <SmartCampusImage src={u.campusImageUrl} name={u.name} noOverlay />
       <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-black/55 to-black/90" aria-hidden />
       <div className="relative z-[1] flex h-full min-h-[280px] flex-col p-5 md:p-6">
         <div className="flex flex-wrap items-start justify-between gap-2">
