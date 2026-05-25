@@ -1,111 +1,39 @@
-## What you're getting
+# Scholarship Infrastructure Overhaul — Plan
 
-A full **per-university detail page system** at `/universities/[slug]` for 30 seed universities (MIT, Harvard, Stanford, Oxford, Cambridge, ETH, TU Munich, UCL, Imperial, Edinburgh, Toronto, McGill, Waterloo, UBC, Melbourne, Sydney, Amsterdam, TU Delft, KTH, Uppsala, Helsinki, Aalto, Oslo, Politecnico Milano, Sapienza, NUS, SNU, KAIST, U Tokyo, Waseda).
+This is a very large change set. To keep it safe and reviewable I'll ship it in 4 phases. You can approve the whole plan now and I'll execute phase-by-phase, pausing only if a migration needs your confirmation.
 
-Each page has 6 sticky tabs, a campus hero, logos from Clearbit, sticky match/compare/save sidebar, deadline countdown, and a community tips system pulling from Reddit/Quora/YouTube-style entries.
+## Phase 1 — Schema (one migration)
 
-## Page structure
+Extend `scholarships` with the missing tracking columns (idempotent `ADD COLUMN IF NOT EXISTS`):
+`status`, `next_cycle`, `fully_funded`, `covers_tuition`, `covers_living`, `covers_airfare`, `covers_insurance`, `monthly_stipend_usd`, `seats_per_year`, `acceptance_rate`, `avg_gpa_recipients`, `avg_ielts_recipients`, `competitiveness`, `bond_requirement`, `renewable`, `renewal_conditions`, `work_permit`, `age_limit`, `required_docs jsonb`, `application_steps jsonb`, `results_announced`, `official_apply_url`, `banner_image_url`, `flag_emoji`, `subject_restrictions text[]`, `universities_covered text[]`, `wow_fact`. (slug, degree_level, host_country, eligible_countries, annual_value_usd already exist.)
 
-```
-/universities/mit
-├── HERO: campus photo + dark gradient
-│        ├ Logo (Clearbit) bottom-left
-│        ├ Name, flag, city, QS #, founded year
-├── STICKY TAB BAR ──────────────────────────────┐
-│   Overview │ Admissions │ Tuition │ Programs │ How To Get In │ Exams
-│                                               │
-├── TAB CONTENT ────────────────────┐  ┌────────┤
-│                                   │  │ SIDEBAR (sticky)
-│                                   │  │ ├ Match % (circular)
-│                                   │  │ ├ Save / Compare / Share
-│                                   │  │ ├ Deadline countdown
-│                                   │  │ └ Apply button
-└── FLOATING COMPARE BAR (when ≥1 added)
-```
+Create:
+- `scholarship_tips` (id, scholarship_id FK, tip_text, source_platform, source_url, source_upvotes, tag, applicant_country, year_posted, helpful_count, created_at)
+- `scholarship_success_stories` (id, scholarship_id FK, applicant_country, curriculum, gpa_raw, ielts_score, major, eca_summary, year_awarded, story, tips_from_winner, created_at)
 
-## Tabs in detail
+RLS: public SELECT on both; writes only via service role.
 
-1. **Overview** — about, key stats row (acceptance, students, intl %, ratio), campus life, alumni, subject rankings, website button, Google Maps embed.
-2. **Admissions** — requirements table with **BD↔US/UK/EU GPA conversion shown inline**, deadlines by intake (Fall/Spring/Winter), step-by-step process, doc checklist, apply link, processing time.
-3. **Tuition & Aid** — tuition tables, living costs, total CoA, fee waivers, scholarship cards, financial aid, work permit rules per country.
-4. **Programs** — programs grouped by faculty with search + faculty filter; each row shows duration, language, tuition.
-5. **How To Get In** — curated community tips with source platform logos (Reddit/Quora/YouTube), upvote counts, tag filter, "Submit a tip" form, disclaimer.
-6. **Entrance Exams** — required exams with score thresholds for THIS uni, registration links, next dates, prep resources, sample paper links.
+## Phase 2 — Seed ingestion server fn
 
-## Database changes
+`src/lib/seed-scholarships.functions.ts` — `seedScholarships` server fn (admin-secret guarded, `supabaseAdmin`) that upserts all 45 elite programs keyed by `slug`, plus a curated set of community tips (APS for Germany, Chevening 4-essay framework, GKS health cert, etc.) and 2–4 anonymized success stories per flagship award. Realistic but conservative figures; flagged with `hydrated_at` set so JIT hydrator skips them.
 
-New tables (`/universities` catalog stays for the directory; new `universities_detail` holds rich page data so we don't bloat the 10k-row catalog):
+A tiny admin page at `/admin/seed-scholarships` posts to it (or you can call it via the invoke-server-function tool).
 
-```sql
-universities_detail (
-  slug text primary key,
-  catalog_id text,              -- joins universities_catalog.id
-  name, country, city, qs_rank, founded_year,
-  acceptance_rate, total_students, international_pct, student_faculty_ratio,
-  about, campus_life, notable_alumni text[], subject_rankings jsonb,
-  logo_url, campus_image_url, official_url, application_url, maps_query,
-  admission_reqs jsonb,         -- {min_gpa_us, ielts, toefl, sat_min, sat_max, act_min, act_max, language}
-  deadlines jsonb,              -- [{intake, deadline, decision}]
-  application_steps text[],
-  required_docs text[],
-  processing_time text,
-  tuition jsonb,                -- {per_year_usd, per_semester, per_credit, currency, display}
-  living_cost_monthly integer,
-  fee_waivers text,
-  scholarships jsonb,           -- [{name, amount, eligibility, deadline, url}]
-  financial_aid text,
-  work_permit text,
-  programs_detail jsonb,        -- [{faculty, name, duration, language, tuition, seats}]
-  exams jsonb                   -- [{name, what_it_tests, score_req, register_url, next_dates, prep_links[], sample_url}]
-)
+## Phase 3 — Hub redesign (`scholarships.index.tsx`)
 
-university_tips (
-  id uuid primary key,
-  uni_slug text references universities_detail(slug),
-  tip_text text,
-  source_platform text,         -- reddit | quora | youtube | forum
-  source_url text,
-  source_upvotes integer,
-  tag text,                     -- Academics | ECA | Scholarship | Strategy | CampusLife | FinancialAid
-  posted_at date,
-  verified boolean default false,
-  submitted_by uuid,            -- nullable; user-submitted tips
-  approved boolean default true,
-  created_at timestamptz default now()
-)
-```
+Academic light theme. Sections:
+- Hero: "Find scholarships you can actually win." + odds subhead
+- WTF Scholarships horizontal carousel (auto-pulled from `wow_fact`)
+- Filter Matrix: Degree level / Status / Funding scope / Host country / Subject / Competitiveness
+- Two-stream card grid: Open vs Closed-prep-mode. Pulsing red countdown for <30 days. Red "Next cycle" pill for closed.
 
-Seeded with the 30 universities + ~6 tips each (180 tips). All RLS-protected (public read, authenticated insert for tips with `approved=false`).
+## Phase 4 — 8-tab detail (`scholarships.$slug.tsx`)
 
-## Compare upgrade
+Rebuild with 8 tabs: Overview, What It Covers (balance sheet), Who Can Apply (GPA cross-map US/UK/SA boards), How To Apply (vertical timeline + common errors), Required Documents (country dropdown — Bangladesh/India/Pakistan/Nigeria localized + checklist download), Tips From Recipients (pulled from `scholarship_tips`), Success Stories (from `scholarship_success_stories`), Odds Calculator (reads profile from auth context, returns % + improvement bullets). Closed scholarships render in "Next Cycle Prep Mode" with disabled apply CTA but full research content.
 
-`/compare` page rewritten to show the new richer rows: logo+name, QS, country, acceptance %, tuition, IELTS, GPA (with BD conversion), SAT, scholarships, top programs, intl %, deadline, website. **Best value per row highlighted green.** "Match to my profile" button per column if logged in.
+## Notes
+- All ingestion via `createServerFn` + `supabaseAdmin`. No Edge Functions.
+- Builds on top of existing `hydrate-scholarship.functions.ts` (still runs for unknown slugs).
+- Existing enriched static fallback (`scholarship-enrich.ts`) stays as final safety net.
 
-The existing floating CompareTray stays; it already supports max 3.
-
-## GPA conversion utility
-
-Already exists at `src/lib/gpa.ts` (`bdToUs`, `bdToUk`, `bdToEcts`). I'll add the **reverse** helper `usToBd(usGpa)` so when a uni says "min 3.5 US", we render: **"3.5 US GPA = BD HSC 4.25+ / 5.0"** automatically everywhere.
-
-## Files
-
-**Created**
-- `supabase/migrations/...sql` — two new tables + seed for 30 unis + tips
-- `src/lib/universities-detail.ts` — typed seed data (used to generate migration + as fallback)
-- `src/lib/universities-detail.functions.ts` — server fn to fetch detail + tips by slug
-- `src/lib/tips.functions.ts` — submit-tip server fn (auth-gated)
-- `src/routes/universities.$slug.tsx` — the new detail page (replaces `universities.$uniId.tsx`)
-- `src/components/uni/Hero.tsx`, `TabBar.tsx`, `Sidebar.tsx`, `TipCard.tsx`, `SubmitTipDialog.tsx`, `DeadlineCountdown.tsx`, `MatchRing.tsx`
-
-**Modified**
-- `src/routes/universities.tsx` — link to `/universities/<slug>` instead of `/<id>`
-- `src/routes/compare.tsx` — rewrite with richer rows + green-highlight + match button
-- `src/lib/gpa.ts` — add `usToBd()` helper
-
-## Out of scope (call out so you can ask if you want them)
-
-- Live Reddit/Quora scraping — tips are seeded as realistic examples per uni. Real scraping needs API keys + scheduled jobs; tell me if you want that added.
-- Clearbit logos and Unsplash photos use direct URLs at runtime (no API key needed for Clearbit's free logo endpoint). If a logo 404s we fall back to a monogram.
-- The 10k catalog directory keeps working unchanged. Only the 30 seeded unis get rich detail pages; clicking any other catalog uni shows a "Rich page coming soon — basic info + outbound link" stub (so we don't break the directory).
-
-Approve and I'll ship it in one pass.
+Approve and I'll start with Phase 1 (the migration).

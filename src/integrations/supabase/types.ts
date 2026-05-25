@@ -155,14 +155,135 @@ export type Database = {
         }
         Relationships: []
       }
+      scholarship_success_stories: {
+        Row: {
+          applicant_country: string | null
+          created_at: string
+          curriculum: string | null
+          eca_summary: string | null
+          gpa_raw: string | null
+          id: string
+          ielts_score: string | null
+          major: string | null
+          scholarship_id: string | null
+          scholarship_slug: string
+          story: string | null
+          tips_from_winner: string | null
+          year_awarded: number | null
+        }
+        Insert: {
+          applicant_country?: string | null
+          created_at?: string
+          curriculum?: string | null
+          eca_summary?: string | null
+          gpa_raw?: string | null
+          id?: string
+          ielts_score?: string | null
+          major?: string | null
+          scholarship_id?: string | null
+          scholarship_slug: string
+          story?: string | null
+          tips_from_winner?: string | null
+          year_awarded?: number | null
+        }
+        Update: {
+          applicant_country?: string | null
+          created_at?: string
+          curriculum?: string | null
+          eca_summary?: string | null
+          gpa_raw?: string | null
+          id?: string
+          ielts_score?: string | null
+          major?: string | null
+          scholarship_id?: string | null
+          scholarship_slug?: string
+          story?: string | null
+          tips_from_winner?: string | null
+          year_awarded?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "scholarship_success_stories_scholarship_id_fkey"
+            columns: ["scholarship_id"]
+            isOneToOne: false
+            referencedRelation: "scholarships"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      scholarship_tips: {
+        Row: {
+          applicant_country: string | null
+          created_at: string
+          helpful_count: number | null
+          id: string
+          scholarship_id: string | null
+          scholarship_slug: string
+          source_platform: string | null
+          source_upvotes: number | null
+          source_url: string | null
+          tag: string | null
+          tip_text: string
+          year_posted: number | null
+        }
+        Insert: {
+          applicant_country?: string | null
+          created_at?: string
+          helpful_count?: number | null
+          id?: string
+          scholarship_id?: string | null
+          scholarship_slug: string
+          source_platform?: string | null
+          source_upvotes?: number | null
+          source_url?: string | null
+          tag?: string | null
+          tip_text: string
+          year_posted?: number | null
+        }
+        Update: {
+          applicant_country?: string | null
+          created_at?: string
+          helpful_count?: number | null
+          id?: string
+          scholarship_id?: string | null
+          scholarship_slug?: string
+          source_platform?: string | null
+          source_upvotes?: number | null
+          source_url?: string | null
+          tag?: string | null
+          tip_text?: string
+          year_posted?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "scholarship_tips_scholarship_id_fkey"
+            columns: ["scholarship_id"]
+            isOneToOne: false
+            referencedRelation: "scholarships"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       scholarships: {
         Row: {
           academic_profile_weight: string | null
+          acceptance_rate: string | null
           accepts_moi_waiver: boolean | null
+          age_limit: number | null
           allowance_breakdown: Json | null
           amount_display: string | null
           annual_value_usd: number | null
           application_fee_usd: number | null
+          application_steps: Json | null
+          avg_gpa_recipients: string | null
+          avg_ielts_recipients: string | null
+          banner_image_url: string | null
+          bond_requirement: string | null
+          competitiveness: string | null
+          covers_airfare: boolean | null
+          covers_insurance: boolean | null
+          covers_living: boolean | null
+          covers_tuition: boolean | null
           created_at: string
           cycle_status: string | null
           deadline: string | null
@@ -170,6 +291,8 @@ export type Database = {
           description: string | null
           eligible_countries: string[] | null
           expected_next_open_month: string | null
+          flag_emoji: string | null
+          fully_funded: boolean | null
           funding_type: string | null
           hidden_costs_for_student: string | null
           hidden_obligations: string | null
@@ -177,22 +300,47 @@ export type Database = {
           hydrated_at: string | null
           id: string
           insider_tips: Json | null
+          monthly_stipend_usd: number | null
           name: string
+          next_cycle: string | null
+          official_apply_url: string | null
           official_url: string | null
           provider: string | null
           provider_type: string | null
+          renewable: boolean | null
+          renewal_conditions: string | null
+          required_docs: Json | null
           required_documents_checklist: string[] | null
+          results_announced: string | null
+          seats_per_year: number | null
           slug: string | null
+          status: string | null
+          subject_restrictions: string[] | null
+          universities_covered: string[] | null
           updated_at: string
           upfront_costs_covered: Json | null
+          work_permit: boolean | null
+          wow_fact: string | null
         }
         Insert: {
           academic_profile_weight?: string | null
+          acceptance_rate?: string | null
           accepts_moi_waiver?: boolean | null
+          age_limit?: number | null
           allowance_breakdown?: Json | null
           amount_display?: string | null
           annual_value_usd?: number | null
           application_fee_usd?: number | null
+          application_steps?: Json | null
+          avg_gpa_recipients?: string | null
+          avg_ielts_recipients?: string | null
+          banner_image_url?: string | null
+          bond_requirement?: string | null
+          competitiveness?: string | null
+          covers_airfare?: boolean | null
+          covers_insurance?: boolean | null
+          covers_living?: boolean | null
+          covers_tuition?: boolean | null
           created_at?: string
           cycle_status?: string | null
           deadline?: string | null
@@ -200,6 +348,8 @@ export type Database = {
           description?: string | null
           eligible_countries?: string[] | null
           expected_next_open_month?: string | null
+          flag_emoji?: string | null
+          fully_funded?: boolean | null
           funding_type?: string | null
           hidden_costs_for_student?: string | null
           hidden_obligations?: string | null
@@ -207,22 +357,47 @@ export type Database = {
           hydrated_at?: string | null
           id?: string
           insider_tips?: Json | null
+          monthly_stipend_usd?: number | null
           name: string
+          next_cycle?: string | null
+          official_apply_url?: string | null
           official_url?: string | null
           provider?: string | null
           provider_type?: string | null
+          renewable?: boolean | null
+          renewal_conditions?: string | null
+          required_docs?: Json | null
           required_documents_checklist?: string[] | null
+          results_announced?: string | null
+          seats_per_year?: number | null
           slug?: string | null
+          status?: string | null
+          subject_restrictions?: string[] | null
+          universities_covered?: string[] | null
           updated_at?: string
           upfront_costs_covered?: Json | null
+          work_permit?: boolean | null
+          wow_fact?: string | null
         }
         Update: {
           academic_profile_weight?: string | null
+          acceptance_rate?: string | null
           accepts_moi_waiver?: boolean | null
+          age_limit?: number | null
           allowance_breakdown?: Json | null
           amount_display?: string | null
           annual_value_usd?: number | null
           application_fee_usd?: number | null
+          application_steps?: Json | null
+          avg_gpa_recipients?: string | null
+          avg_ielts_recipients?: string | null
+          banner_image_url?: string | null
+          bond_requirement?: string | null
+          competitiveness?: string | null
+          covers_airfare?: boolean | null
+          covers_insurance?: boolean | null
+          covers_living?: boolean | null
+          covers_tuition?: boolean | null
           created_at?: string
           cycle_status?: string | null
           deadline?: string | null
@@ -230,6 +405,8 @@ export type Database = {
           description?: string | null
           eligible_countries?: string[] | null
           expected_next_open_month?: string | null
+          flag_emoji?: string | null
+          fully_funded?: boolean | null
           funding_type?: string | null
           hidden_costs_for_student?: string | null
           hidden_obligations?: string | null
@@ -237,14 +414,27 @@ export type Database = {
           hydrated_at?: string | null
           id?: string
           insider_tips?: Json | null
+          monthly_stipend_usd?: number | null
           name?: string
+          next_cycle?: string | null
+          official_apply_url?: string | null
           official_url?: string | null
           provider?: string | null
           provider_type?: string | null
+          renewable?: boolean | null
+          renewal_conditions?: string | null
+          required_docs?: Json | null
           required_documents_checklist?: string[] | null
+          results_announced?: string | null
+          seats_per_year?: number | null
           slug?: string | null
+          status?: string | null
+          subject_restrictions?: string[] | null
+          universities_covered?: string[] | null
           updated_at?: string
           upfront_costs_covered?: Json | null
+          work_permit?: boolean | null
+          wow_fact?: string | null
         }
         Relationships: []
       }
