@@ -329,43 +329,8 @@ function CatalogBrowser() {
 
 const CARD_FALLBACK = "https://images.unsplash.com/photo-1541339907198-e08756dedf3f?w=800&q=80";
 
-function domainFromWebsite(website?: string | null): string | null {
-  if (!website) return null;
-  try {
-    const url = website.startsWith("http") ? website : `https://${website}`;
-    return new URL(url).hostname.replace(/^www\./, "");
-  } catch { return null; }
-}
-
 function UniLogo({ website, name, size = 48 }: { website?: string | null; name: string; size?: number }) {
-  const domain = domainFromWebsite(website);
-  const [errored, setErrored] = useState(false);
-  const initials = name.split(/\s+/).filter(w => /^[A-Z]/.test(w)).slice(0, 2).map(w => w[0]).join("") || name.slice(0, 2).toUpperCase();
-  if (!domain || errored) {
-    return (
-      <div
-        className="flex flex-none items-center justify-center rounded-lg bg-primary/10 font-heading text-sm font-extrabold text-primary ring-1 ring-primary/20"
-        style={{ width: size, height: size }}
-        aria-hidden
-      >
-        {initials}
-      </div>
-    );
-  }
-  return (
-    <div
-      className="flex flex-none items-center justify-center overflow-hidden rounded-lg border border-border bg-white p-1.5"
-      style={{ width: size, height: size }}
-    >
-      <img
-        src={`https://logo.clearbit.com/${domain}`}
-        alt=""
-        className="max-h-full max-w-full object-contain"
-        loading="lazy"
-        onError={() => setErrored(true)}
-      />
-    </div>
-  );
+  return <SmartLogo name={name} website={website} size={size} />;
 }
 
 
