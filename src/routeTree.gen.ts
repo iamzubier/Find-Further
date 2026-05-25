@@ -9,14 +9,15 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as ScholarshipsRouteImport } from './routes/scholarships'
 import { Route as EvaluateRouteImport } from './routes/evaluate'
 import { Route as CompareRouteImport } from './routes/compare'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as UniversitiesIndexRouteImport } from './routes/universities.index'
+import { Route as ScholarshipsIndexRouteImport } from './routes/scholarships.index'
 import { Route as UniversitiesSlugRouteImport } from './routes/universities.$slug'
+import { Route as ScholarshipsSlugRouteImport } from './routes/scholarships.$slug'
 import { Route as AdminImportRouteImport } from './routes/admin.import'
 import { Route as AuthenticatedShortlistRouteImport } from './routes/_authenticated/shortlist'
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
@@ -24,11 +25,6 @@ import { Route as AuthenticatedDashboardRouteImport } from './routes/_authentica
 import { Route as AuthenticatedAskAiRouteImport } from './routes/_authenticated/ask-ai'
 import { Route as AuthenticatedEvaluateResultsIdRouteImport } from './routes/_authenticated/evaluate.results.$id'
 
-const ScholarshipsRoute = ScholarshipsRouteImport.update({
-  id: '/scholarships',
-  path: '/scholarships',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const EvaluateRoute = EvaluateRouteImport.update({
   id: '/evaluate',
   path: '/evaluate',
@@ -58,9 +54,19 @@ const UniversitiesIndexRoute = UniversitiesIndexRouteImport.update({
   path: '/universities/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ScholarshipsIndexRoute = ScholarshipsIndexRouteImport.update({
+  id: '/scholarships/',
+  path: '/scholarships/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const UniversitiesSlugRoute = UniversitiesSlugRouteImport.update({
   id: '/universities/$slug',
   path: '/universities/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ScholarshipsSlugRoute = ScholarshipsSlugRouteImport.update({
+  id: '/scholarships/$slug',
+  path: '/scholarships/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminImportRoute = AdminImportRouteImport.update({
@@ -100,13 +106,14 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/compare': typeof CompareRoute
   '/evaluate': typeof EvaluateRoute
-  '/scholarships': typeof ScholarshipsRoute
   '/ask-ai': typeof AuthenticatedAskAiRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/shortlist': typeof AuthenticatedShortlistRoute
   '/admin/import': typeof AdminImportRoute
+  '/scholarships/$slug': typeof ScholarshipsSlugRoute
   '/universities/$slug': typeof UniversitiesSlugRoute
+  '/scholarships/': typeof ScholarshipsIndexRoute
   '/universities/': typeof UniversitiesIndexRoute
   '/evaluate/results/$id': typeof AuthenticatedEvaluateResultsIdRoute
 }
@@ -115,13 +122,14 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/compare': typeof CompareRoute
   '/evaluate': typeof EvaluateRoute
-  '/scholarships': typeof ScholarshipsRoute
   '/ask-ai': typeof AuthenticatedAskAiRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/shortlist': typeof AuthenticatedShortlistRoute
   '/admin/import': typeof AdminImportRoute
+  '/scholarships/$slug': typeof ScholarshipsSlugRoute
   '/universities/$slug': typeof UniversitiesSlugRoute
+  '/scholarships': typeof ScholarshipsIndexRoute
   '/universities': typeof UniversitiesIndexRoute
   '/evaluate/results/$id': typeof AuthenticatedEvaluateResultsIdRoute
 }
@@ -132,13 +140,14 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/compare': typeof CompareRoute
   '/evaluate': typeof EvaluateRoute
-  '/scholarships': typeof ScholarshipsRoute
   '/_authenticated/ask-ai': typeof AuthenticatedAskAiRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
   '/_authenticated/shortlist': typeof AuthenticatedShortlistRoute
   '/admin/import': typeof AdminImportRoute
+  '/scholarships/$slug': typeof ScholarshipsSlugRoute
   '/universities/$slug': typeof UniversitiesSlugRoute
+  '/scholarships/': typeof ScholarshipsIndexRoute
   '/universities/': typeof UniversitiesIndexRoute
   '/_authenticated/evaluate/results/$id': typeof AuthenticatedEvaluateResultsIdRoute
 }
@@ -149,13 +158,14 @@ export interface FileRouteTypes {
     | '/auth'
     | '/compare'
     | '/evaluate'
-    | '/scholarships'
     | '/ask-ai'
     | '/dashboard'
     | '/profile'
     | '/shortlist'
     | '/admin/import'
+    | '/scholarships/$slug'
     | '/universities/$slug'
+    | '/scholarships/'
     | '/universities/'
     | '/evaluate/results/$id'
   fileRoutesByTo: FileRoutesByTo
@@ -164,13 +174,14 @@ export interface FileRouteTypes {
     | '/auth'
     | '/compare'
     | '/evaluate'
-    | '/scholarships'
     | '/ask-ai'
     | '/dashboard'
     | '/profile'
     | '/shortlist'
     | '/admin/import'
+    | '/scholarships/$slug'
     | '/universities/$slug'
+    | '/scholarships'
     | '/universities'
     | '/evaluate/results/$id'
   id:
@@ -180,13 +191,14 @@ export interface FileRouteTypes {
     | '/auth'
     | '/compare'
     | '/evaluate'
-    | '/scholarships'
     | '/_authenticated/ask-ai'
     | '/_authenticated/dashboard'
     | '/_authenticated/profile'
     | '/_authenticated/shortlist'
     | '/admin/import'
+    | '/scholarships/$slug'
     | '/universities/$slug'
+    | '/scholarships/'
     | '/universities/'
     | '/_authenticated/evaluate/results/$id'
   fileRoutesById: FileRoutesById
@@ -197,21 +209,15 @@ export interface RootRouteChildren {
   AuthRoute: typeof AuthRoute
   CompareRoute: typeof CompareRoute
   EvaluateRoute: typeof EvaluateRoute
-  ScholarshipsRoute: typeof ScholarshipsRoute
   AdminImportRoute: typeof AdminImportRoute
+  ScholarshipsSlugRoute: typeof ScholarshipsSlugRoute
   UniversitiesSlugRoute: typeof UniversitiesSlugRoute
+  ScholarshipsIndexRoute: typeof ScholarshipsIndexRoute
   UniversitiesIndexRoute: typeof UniversitiesIndexRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/scholarships': {
-      id: '/scholarships'
-      path: '/scholarships'
-      fullPath: '/scholarships'
-      preLoaderRoute: typeof ScholarshipsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/evaluate': {
       id: '/evaluate'
       path: '/evaluate'
@@ -254,11 +260,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof UniversitiesIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/scholarships/': {
+      id: '/scholarships/'
+      path: '/scholarships'
+      fullPath: '/scholarships/'
+      preLoaderRoute: typeof ScholarshipsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/universities/$slug': {
       id: '/universities/$slug'
       path: '/universities/$slug'
       fullPath: '/universities/$slug'
       preLoaderRoute: typeof UniversitiesSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/scholarships/$slug': {
+      id: '/scholarships/$slug'
+      path: '/scholarships/$slug'
+      fullPath: '/scholarships/$slug'
+      preLoaderRoute: typeof ScholarshipsSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin/import': {
@@ -332,9 +352,10 @@ const rootRouteChildren: RootRouteChildren = {
   AuthRoute: AuthRoute,
   CompareRoute: CompareRoute,
   EvaluateRoute: EvaluateRoute,
-  ScholarshipsRoute: ScholarshipsRoute,
   AdminImportRoute: AdminImportRoute,
+  ScholarshipsSlugRoute: ScholarshipsSlugRoute,
   UniversitiesSlugRoute: UniversitiesSlugRoute,
+  ScholarshipsIndexRoute: ScholarshipsIndexRoute,
   UniversitiesIndexRoute: UniversitiesIndexRoute,
 }
 export const routeTree = rootRouteImport
