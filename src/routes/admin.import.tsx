@@ -1,10 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { useServerFn } from "@tanstack/react-start";
+import Papa from "papaparse";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
-import { Upload, Database, FileSpreadsheet, Lock, BarChart3, Image as ImageIcon, Globe } from "lucide-react";
+import { Upload, Database, FileSpreadsheet, Lock, BarChart3, Image as ImageIcon, Globe, Trophy } from "lucide-react";
 import {
   verifyAdmin,
   importFromHipolabs,
@@ -14,6 +15,7 @@ import {
 import { getUniStats } from "@/lib/admin-stats.functions";
 import { fixCampusImagesBatch } from "@/lib/admin-wiki-images.functions";
 import { fixOgImagesBatch } from "@/lib/admin-og-images.functions";
+import { qsSyncBatch } from "@/lib/admin-qs-sync.functions";
 
 
 export const Route = createFileRoute("/admin/import")({
@@ -60,6 +62,12 @@ function AdminImportPage() {
   const fixImages = useServerFn(fixCampusImagesBatch);
   const fixOg = useServerFn(fixOgImagesBatch);
   const [ogProgress, setOgProgress] = useState<{ processed: number; total: number; updated: number; skipped: number; failed: number } | null>(null);
+  const qsSync = useServerFn(qsSyncBatch);
+  const [qsState, setQsState] = useState<{
+    processed: number; total: number; updated: number; unmatched: string[]; failed: number; dragging: boolean;
+  }>({ processed: 0, total: 0, updated: 0, unmatched: [], failed: 0, dragging: false });
+
+
 
 
   async function loadStats() {
@@ -149,6 +157,74 @@ function AdminImportPage() {
     } catch (e) { toast.error((e as Error).message); }
     finally { setBusy(null); }
   }
+
+  function pickField(row: Record<string, string>, keys: string[]): string | undefined {
+    for (const k of keys) {
+      for (const rk of Object.keys(row)) {
+        if (rk.toLowerCase().replace(/[^a-z0-9]/g, "") === k.toLowerCase().replace(/[^a-z0-9]/g, "")) {
+          const v = row[rk]?.trim();
+          if (v) return v;
+        }
+      }
+    }
+    return undefined;
+  }
+
+  async function handleQsCsv(file: File) {
+    setBusy("qs-sync");
+    setQsState({ processed: 0, total: 0, updated: 0, unmatched: [], failed: 0, dragging: false });
+    try {
+      const text = await file.text();
+      const parsed = Papa.parse<Record<string, string>>(text, {
+        header: true, skipEmptyLines: true, transformHeader: (h) => h.trim(),
+      });
+      const rawRows = parsed.data.filter((r) => r && typeof r === "object");
+      const rows = rawRows
+        .map((r) => {
+          const name = pickField(r, ["institution", "institution_name", "university", "university_name", "name"]);
+          if (!name) return null;
+          const rankRaw = pickField(r, ["rank", "qs_rank", "ranking", "world_rank", "2024_rank", "2025_rank"]);
+          const rank = rankRaw ? parseInt(rankRaw.replace(/[^0-9]/g, ""), 10) : null;
+          return {
+            name,
+            qs_rank: Number.isFinite(rank) && rank! > 0 ? rank : null,
+            international_pct: pickField(r, ["international_students", "international_pct", "intl_students_pct", "international_students_pct"]) ?? null,
+            total_students: pickField(r, ["total_students", "size", "student_population", "students"]) ?? null,
+            student_faculty_ratio: pickField(r, ["student_faculty_ratio", "faculty_student_ratio", "student_to_faculty"]) ?? null,
+          };
+        })
+        .filter((r): r is NonNullable<typeof r> => r !== null);
+
+      if (!rows.length) throw new Error("No valid rows found in CSV");
+
+      const BATCH = 50;
+      let updated = 0, failed = 0;
+      const unmatched: string[] = [];
+      setQsState((s) => ({ ...s, total: rows.length }));
+
+      for (let i = 0; i < rows.length; i += BATCH) {
+        const chunk = rows.slice(i, i + BATCH);
+        const r = await qsSync({ data: { key, rows: chunk } });
+        updated += r.updated.length;
+        failed += r.failed.length;
+        unmatched.push(...r.unmatched);
+        setQsState((s) => ({ ...s, processed: Math.min(i + BATCH, rows.length), updated, failed, unmatched: [...unmatched] }));
+      }
+      toast.success(`Synced: ${updated} updated, ${unmatched.length} unmatched, ${failed} failed`);
+    } catch (e) { toast.error((e as Error).message); }
+    finally { setBusy(null); }
+  }
+
+  const onQsDrop = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    setQsState((s) => ({ ...s, dragging: false }));
+    const f = e.dataTransfer.files?.[0];
+    if (f) handleQsCsv(f);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [key]);
+
+
+
 
 
   if (!verified) {
@@ -263,7 +339,55 @@ function AdminImportPage() {
         )}
       </Card>
 
+      <Card title="QS Rankings Sync" icon={<Trophy className="h-5 w-5" />}
+        desc="Drop a QS World University Rankings CSV. Fuzzy-matches institutions to the database and updates qs_rank, international_pct, total_students, and student_faculty_ratio. Never overwrites images, logos, or curated content.">
+        <label
+          onDragOver={(e) => { e.preventDefault(); setQsState((s) => ({ ...s, dragging: true })); }}
+          onDragLeave={() => setQsState((s) => ({ ...s, dragging: false }))}
+          onDrop={onQsDrop}
+          className={`flex cursor-pointer flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed p-10 text-center transition-colors ${
+            qsState.dragging ? "border-primary bg-primary/5" : "border-border hover:border-primary/60 hover:bg-secondary/40"
+          } ${busy ? "pointer-events-none opacity-50" : ""}`}
+        >
+          <Trophy className="h-8 w-8 text-primary" />
+          <div className="font-heading text-base font-semibold">Drop QS World Rankings CSV Here (Kaggle Format)</div>
+          <div className="text-xs text-muted-foreground">or click to browse — fields auto-detected (institution, rank, international_students, total_students, student_faculty_ratio)</div>
+          <input type="file" accept=".csv" className="hidden" onChange={(e) => {
+            const f = e.target.files?.[0]; if (f) handleQsCsv(f); e.target.value = "";
+          }} />
+        </label>
 
+        {qsState.total > 0 && (
+          <div className="mt-4 space-y-3">
+            <div className="h-2 w-full overflow-hidden rounded bg-secondary">
+              <div className="h-full bg-primary transition-all"
+                style={{ width: `${(qsState.processed / qsState.total) * 100}%` }} />
+            </div>
+            <div className="text-sm tabular-nums text-muted-foreground">
+              {busy === "qs-sync"
+                ? `Updating University ${qsState.processed} of ${qsState.total.toLocaleString()}…`
+                : `Processed ${qsState.processed} of ${qsState.total.toLocaleString()}`}
+            </div>
+            <div className="grid grid-cols-3 gap-3">
+              <Stat label="Updated" value={qsState.updated} tone="success" />
+              <Stat label="Unmatched" value={qsState.unmatched.length} tone="warn" />
+              <Stat label="Failed" value={qsState.failed} tone="danger" />
+            </div>
+            {qsState.unmatched.length > 0 && (
+              <div>
+                <div className="mb-1 text-xs uppercase text-muted-foreground">Unmatched institutions</div>
+                <div className="max-h-60 overflow-auto rounded-md border border-border bg-secondary/30 p-3 text-sm">
+                  <ul className="space-y-1">
+                    {qsState.unmatched.map((n, i) => (
+                      <li key={`${n}-${i}`} className="font-mono text-xs">{n}</li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+      </Card>
 
 
       <Card title="1. Hipolabs Universities API" icon={<Database className="h-5 w-5" />}
@@ -314,3 +438,14 @@ function FilePick({ onPick, label, disabled }: { onPick: (f: File) => void; labe
     </label>
   );
 }
+
+function Stat({ label, value, tone }: { label: string; value: number; tone: "success" | "warn" | "danger" }) {
+  const toneClass = tone === "success" ? "text-emerald-500" : tone === "warn" ? "text-amber-500" : "text-destructive";
+  return (
+    <div className="rounded-md border border-border bg-secondary/40 p-3">
+      <div className="text-xs uppercase text-muted-foreground">{label}</div>
+      <div className={`font-heading text-2xl font-bold ${toneClass}`}>{value.toLocaleString()}</div>
+    </div>
+  );
+}
+
