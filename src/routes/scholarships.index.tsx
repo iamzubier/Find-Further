@@ -405,12 +405,24 @@ function EmptyState({ reset }: { reset: () => void }) {
 
 /* ──────────────────── Card ──────────────────── */
 
+function levelBadge(level: EnrichedScholarship["level"]): string {
+  switch (level) {
+    case "ug": return "Bachelor's";
+    case "pg": return "Master's";
+    case "phd": return "PhD";
+    case "all": return "All Levels";
+    default: return String(level ?? "").toUpperCase();
+  }
+}
+
 function ScholarshipCard({
   s,
   variant,
+  bannerUrl,
 }: {
   s: EnrichedScholarship;
   variant: "active" | "prep";
+  bannerUrl?: string | null;
 }) {
   const { user } = useAuth();
   const [saving, setSaving] = useState(false);
@@ -419,14 +431,16 @@ function ScholarshipCard({
 
   const countdownCls =
     d < 0
-      ? "bg-neutral-100 text-muted-foreground ring-border"
+      ? "bg-white/15 text-white/80 ring-white/20"
       : d <= 10
-      ? "bg-destructive/10 text-destructive ring-destructive/40"
+      ? "bg-red-500/90 text-white ring-red-300/60"
       : d <= 30
-      ? "bg-amber-500/10 text-amber-700 ring-amber-500/40"
-      : "bg-emerald-500/10 text-emerald-700 ring-emerald-500/40";
+      ? "bg-amber-500/90 text-white ring-amber-200/60"
+      : "bg-emerald-500/90 text-white ring-emerald-200/60";
 
-  const save = async () => {
+  const save = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
     if (!user) {
       toast.error("Log in to save scholarships");
       return;
@@ -444,98 +458,111 @@ function ScholarshipCard({
     else toast.success(`Saved ${s.name}`);
   };
 
+  // Background: real banner image when available, else letter-based gradient.
+  const hasImg = Boolean(bannerUrl);
+  const bgStyle: React.CSSProperties = hasImg
+    ? { backgroundImage: `url(${bannerUrl})` }
+    : { background: gradientForName(s.country || s.name) };
+
   return (
-    <article
-      className={`group flex h-full flex-col rounded-md border p-5 transition-shadow hover:shadow-[0_4px_6px_-1px_rgba(0,0,0,0.1)] ${
-        variant === "prep"
-          ? "border-amber-200 bg-[#FBF7EE]"
-          : "border-border bg-white"
-      }`}
+    <Link
+      to="/scholarships/$slug"
+      params={{ slug }}
+      className="group relative block h-[360px] overflow-hidden rounded-lg ring-1 ring-border shadow-sm transition-shadow hover:shadow-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
     >
-      <div className="flex items-start justify-between gap-3">
-        <div className="flex flex-wrap items-center gap-1.5">
-          <span className="inline-flex items-center rounded-full bg-primary/10 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-primary ring-1 ring-primary/30">
-            {fundingLabel(s.funding_type)}
-          </span>
-          <span className="inline-flex items-center rounded-full bg-neutral-100 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-foreground/70 ring-1 ring-border">
-            {providerLabel(s.provider_type)}
-          </span>
-        </div>
+      {/* Background image / gradient */}
+      <div
+        className="absolute inset-0 bg-cover bg-center transition-transform duration-500 ease-out group-hover:scale-105"
+        style={bgStyle}
+        aria-hidden
+      />
+      {/* Dark gradient overlay for legibility */}
+      <div
+        className="absolute inset-0"
+        style={{
+          background:
+            "linear-gradient(to bottom, rgba(15,23,42,0.4) 0%, rgba(15,23,42,0.75) 55%, rgba(15,23,42,0.95) 100%)",
+        }}
+        aria-hidden
+      />
+
+      {/* Top-right level badge */}
+      <div className="absolute right-3 top-3 z-10 flex items-center gap-1.5">
+        <span className="rounded-full bg-white/15 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-white ring-1 ring-white/30 backdrop-blur">
+          {levelBadge(s.level)}
+        </span>
         <button
           onClick={save}
           disabled={saving}
           aria-label="Save to shortlist"
-          className="rounded-md p-1.5 text-muted-foreground ring-1 ring-border transition hover:text-destructive hover:ring-destructive/40"
+          className="rounded-full bg-white/10 p-1.5 text-white ring-1 ring-white/30 backdrop-blur transition hover:bg-white/20 hover:text-red-300"
         >
-          <Heart className="h-4 w-4" />
+          <Heart className="h-3.5 w-3.5" />
         </button>
       </div>
 
-      <h3 className="mt-3 font-heading text-lg font-bold leading-snug text-foreground line-clamp-2">
-        {s.name}
-      </h3>
-      <div className="mt-1 truncate text-xs text-muted-foreground">{s.provider}</div>
-
-      <div className="mt-2 flex items-center gap-2 text-sm text-muted-foreground">
-        <span className="text-xl leading-none">{s.countryFlag}</span>
-        <span>{s.country}</span>
+      {/* Top-left chips */}
+      <div className="absolute left-3 top-3 z-10 flex flex-wrap items-center gap-1.5">
+        <span className="rounded-full bg-primary/90 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-primary-foreground ring-1 ring-white/20 backdrop-blur">
+          {fundingLabel(s.funding_type)}
+        </span>
+        {variant === "prep" && (
+          <span className="rounded-full bg-amber-500/90 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-white ring-1 ring-white/20 backdrop-blur">
+            Prep mode
+          </span>
+        )}
       </div>
 
-      <dl className="mt-4 grid grid-cols-2 gap-3 border-y border-border py-4 text-sm">
-        <div>
-          <dt className="text-[10px] uppercase tracking-wide text-muted-foreground">Headline value</dt>
-          <dd className="mt-0.5 font-bold text-foreground">{s.amount || "Varies"}</dd>
+      {/* Bottom content */}
+      <div className="relative z-10 flex h-full flex-col justify-end p-5 text-white">
+        <div className="flex items-center gap-2 text-sm text-white/85">
+          <span className="text-xl leading-none">{s.countryFlag}</span>
+          <span className="font-medium">{s.country}</span>
+          <span aria-hidden className="text-white/40">·</span>
+          <span className="text-xs text-white/70">{providerLabel(s.provider_type)}</span>
         </div>
-        <div>
-          <dt className="text-[10px] uppercase tracking-wide text-muted-foreground">App fee</dt>
-          <dd className="mt-0.5 font-bold text-foreground">
-            {s.application_fee_usd > 0 ? `$${s.application_fee_usd}` : "Free"}
-          </dd>
-        </div>
-      </dl>
 
-      {/* Cycle row */}
-      {variant === "prep" ? (
-        <div className="mt-4 rounded border border-amber-200 bg-amber-50/60 p-3 text-xs">
-          <div className="flex items-center gap-1.5 font-bold uppercase tracking-wide text-amber-800">
-            <CalendarClock className="h-3 w-3" /> Prep mode
+        <h3 className="mt-2 font-heading text-xl font-extrabold leading-tight text-white line-clamp-2 drop-shadow">
+          {s.name}
+        </h3>
+        <div className="mt-1 truncate text-xs text-white/70">{s.provider}</div>
+
+        <div className="mt-4 flex items-center justify-between gap-2 border-t border-white/15 pt-3">
+          <div className="min-w-0">
+            <div className="text-[10px] uppercase tracking-wide text-white/55">Value</div>
+            <div className="truncate text-sm font-bold text-white">{s.amount || "Varies"}</div>
           </div>
-          <p className="mt-1 text-amber-900/85">
-            {s.prep_hint ?? "Currently closed — start collecting references and a draft SOP."}
-          </p>
-        </div>
-      ) : (
-        <div className="mt-4 flex items-center justify-between gap-2">
-          <span
-            className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-semibold ring-1 ${countdownCls}`}
-          >
-            <Clock className="h-3 w-3" />
-            {d < 0
-              ? "Closed"
-              : d === 0
-              ? "Closes today"
-              : s.cycle_status === "rolling_admissions"
-              ? "Rolling"
-              : `${d} days left`}
-          </span>
-          {s.accepts_moi_waiver && (
-            <span className="text-[10px] font-semibold uppercase tracking-wide text-emerald-700">
-              MOI ok
+          {variant === "prep" ? (
+            <span className="inline-flex items-center gap-1 rounded-full bg-amber-500/90 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-white ring-1 ring-white/20">
+              <CalendarClock className="h-3 w-3" /> Opens later
+            </span>
+          ) : (
+            <span className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[11px] font-bold uppercase tracking-wide ring-1 ${countdownCls}`}>
+              <Clock className="h-3 w-3" />
+              {d < 0
+                ? "Closed"
+                : d === 0
+                ? "Today"
+                : s.cycle_status === "rolling_admissions"
+                ? "Rolling"
+                : `${d}d left`}
             </span>
           )}
         </div>
-      )}
 
-      <Button
-        asChild
-        size="sm"
-        className="mt-4 h-9 w-full bg-primary text-primary-foreground hover:bg-primary/90"
-      >
-        <Link to="/scholarships/$slug" params={{ slug }}>
-          View details <ArrowRight className="ml-1 h-3.5 w-3.5" />
-        </Link>
-      </Button>
-    </article>
+        <div className="mt-3 flex items-center justify-between text-[11px] text-white/70">
+          <span>{s.application_fee_usd > 0 ? `$${s.application_fee_usd} fee` : "Free to apply"}</span>
+          {s.accepts_moi_waiver && (
+            <span className="rounded-full bg-emerald-500/20 px-2 py-0.5 font-semibold text-emerald-200 ring-1 ring-emerald-300/40">
+              MOI ok
+            </span>
+          )}
+          <span className="inline-flex items-center gap-1 font-semibold text-white group-hover:underline">
+            View <ArrowRight className="h-3 w-3 transition-transform group-hover:translate-x-0.5" />
+          </span>
+        </div>
+      </div>
+    </Link>
   );
 }
 
