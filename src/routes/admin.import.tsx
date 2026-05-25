@@ -65,7 +65,9 @@ function AdminImportPage() {
   const hipo = useServerFn(importFromHipolabs);
   const fixImages = useServerFn(fixCampusImagesBatch);
   const fixOg = useServerFn(fixOgImagesBatch);
+  const fixAll = useServerFn(fixAllImagesBatch);
   const [ogProgress, setOgProgress] = useState<{ processed: number; total: number; updated: number; skipped: number; failed: number } | null>(null);
+  const [allProgress, setAllProgress] = useState<{ processed: number; total: number; logos: number; campus: number; fallback: number; failed: number } | null>(null);
   const qsSync = useServerFn(qsSyncBatch);
   const [qsState, setQsState] = useState<{
     processed: number; total: number; updated: number; unmatched: string[]; failed: number; dragging: boolean;
