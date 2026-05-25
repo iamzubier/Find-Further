@@ -203,7 +203,7 @@ function Stats() {
 
 function WtfSection() {
   return (
-    <section className="mx-auto max-w-6xl px-4 py-16">
+    <section className="mx-auto max-w-6xl px-4 py-28">
       <div className="mb-8">
         <h2 className="font-heading text-3xl font-extrabold md:text-5xl">
           Wait… you didn't know this? <span>🤯</span>
