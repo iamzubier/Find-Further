@@ -42,7 +42,7 @@ function Hero() {
   const countLabel = countData?.count ? `${countData.count.toLocaleString()}+` : "10,000+";
 
   return (
-    <section className="relative overflow-hidden border-b border-border bg-background">
+    <section className="relative overflow-hidden border-b border-border" style={{ backgroundColor: "#ff0000" }}>
       <div className="relative mx-auto grid max-w-6xl gap-10 px-4 pb-10 pt-16 md:grid-cols-[1.2fr_1fr] md:pt-24">
         <div>
           <LogoMark className="mb-6 h-12 w-12 text-primary" />
