@@ -172,10 +172,11 @@ export const qsSyncBatch = createServerFn({ method: "POST" })
             indexed.push({
               slug,
               name: row.name,
-              admission_reqs: insertRow.admission_reqs ?? {},
+              admission_reqs: (insertRow.admission_reqs as Record<string, unknown>) ?? {},
               tokens: qTokens,
               normName: qName,
             });
+
           }
         }
       } catch (e) {
