@@ -402,8 +402,8 @@ function ScorePanel({ breakdown, converted }: { breakdown: ScoreBreakdown; conve
       <div className="mt-4 flex items-center gap-5">
         <div className="relative">
           <svg width="128" height="128" viewBox="0 0 128 128">
-            <circle cx="64" cy="64" r={r} stroke="hsl(var(--border))" strokeWidth="10" fill="none" />
-            <circle cx="64" cy="64" r={r} stroke="hsl(var(--primary))" strokeWidth="10" fill="none"
+            <circle cx="64" cy="64" r={r} stroke="var(--border)" strokeWidth="10" fill="none" />
+            <circle cx="64" cy="64" r={r} stroke="var(--primary)" strokeWidth="10" fill="none"
               strokeLinecap="round" strokeDasharray={`${dash} ${c}`} transform="rotate(-90 64 64)"
               style={{ transition: "stroke-dasharray 400ms ease" }} />
           </svg>
