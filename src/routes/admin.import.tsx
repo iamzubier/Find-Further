@@ -484,6 +484,31 @@ function AdminImportPage() {
         )}
       </Card>
 
+      <Card title="Fix All Images (Logos + Campus, Bulletproof)" icon={<ImageIcon className="h-5 w-5" />}
+        desc="One-shot bulletproof pipeline. For every university missing a logo: derive domain from official_url and fetch via Clearbit. For every university missing a campus image: try Wikipedia → og:image → curated Unsplash campus photo. Guarantees every card has a logo and an image.">
+        <Button onClick={handleFixAllImages} disabled={busy !== null}>
+          {busy === "all" ? "Running…" : "Fix All Images"}
+        </Button>
+        {allProgress && (
+          <div className="mt-4 space-y-2">
+            <div className="h-2 w-full overflow-hidden rounded bg-secondary">
+              <div
+                className="h-full bg-primary transition-all"
+                style={{ width: `${allProgress.total ? Math.min(100, (allProgress.processed / allProgress.total) * 100) : 0}%` }}
+              />
+            </div>
+            <div className="flex flex-wrap gap-4 text-xs text-muted-foreground tabular-nums">
+              <span>Processed: <b className="text-foreground">{allProgress.processed}</b></span>
+              <span>Logos: <b className="text-foreground">{allProgress.logos}</b></span>
+              <span>Campus: <b className="text-foreground">{allProgress.campus}</b></span>
+              <span>Fallback: <b className="text-foreground">{allProgress.fallback}</b></span>
+              <span>Failed: <b className="text-foreground">{allProgress.failed}</b></span>
+            </div>
+          </div>
+        )}
+      </Card>
+
+
       <Card title="QS Rankings Sync" icon={<Trophy className="h-5 w-5" />}
         desc="Drop a QS World University Rankings CSV. Fuzzy-matches institutions to the database and updates qs_rank, international_pct, total_students, and student_faculty_ratio. Never overwrites images, logos, or curated content.">
         <label
