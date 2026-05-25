@@ -227,7 +227,7 @@ function AdminImportPage() {
 
   async function handleQsCsv(file: File) {
     setBusy("qs-sync");
-    setQsState({ processed: 0, total: 0, updated: 0, unmatched: [], failed: 0, dragging: false });
+    setQsState({ processed: 0, total: 0, updated: 0, inserted: 0, failed: 0, dragging: false });
     try {
       const text = await file.text();
       const parsed = Papa.parse<Record<string, string>>(text, {
@@ -242,6 +242,7 @@ function AdminImportPage() {
           const rank = rankRaw ? parseInt(rankRaw.replace(/[^0-9]/g, ""), 10) : null;
           return {
             name,
+            country: pickField(r, ["country", "location", "country_name", "nation"]) ?? null,
             qs_rank: Number.isFinite(rank) && rank! > 0 ? rank : null,
             international_pct: pickField(r, ["international_students", "international_pct", "intl_students_pct", "international_students_pct"]) ?? null,
             total_students: pickField(r, ["total_students", "size", "student_population", "students"]) ?? null,
@@ -253,22 +254,22 @@ function AdminImportPage() {
       if (!rows.length) throw new Error("No valid rows found in CSV");
 
       const BATCH = 50;
-      let updated = 0, failed = 0;
-      const unmatched: string[] = [];
+      let updated = 0, inserted = 0, failed = 0;
       setQsState((s) => ({ ...s, total: rows.length }));
 
       for (let i = 0; i < rows.length; i += BATCH) {
         const chunk = rows.slice(i, i + BATCH);
         const r = await qsSync({ data: { key, rows: chunk } });
         updated += r.updated.length;
+        inserted += r.inserted.length;
         failed += r.failed.length;
-        unmatched.push(...r.unmatched);
-        setQsState((s) => ({ ...s, processed: Math.min(i + BATCH, rows.length), updated, failed, unmatched: [...unmatched] }));
+        setQsState((s) => ({ ...s, processed: Math.min(i + BATCH, rows.length), updated, inserted, failed }));
       }
-      toast.success(`Synced: ${updated} updated, ${unmatched.length} unmatched, ${failed} failed`);
+      toast.success(`Synced: ${updated} updated, ${inserted} newly created, ${failed} failed`);
     } catch (e) { toast.error((e as Error).message); }
     finally { setBusy(null); }
   }
+
 
   const onQsDrop = useCallback((e: React.DragEvent) => {
     e.preventDefault();
