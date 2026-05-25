@@ -339,7 +339,55 @@ function AdminImportPage() {
         )}
       </Card>
 
+      <Card title="QS Rankings Sync" icon={<Trophy className="h-5 w-5" />}
+        desc="Drop a QS World University Rankings CSV. Fuzzy-matches institutions to the database and updates qs_rank, international_pct, total_students, and student_faculty_ratio. Never overwrites images, logos, or curated content.">
+        <label
+          onDragOver={(e) => { e.preventDefault(); setQsState((s) => ({ ...s, dragging: true })); }}
+          onDragLeave={() => setQsState((s) => ({ ...s, dragging: false }))}
+          onDrop={onQsDrop}
+          className={`flex cursor-pointer flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed p-10 text-center transition-colors ${
+            qsState.dragging ? "border-primary bg-primary/5" : "border-border hover:border-primary/60 hover:bg-secondary/40"
+          } ${busy ? "pointer-events-none opacity-50" : ""}`}
+        >
+          <Trophy className="h-8 w-8 text-primary" />
+          <div className="font-heading text-base font-semibold">Drop QS World Rankings CSV Here (Kaggle Format)</div>
+          <div className="text-xs text-muted-foreground">or click to browse — fields auto-detected (institution, rank, international_students, total_students, student_faculty_ratio)</div>
+          <input type="file" accept=".csv" className="hidden" onChange={(e) => {
+            const f = e.target.files?.[0]; if (f) handleQsCsv(f); e.target.value = "";
+          }} />
+        </label>
 
+        {qsState.total > 0 && (
+          <div className="mt-4 space-y-3">
+            <div className="h-2 w-full overflow-hidden rounded bg-secondary">
+              <div className="h-full bg-primary transition-all"
+                style={{ width: `${(qsState.processed / qsState.total) * 100}%` }} />
+            </div>
+            <div className="text-sm tabular-nums text-muted-foreground">
+              {busy === "qs-sync"
+                ? `Updating University ${qsState.processed} of ${qsState.total.toLocaleString()}…`
+                : `Processed ${qsState.processed} of ${qsState.total.toLocaleString()}`}
+            </div>
+            <div className="grid grid-cols-3 gap-3">
+              <Stat label="Updated" value={qsState.updated} tone="success" />
+              <Stat label="Unmatched" value={qsState.unmatched.length} tone="warn" />
+              <Stat label="Failed" value={qsState.failed} tone="danger" />
+            </div>
+            {qsState.unmatched.length > 0 && (
+              <div>
+                <div className="mb-1 text-xs uppercase text-muted-foreground">Unmatched institutions</div>
+                <div className="max-h-60 overflow-auto rounded-md border border-border bg-secondary/30 p-3 text-sm">
+                  <ul className="space-y-1">
+                    {qsState.unmatched.map((n, i) => (
+                      <li key={`${n}-${i}`} className="font-mono text-xs">{n}</li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+      </Card>
 
 
       <Card title="1. Hipolabs Universities API" icon={<Database className="h-5 w-5" />}
