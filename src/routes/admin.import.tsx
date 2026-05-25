@@ -4,7 +4,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
-import { Upload, Database, FileSpreadsheet, Lock, BarChart3, Image as ImageIcon } from "lucide-react";
+import { Upload, Database, FileSpreadsheet, Lock, BarChart3, Image as ImageIcon, Globe } from "lucide-react";
 import {
   verifyAdmin,
   importFromHipolabs,
@@ -13,6 +13,8 @@ import {
 } from "@/lib/admin-import.functions";
 import { getUniStats } from "@/lib/admin-stats.functions";
 import { fixCampusImagesBatch } from "@/lib/admin-wiki-images.functions";
+import { fixOgImagesBatch } from "@/lib/admin-og-images.functions";
+
 
 export const Route = createFileRoute("/admin/import")({
   head: () => ({ meta: [{ title: "Admin — Import Data" }, { name: "robots", content: "noindex" }] }),
@@ -56,6 +58,9 @@ function AdminImportPage() {
   const statsFn = useServerFn(getUniStats);
   const hipo = useServerFn(importFromHipolabs);
   const fixImages = useServerFn(fixCampusImagesBatch);
+  const fixOg = useServerFn(fixOgImagesBatch);
+  const [ogProgress, setOgProgress] = useState<{ processed: number; total: number; updated: number; skipped: number; failed: number } | null>(null);
+
 
   async function loadStats() {
     setBusy("stats");
@@ -119,6 +124,32 @@ function AdminImportPage() {
     } catch (e) { toast.error((e as Error).message); }
     finally { setBusy(null); }
   }
+
+  async function handleFixOg() {
+    setBusy("og");
+    setOgProgress({ processed: 0, total: 0, updated: 0, skipped: 0, failed: 0 });
+    try {
+      const limit = 10;
+      let offset = 0;
+      let updated = 0, skipped = 0, failed = 0, total = 0, processed = 0;
+      let safety = 0;
+      // Rows leaving the filter as we update them; advance offset only by non-updated.
+      while (safety++ < 2000) {
+        const r = await fixOg({ data: { key, offset, limit } });
+        updated += r.updated; skipped += r.skipped; failed += r.failed;
+        total = r.total;
+        processed += r.batch;
+        setOgProgress({ processed, total: total + updated, updated, skipped, failed });
+        if (r.batch === 0) break;
+        // Updated rows drop out of the result set; only skipped/failed remain, so advance by those.
+        offset += r.skipped + r.failed;
+        if (r.updated === 0 && r.skipped + r.failed < limit) break;
+      }
+      toast.success(`Done: ${updated} updated, ${skipped} skipped (no og:image), ${failed} failed`);
+    } catch (e) { toast.error((e as Error).message); }
+    finally { setBusy(null); }
+  }
+
 
   if (!verified) {
     return (
@@ -208,6 +239,31 @@ function AdminImportPage() {
           </div>
         )}
       </Card>
+
+      <Card title="Fix Missing Images (Official Sites)" icon={<Globe className="h-5 w-5" />}
+        desc="For universities still missing a campus image (null or generic Unsplash), fetch the og:image meta tag from their official website and update campus_image_url. No fallback — leaves null if og:image is missing.">
+        <Button onClick={handleFixOg} disabled={busy !== null}>
+          {busy === "og" ? "Running…" : "Fix Missing Images (Official Sites)"}
+        </Button>
+        {ogProgress && (
+          <div className="mt-4 space-y-2">
+            <div className="h-2 w-full overflow-hidden rounded bg-secondary">
+              <div
+                className="h-full bg-primary transition-all"
+                style={{ width: `${ogProgress.total ? (ogProgress.processed / ogProgress.total) * 100 : 0}%` }}
+              />
+            </div>
+            <div className="flex flex-wrap gap-4 text-xs text-muted-foreground tabular-nums">
+              <span>{ogProgress.processed} / {ogProgress.total}</span>
+              <span>Updated: <b className="text-foreground">{ogProgress.updated}</b></span>
+              <span>Skipped (no og:image): <b className="text-foreground">{ogProgress.skipped}</b></span>
+              <span>Failed: <b className="text-foreground">{ogProgress.failed}</b></span>
+            </div>
+          </div>
+        )}
+      </Card>
+
+
 
 
       <Card title="1. Hipolabs Universities API" icon={<Database className="h-5 w-5" />}
