@@ -4,7 +4,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
-import { Upload, Database, FileSpreadsheet, Lock, BarChart3 } from "lucide-react";
+import { Upload, Database, FileSpreadsheet, Lock, BarChart3, Image as ImageIcon } from "lucide-react";
 import {
   verifyAdmin,
   importFromHipolabs,
@@ -12,6 +12,7 @@ import {
   importTuition,
 } from "@/lib/admin-import.functions";
 import { getUniStats } from "@/lib/admin-stats.functions";
+import { fixCampusImagesBatch } from "@/lib/admin-wiki-images.functions";
 
 export const Route = createFileRoute("/admin/import")({
   head: () => ({ meta: [{ title: "Admin — Import Data" }, { name: "robots", content: "noindex" }] }),
@@ -49,10 +50,12 @@ function AdminImportPage() {
   const [verified, setVerified] = useState(false);
   const [busy, setBusy] = useState<string | null>(null);
   const [stats, setStats] = useState<Stats | null>(null);
+  const [wikiProgress, setWikiProgress] = useState<{ processed: number; total: number; wiki: number; fallback: number; failed: number } | null>(null);
 
   const verify = useServerFn(verifyAdmin);
   const statsFn = useServerFn(getUniStats);
   const hipo = useServerFn(importFromHipolabs);
+  const fixImages = useServerFn(fixCampusImagesBatch);
 
   async function loadStats() {
     setBusy("stats");
@@ -92,6 +95,27 @@ function AdminImportPage() {
         ? await qs({ data: { key, rows } })
         : await tu({ data: { key, rows } });
       toast.success(`Processed ${rows.length} rows: ${JSON.stringify(r)}`);
+    } catch (e) { toast.error((e as Error).message); }
+    finally { setBusy(null); }
+  }
+
+  async function handleFixImages() {
+    setBusy("wiki");
+    setWikiProgress({ processed: 0, total: 0, wiki: 0, fallback: 0, failed: 0 });
+    try {
+      let offset = 0;
+      const limit = 10;
+      let wiki = 0, fallback = 0, failed = 0, total = 0;
+      // eslint-disable-next-line no-constant-condition
+      while (true) {
+        const r = await fixImages({ data: { key, offset, limit } });
+        wiki += r.wiki; fallback += r.fallback; failed += r.failed;
+        total = r.total;
+        setWikiProgress({ processed: r.processed, total, wiki, fallback, failed });
+        if (r.done || r.batch === 0) break;
+        offset += limit;
+      }
+      toast.success(`Done: ${wiki} from Wikipedia, ${fallback} fallback, ${failed} failed`);
     } catch (e) { toast.error((e as Error).message); }
     finally { setBusy(null); }
   }
@@ -161,6 +185,30 @@ function AdminImportPage() {
           </div>
         )}
       </Card>
+
+      <Card title="Fix Campus Images (Wikipedia)" icon={<ImageIcon className="h-5 w-5" />}
+        desc="Fetch the real infobox photo from the Wikipedia REST API for every university and update campus_image_url. Falls back to a country-based Unsplash image when Wikipedia has no thumbnail.">
+        <Button onClick={handleFixImages} disabled={busy !== null}>
+          {busy === "wiki" ? "Running…" : "Fix Campus Images (Wikipedia)"}
+        </Button>
+        {wikiProgress && (
+          <div className="mt-4 space-y-2">
+            <div className="h-2 w-full overflow-hidden rounded bg-secondary">
+              <div
+                className="h-full bg-primary transition-all"
+                style={{ width: `${wikiProgress.total ? (wikiProgress.processed / wikiProgress.total) * 100 : 0}%` }}
+              />
+            </div>
+            <div className="flex flex-wrap gap-4 text-xs text-muted-foreground tabular-nums">
+              <span>{wikiProgress.processed} / {wikiProgress.total}</span>
+              <span>Wikipedia: <b className="text-foreground">{wikiProgress.wiki}</b></span>
+              <span>Fallback: <b className="text-foreground">{wikiProgress.fallback}</b></span>
+              <span>Failed: <b className="text-foreground">{wikiProgress.failed}</b></span>
+            </div>
+          </div>
+        )}
+      </Card>
+
 
       <Card title="1. Hipolabs Universities API" icon={<Database className="h-5 w-5" />}
         desc="Fetch ~10k universities from 15 countries. Free public API.">
