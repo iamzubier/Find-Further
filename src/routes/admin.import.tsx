@@ -186,6 +186,30 @@ function AdminImportPage() {
         )}
       </Card>
 
+      <Card title="Fix Campus Images (Wikipedia)" icon={<ImageIcon className="h-5 w-5" />}
+        desc="Fetch the real infobox photo from the Wikipedia REST API for every university and update campus_image_url. Falls back to a country-based Unsplash image when Wikipedia has no thumbnail.">
+        <Button onClick={handleFixImages} disabled={busy !== null}>
+          {busy === "wiki" ? "Running…" : "Fix Campus Images (Wikipedia)"}
+        </Button>
+        {wikiProgress && (
+          <div className="mt-4 space-y-2">
+            <div className="h-2 w-full overflow-hidden rounded bg-secondary">
+              <div
+                className="h-full bg-primary transition-all"
+                style={{ width: `${wikiProgress.total ? (wikiProgress.processed / wikiProgress.total) * 100 : 0}%` }}
+              />
+            </div>
+            <div className="flex flex-wrap gap-4 text-xs text-muted-foreground tabular-nums">
+              <span>{wikiProgress.processed} / {wikiProgress.total}</span>
+              <span>Wikipedia: <b className="text-foreground">{wikiProgress.wiki}</b></span>
+              <span>Fallback: <b className="text-foreground">{wikiProgress.fallback}</b></span>
+              <span>Failed: <b className="text-foreground">{wikiProgress.failed}</b></span>
+            </div>
+          </div>
+        )}
+      </Card>
+
+
       <Card title="1. Hipolabs Universities API" icon={<Database className="h-5 w-5" />}
         desc="Fetch ~10k universities from 15 countries. Free public API.">
         <Button onClick={handleHipo} disabled={busy !== null}>
