@@ -17,6 +17,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as UniversitiesIndexRouteImport } from './routes/universities.index'
 import { Route as ScholarshipsIndexRouteImport } from './routes/scholarships.index'
 import { Route as UniversitiesSlugRouteImport } from './routes/universities.$slug'
+import { Route as ScholarshipsSlugRouteImport } from './routes/scholarships.$slug'
 import { Route as AdminImportRouteImport } from './routes/admin.import'
 import { Route as AuthenticatedShortlistRouteImport } from './routes/_authenticated/shortlist'
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
@@ -63,6 +64,11 @@ const UniversitiesSlugRoute = UniversitiesSlugRouteImport.update({
   path: '/universities/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ScholarshipsSlugRoute = ScholarshipsSlugRouteImport.update({
+  id: '/scholarships/$slug',
+  path: '/scholarships/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AdminImportRoute = AdminImportRouteImport.update({
   id: '/admin/import',
   path: '/admin/import',
@@ -105,6 +111,7 @@ export interface FileRoutesByFullPath {
   '/profile': typeof AuthenticatedProfileRoute
   '/shortlist': typeof AuthenticatedShortlistRoute
   '/admin/import': typeof AdminImportRoute
+  '/scholarships/$slug': typeof ScholarshipsSlugRoute
   '/universities/$slug': typeof UniversitiesSlugRoute
   '/scholarships/': typeof ScholarshipsIndexRoute
   '/universities/': typeof UniversitiesIndexRoute
@@ -120,6 +127,7 @@ export interface FileRoutesByTo {
   '/profile': typeof AuthenticatedProfileRoute
   '/shortlist': typeof AuthenticatedShortlistRoute
   '/admin/import': typeof AdminImportRoute
+  '/scholarships/$slug': typeof ScholarshipsSlugRoute
   '/universities/$slug': typeof UniversitiesSlugRoute
   '/scholarships': typeof ScholarshipsIndexRoute
   '/universities': typeof UniversitiesIndexRoute
@@ -137,6 +145,7 @@ export interface FileRoutesById {
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
   '/_authenticated/shortlist': typeof AuthenticatedShortlistRoute
   '/admin/import': typeof AdminImportRoute
+  '/scholarships/$slug': typeof ScholarshipsSlugRoute
   '/universities/$slug': typeof UniversitiesSlugRoute
   '/scholarships/': typeof ScholarshipsIndexRoute
   '/universities/': typeof UniversitiesIndexRoute
@@ -154,6 +163,7 @@ export interface FileRouteTypes {
     | '/profile'
     | '/shortlist'
     | '/admin/import'
+    | '/scholarships/$slug'
     | '/universities/$slug'
     | '/scholarships/'
     | '/universities/'
@@ -169,6 +179,7 @@ export interface FileRouteTypes {
     | '/profile'
     | '/shortlist'
     | '/admin/import'
+    | '/scholarships/$slug'
     | '/universities/$slug'
     | '/scholarships'
     | '/universities'
@@ -185,6 +196,7 @@ export interface FileRouteTypes {
     | '/_authenticated/profile'
     | '/_authenticated/shortlist'
     | '/admin/import'
+    | '/scholarships/$slug'
     | '/universities/$slug'
     | '/scholarships/'
     | '/universities/'
@@ -198,6 +210,7 @@ export interface RootRouteChildren {
   CompareRoute: typeof CompareRoute
   EvaluateRoute: typeof EvaluateRoute
   AdminImportRoute: typeof AdminImportRoute
+  ScholarshipsSlugRoute: typeof ScholarshipsSlugRoute
   UniversitiesSlugRoute: typeof UniversitiesSlugRoute
   ScholarshipsIndexRoute: typeof ScholarshipsIndexRoute
   UniversitiesIndexRoute: typeof UniversitiesIndexRoute
@@ -259,6 +272,13 @@ declare module '@tanstack/react-router' {
       path: '/universities/$slug'
       fullPath: '/universities/$slug'
       preLoaderRoute: typeof UniversitiesSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/scholarships/$slug': {
+      id: '/scholarships/$slug'
+      path: '/scholarships/$slug'
+      fullPath: '/scholarships/$slug'
+      preLoaderRoute: typeof ScholarshipsSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin/import': {
@@ -333,6 +353,7 @@ const rootRouteChildren: RootRouteChildren = {
   CompareRoute: CompareRoute,
   EvaluateRoute: EvaluateRoute,
   AdminImportRoute: AdminImportRoute,
+  ScholarshipsSlugRoute: ScholarshipsSlugRoute,
   UniversitiesSlugRoute: UniversitiesSlugRoute,
   ScholarshipsIndexRoute: ScholarshipsIndexRoute,
   UniversitiesIndexRoute: UniversitiesIndexRoute,
