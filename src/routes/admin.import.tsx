@@ -201,8 +201,8 @@ function AdminImportPage() {
             </div>
             <div className="flex flex-wrap gap-4 text-xs text-muted-foreground tabular-nums">
               <span>{wikiProgress.processed} / {wikiProgress.total}</span>
-              <span>Wikipedia: <b className="text-foreground">{wikiProgress.wiki}</b></span>
-              <span>Fallback: <b className="text-foreground">{wikiProgress.fallback}</b></span>
+              <span>Updated: <b className="text-foreground">{wikiProgress.updated}</b></span>
+              <span>Skipped (no image): <b className="text-foreground">{wikiProgress.skipped}</b></span>
               <span>Failed: <b className="text-foreground">{wikiProgress.failed}</b></span>
             </div>
           </div>
