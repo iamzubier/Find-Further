@@ -15,6 +15,7 @@ import {
 import { getUniStats } from "@/lib/admin-stats.functions";
 import { fixCampusImagesBatch } from "@/lib/admin-wiki-images.functions";
 import { fixOgImagesBatch } from "@/lib/admin-og-images.functions";
+import { fixAllImagesBatch } from "@/lib/admin-fix-all-images.functions";
 import { qsSyncBatch } from "@/lib/admin-qs-sync.functions";
 import { scholarshipsImportBatch } from "@/lib/admin-scholarships-sync.functions";
 import { GraduationCap } from "lucide-react";
