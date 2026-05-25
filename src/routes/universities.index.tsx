@@ -15,6 +15,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { getUniversityCount } from "@/lib/admin-import.functions";
 import { useCompare } from "@/lib/compare-store";
 import { toast } from "sonner";
+import { SmartLogo } from "@/components/SmartLogo";
+import { SmartCampusImage } from "@/components/SmartCampusImage";
 
 
 const SearchSchema = z.object({
