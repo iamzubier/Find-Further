@@ -327,7 +327,6 @@ function CatalogBrowser() {
   );
 }
 
-const CARD_FALLBACK = "https://images.unsplash.com/photo-1541339907198-e08756dedf3f?w=800&q=80";
 
 function UniLogo({ website, name, size = 48 }: { website?: string | null; name: string; size?: number }) {
   return <SmartLogo name={name} website={website} size={size} />;
