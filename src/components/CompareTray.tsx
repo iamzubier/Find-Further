@@ -2,8 +2,7 @@ import { Link } from "@tanstack/react-router";
 import { useCompare } from "@/lib/compare-store";
 import { Button } from "@/components/ui/button";
 import { X, GitCompare, Plus, ArrowRight } from "lucide-react";
-
-const FALLBACK_IMG = "https://images.unsplash.com/photo-1541339907198-e08756dedf3f?w=200&q=70";
+import { SmartLogo } from "@/components/SmartLogo";
 
 export function CompareTray() {
   const items = useCompare((s) => s.items);
