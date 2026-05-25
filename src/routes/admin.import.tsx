@@ -62,6 +62,12 @@ function AdminImportPage() {
   const fixImages = useServerFn(fixCampusImagesBatch);
   const fixOg = useServerFn(fixOgImagesBatch);
   const [ogProgress, setOgProgress] = useState<{ processed: number; total: number; updated: number; skipped: number; failed: number } | null>(null);
+  const qsSync = useServerFn(qsSyncBatch);
+  const [qsState, setQsState] = useState<{
+    processed: number; total: number; updated: number; unmatched: string[]; failed: number; dragging: boolean;
+  }>({ processed: 0, total: 0, updated: 0, unmatched: [], failed: 0, dragging: false });
+
+
 
 
   async function loadStats() {
