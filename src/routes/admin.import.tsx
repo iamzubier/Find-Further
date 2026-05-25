@@ -4,13 +4,14 @@ import { useServerFn } from "@tanstack/react-start";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
-import { Upload, Database, FileSpreadsheet, Lock } from "lucide-react";
+import { Upload, Database, FileSpreadsheet, Lock, BarChart3 } from "lucide-react";
 import {
   verifyAdmin,
   importFromHipolabs,
   importQsRankings,
   importTuition,
 } from "@/lib/admin-import.functions";
+import { getUniStats } from "@/lib/admin-stats.functions";
 
 export const Route = createFileRoute("/admin/import")({
   head: () => ({ meta: [{ title: "Admin — Import Data" }, { name: "robots", content: "noindex" }] }),
@@ -41,13 +42,24 @@ function parseCsv(text: string): Record<string, string>[] {
   });
 }
 
+type Stats = { stats: { total: number; has_image: number; has_logo: number; has_ranking: number; has_tuition: number }; countries: { country: string; count: number }[] };
+
 function AdminImportPage() {
   const [key, setKey] = useState("");
   const [verified, setVerified] = useState(false);
   const [busy, setBusy] = useState<string | null>(null);
+  const [stats, setStats] = useState<Stats | null>(null);
 
   const verify = useServerFn(verifyAdmin);
+  const statsFn = useServerFn(getUniStats);
   const hipo = useServerFn(importFromHipolabs);
+
+  async function loadStats() {
+    setBusy("stats");
+    try { setStats(await statsFn({ data: { key } })); }
+    catch (e) { toast.error((e as Error).message); }
+    finally { setBusy(null); }
+  }
   const qs = useServerFn(importQsRankings);
   const tu = useServerFn(importTuition);
 
@@ -103,6 +115,49 @@ function AdminImportPage() {
     <div className="mx-auto max-w-3xl px-4 py-10 space-y-6">
       <h1 className="font-heading text-4xl font-bold">Data Import</h1>
       <p className="text-sm text-muted-foreground">Populate the universities database from free public sources.</p>
+
+      <Card title="Database Stats" icon={<BarChart3 className="h-5 w-5" />}
+        desc="Live counts from universities_detail (the actual table — there is no `universities` table; tuition is JSONB).">
+        <Button onClick={loadStats} disabled={busy !== null} variant="outline">
+          {busy === "stats" ? "Loading…" : stats ? "Refresh" : "Load Stats"}
+        </Button>
+        {stats && (
+          <div className="mt-4 space-y-4">
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-5">
+              {[
+                ["Total", stats.stats.total],
+                ["Has image", stats.stats.has_image],
+                ["Has logo", stats.stats.has_logo],
+                ["Has ranking", stats.stats.has_ranking],
+                ["Has tuition", stats.stats.has_tuition],
+              ].map(([label, val]) => (
+                <div key={label as string} className="rounded-md border border-border bg-secondary/40 p-3">
+                  <div className="text-xs uppercase text-muted-foreground">{label}</div>
+                  <div className="font-heading text-2xl font-bold">{val}</div>
+                </div>
+              ))}
+            </div>
+            <div>
+              <div className="mb-2 text-sm font-medium">Top 20 countries</div>
+              <div className="overflow-hidden rounded-md border border-border">
+                <table className="w-full text-sm">
+                  <thead className="bg-secondary/60 text-left text-xs uppercase text-muted-foreground">
+                    <tr><th className="px-3 py-2">Country</th><th className="px-3 py-2 text-right">Count</th></tr>
+                  </thead>
+                  <tbody>
+                    {stats.countries.map((c) => (
+                      <tr key={c.country} className="border-t border-border">
+                        <td className="px-3 py-2">{c.country}</td>
+                        <td className="px-3 py-2 text-right tabular-nums">{c.count}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        )}
+      </Card>
 
       <Card title="1. Hipolabs Universities API" icon={<Database className="h-5 w-5" />}
         desc="Fetch ~10k universities from 15 countries. Free public API.">
