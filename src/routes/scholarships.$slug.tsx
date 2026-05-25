@@ -862,10 +862,9 @@ function WhoCanApply({ v }: { v: View }) {
         <div>
           <h3 className="text-xs font-bold uppercase tracking-wide text-muted-foreground">Eligible nationals</h3>
           <p className="mt-2 text-sm text-foreground/85">
-            {v.eligibleCountries?.length
-              ? v.eligibleCountries.slice(0, 12).join(", ")
-              : "Open to applicants from most developing & partner countries — check the official portal for the exact list."}
+            Open to applicants from most developing & partner countries — check the official portal for the exact list.
           </p>
+
           <h3 className="mt-4 text-xs font-bold uppercase tracking-wide text-muted-foreground">Level</h3>
           <p className="mt-2 text-sm text-foreground/85 capitalize">{v.level}</p>
         </div>
