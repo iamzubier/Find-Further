@@ -13,10 +13,10 @@ export function CompareTray() {
   const slots = [0, 1, 2];
 
   return (
-    <div className="fixed inset-x-0 bottom-0 z-40 border-t bg-[#111118]" style={{ borderColor: "#1e1e2a" }}>
-      <div className="mx-auto flex max-w-6xl items-center gap-3 px-4 py-3 md:py-3.5">
-        <div className="hidden items-center gap-2 text-xs font-semibold uppercase tracking-wider text-white/70 md:flex">
-          <GitCompare className="h-4 w-4 text-emerald-400" /> Compare
+    <div className="fixed inset-x-0 bottom-0 z-50 border-t border-border bg-white shadow-[0_-4px_12px_-2px_rgba(0,0,0,0.08)]">
+      <div className="mx-auto flex max-w-6xl items-center gap-3 px-4 py-3">
+        <div className="hidden items-center gap-2 text-xs font-bold uppercase tracking-wider text-muted-foreground md:flex">
+          <GitCompare className="h-4 w-4 text-primary" /> Compare
         </div>
         <div className="flex flex-1 items-center gap-2 overflow-x-auto">
           {slots.map((i) => {
@@ -26,19 +26,19 @@ export function CompareTray() {
                 <Link
                   key={i}
                   to="/universities"
-                  className="flex h-12 min-w-[150px] items-center gap-2 rounded-lg border border-dashed border-white/20 px-3 text-xs text-white/50 hover:border-white/40 hover:text-white/80"
+                  className="flex h-12 min-w-[150px] items-center gap-2 rounded border border-dashed border-border px-3 text-xs text-muted-foreground hover:border-primary hover:text-primary"
                 >
                   <Plus className="h-3.5 w-3.5" /> Add university
                 </Link>
               );
             }
             return (
-              <div key={it.slug} className="flex h-12 min-w-[180px] items-center gap-2 rounded-lg bg-white/5 px-2 pr-1">
-                <SmartLogo name={it.name} logoUrl={it.logoUrl} size={36} />
-                <span className="min-w-0 flex-1 truncate text-xs font-medium text-white">{it.name}</span>
+              <div key={it.slug} className="flex h-12 min-w-[180px] items-center gap-2 rounded border border-border bg-white px-2 pr-1">
+                <SmartLogo name={it.name} logoUrl={it.logoUrl} size={32} />
+                <span className="min-w-0 flex-1 truncate text-xs font-semibold text-foreground">{it.name}</span>
                 <button
                   onClick={() => remove(it.slug)}
-                  className="rounded p-1 text-white/60 hover:bg-white/10 hover:text-white"
+                  className="rounded p-1 text-muted-foreground hover:bg-secondary hover:text-foreground"
                   aria-label="Remove"
                 >
                   <X className="h-3.5 w-3.5" />
@@ -47,11 +47,11 @@ export function CompareTray() {
             );
           })}
         </div>
-        <Button variant="ghost" size="sm" onClick={clear} className="text-white/70 hover:bg-white/10 hover:text-white">
+        <Button variant="ghost" size="sm" onClick={clear} className="text-muted-foreground hover:text-foreground">
           Clear
         </Button>
-        <Button asChild size="sm" className="bg-emerald-600 text-white hover:bg-emerald-700" disabled={items.length < 2}>
-          <Link to="/compare">Compare <ArrowRight className="ml-1 h-3.5 w-3.5" /></Link>
+        <Button asChild size="sm" className="bg-primary text-primary-foreground hover:bg-primary/90" disabled={items.length < 2}>
+          <Link to="/compare">Compare Now <ArrowRight className="ml-1 h-3.5 w-3.5" /></Link>
         </Button>
       </div>
     </div>
