@@ -112,55 +112,46 @@ function ComparePage() {
   });
   const overallWinner = wins.indexOf(Math.max(...wins));
 
-  return (
-    <div className="mx-auto max-w-6xl px-4 pb-32 pt-10">
-      <div className="flex flex-wrap items-end justify-between gap-3">
-        <div>
-          <h1 className="font-heading text-3xl font-extrabold md:text-4xl">Compare universities</h1>
-          <p className="mt-1 text-sm text-muted-foreground">{items.length} selected</p>
-        </div>
-        <Button variant="ghost" size="sm" onClick={clear}>Clear all</Button>
-      </div>
+  const NA = <span className="text-xs text-muted-foreground">N/A</span>;
 
-      <div className="card-surface mt-6 overflow-x-auto">
+  return (
+    <div className="mx-auto max-w-6xl px-4 pb-40 pt-10">
+      <header className="border-b border-border pb-6">
+        <h1 className="font-heading text-4xl font-extrabold tracking-tight text-foreground md:text-5xl">Compare Universities</h1>
+        <p className="mt-2 text-sm text-muted-foreground">Analyze side-by-side to find your best fit. <span className="text-foreground">{items.length} selected.</span></p>
+        <div className="mt-3"><Button variant="ghost" size="sm" onClick={clear} className="px-0 text-xs text-muted-foreground hover:bg-transparent hover:text-foreground">Clear all</Button></div>
+      </header>
+
+      <div className="mt-6 overflow-x-auto rounded border border-border bg-white shadow-sm">
         <table className="w-full min-w-[720px]">
           <thead>
             <tr className="border-b border-border">
-              <th className="w-44 p-0"></th>
+              <th className="w-44 bg-secondary/40 p-0"></th>
               {unis.map((u, idx) => (
-                <th key={u.slug} className="p-0 align-top">
-                  <div className="relative h-32 w-full overflow-hidden">
+                <th key={u.slug} className="border-l border-border p-0 align-top">
+                  <div className="relative h-[120px] w-full overflow-hidden">
                     <SmartCampusImage src={u.campus_image_url || u.imageUrl} name={u.name} noOverlay />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/85 to-black/30" />
                     {idx === overallWinner && wins[idx] > 0 && (
-                      <div className="absolute left-2 top-2 inline-flex items-center gap-1 rounded-full bg-emerald-500 px-2 py-0.5 text-[10px] font-bold text-white">
+                      <div className="absolute left-2 top-2 inline-flex items-center gap-1 rounded bg-emerald-600 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-white">
                         <Trophy className="h-3 w-3" /> Best Match
                       </div>
                     )}
                     <button
                       onClick={() => remove(u.slug)}
-                      className="absolute right-2 top-2 rounded bg-black/40 p-1 text-white hover:bg-black/60"
+                      className="absolute right-2 top-2 rounded bg-black/50 p-1 text-white hover:bg-black/70"
                       aria-label="Remove"
                     >
                       <X className="h-3.5 w-3.5" />
                     </button>
                     <div className="absolute inset-x-0 bottom-0 p-3 text-left text-white">
                       <div className="flex items-center gap-2">
-                        <SmartLogo
-                          name={u.name}
-                          logoUrl={u.logo_url}
-                          website={u.official_url}
-                          size={32}
-                        />
-                        <Link
-                          to="/universities/$slug"
-                          params={{ slug: u.slug }}
-                          className="font-heading text-sm font-extrabold leading-tight hover:underline"
-                        >
+                        <SmartLogo name={u.name} logoUrl={u.logo_url} website={u.official_url} size={32} />
+                        <Link to="/universities/$slug" params={{ slug: u.slug }} className="font-heading text-sm font-extrabold leading-tight hover:underline">
                           {u.name}
                         </Link>
                       </div>
-                      <div className="mt-1 text-[11px] text-white/80">{u.country_flag ?? u.countryFlag} {u.country}</div>
+                      <div className="mt-1 text-[11px] text-white/85">{u.country_flag ?? u.countryFlag} {u.country}</div>
                     </div>
                   </div>
                 </th>
@@ -171,30 +162,38 @@ function ComparePage() {
             {detailQ.isLoading ? (
               <tr><td colSpan={unis.length + 1} className="p-10 text-center text-sm text-muted-foreground">Loading comparison…</td></tr>
             ) : rows.map((r) => (
-              <tr key={r.label} className="border-b border-border/50 last:border-0">
-                <td className="p-3 text-xs uppercase tracking-wide text-muted-foreground">{r.label}</td>
-                {unis.map((u, idx) => (
-                  <td
-                    key={u.slug}
-                    className={`p-3 align-top text-sm ${r.bestIdx === idx ? "bg-emerald-500/10 font-semibold text-emerald-700 dark:text-emerald-400" : ""}`}
-                  >
-                    {r.get(u)}
-                  </td>
-                ))}
+              <tr key={r.label} className="border-b border-border last:border-0">
+                <td className="bg-secondary/40 p-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground">{r.label}</td>
+                {unis.map((u, idx) => {
+                  const val = r.get(u);
+                  const empty = val === "—" || val === null || val === undefined || val === "";
+                  const isBest = r.bestIdx === idx;
+                  return (
+                    <td
+                      key={u.slug}
+                      className={`border-l border-border p-3 align-top text-sm ${isBest ? "bg-green-50 font-bold text-foreground" : "text-foreground"}`}
+                    >
+                      {empty ? NA : val}
+                    </td>
+                  );
+                })}
               </tr>
             ))}
           </tbody>
         </table>
       </div>
 
-      <div className="mt-6 flex flex-wrap justify-center gap-3">
-        <Button asChild size="lg" className="bg-primary text-primary-foreground">
-          <Link to="/evaluate">Match these to my profile</Link>
+      <div className="mt-8 rounded border border-border bg-white p-6 text-center shadow-sm">
+        <p className="font-heading text-xl font-bold text-foreground">See your exact odds for these universities.</p>
+        <p className="mt-1 text-sm text-muted-foreground">Get a personalized profile score and match percentage against every column above.</p>
+        <Button asChild size="lg" className="mt-4 bg-primary text-primary-foreground hover:bg-primary/90">
+          <Link to="/evaluate">Evaluate My Profile <ExternalLink className="ml-2 h-4 w-4" /></Link>
         </Button>
       </div>
     </div>
   );
 }
+
 
 function parseRate(s?: string): number | null {
   if (!s) return null;
