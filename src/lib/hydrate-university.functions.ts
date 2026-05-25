@@ -41,6 +41,7 @@ const AI_TOOL = {
             additionalProperties: false,
           },
         },
+        campus_image_url: { type: ["string", "null"], description: "Direct, high-resolution public image URL of the campus or a notable building. Prefer Wikimedia Commons (upload.wikimedia.org) or official university press URLs. Must end in .jpg/.jpeg/.png/.webp. Return null if no reliable image is found." },
       },
       required: ["tuition_display", "acceptance_rate", "about", "reddit_tips"],
       additionalProperties: false,
