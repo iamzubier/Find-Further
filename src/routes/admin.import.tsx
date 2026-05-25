@@ -64,9 +64,12 @@ function AdminImportPage() {
   const tu = useServerFn(importTuition);
 
   async function handleVerify() {
-    const r = await verify({ data: { key } });
-    if (r.ok) { setVerified(true); toast.success("Admin verified"); }
-    else toast.error("Invalid key");
+    if (!key.trim()) { toast.error("Enter the admin secret"); return; }
+    try {
+      const r = await verify({ data: { key } });
+      if (r.ok) { setVerified(true); toast.success("Admin verified"); }
+      else toast.error("Invalid key");
+    } catch { toast.error("Invalid key"); }
   }
 
   async function handleHipo() {
