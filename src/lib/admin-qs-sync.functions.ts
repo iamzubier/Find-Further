@@ -10,6 +10,7 @@ function checkAdmin(key: string) {
 
 const RowSchema = z.object({
   name: z.string().min(1).max(300),
+  country: z.string().max(120).nullable().optional(),
   qs_rank: z.number().int().positive().nullable().optional(),
   international_pct: z.string().max(20).nullable().optional(),
   total_students: z.string().max(50).nullable().optional(),
@@ -41,16 +42,26 @@ function jaccard(a: Set<string>, b: Set<string>): number {
   return inter / (a.size + b.size - inter);
 }
 
+function slugify(s: string): string {
+  return s
+    .toLowerCase()
+    .normalize("NFKD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .slice(0, 80) || "uni";
+}
+
 export const qsSyncBatch = createServerFn({ method: "POST" })
   .inputValidator((d: unknown) => InputSchema.parse(d))
   .handler(async ({ data }) => {
     checkAdmin(data.key);
 
     const updated: string[] = [];
-    const unmatched: string[] = [];
+    const inserted: string[] = [];
     const failed: { name: string; error: string }[] = [];
 
-    // Load entire catalog (lightweight) once per batch. ~1k rows is fine.
+    // Load entire catalog once per batch.
     const { data: catalog, error: catErr } = await supabaseAdmin
       .from("universities_detail")
       .select("slug, name, admission_reqs");
@@ -63,6 +74,7 @@ export const qsSyncBatch = createServerFn({ method: "POST" })
       tokens: tokens(c.name),
       normName: norm(c.name),
     }));
+    const existingSlugs = new Set(indexed.map((u) => u.slug));
 
     for (const row of data.rows) {
       try {
@@ -89,46 +101,87 @@ export const qsSyncBatch = createServerFn({ method: "POST" })
           }
         }
 
-        if (!match) {
-          unmatched.push(row.name);
-          continue;
-        }
+        if (match) {
+          const patch: Record<string, unknown> = {};
+          if (row.qs_rank != null) patch.qs_rank = row.qs_rank;
+          if (row.international_pct) patch.international_pct = row.international_pct;
+          if (row.total_students) patch.total_students = row.total_students;
+          if (row.student_faculty_ratio) {
+            patch.student_faculty_ratio = row.student_faculty_ratio;
+            const existingReqs =
+              typeof match.admission_reqs === "object" && match.admission_reqs !== null
+                ? (match.admission_reqs as Record<string, unknown>)
+                : {};
+            patch.admission_reqs = {
+              ...existingReqs,
+              student_faculty_ratio: row.student_faculty_ratio,
+            };
+          }
 
-        const patch: Record<string, unknown> = {};
-        if (row.qs_rank != null) patch.qs_rank = row.qs_rank;
-        if (row.international_pct) patch.international_pct = row.international_pct;
-        if (row.total_students) patch.total_students = row.total_students;
-        if (row.student_faculty_ratio) {
-          patch.student_faculty_ratio = row.student_faculty_ratio;
-          const existingReqs =
-            typeof match.admission_reqs === "object" && match.admission_reqs !== null
-              ? (match.admission_reqs as Record<string, unknown>)
-              : {};
-          patch.admission_reqs = {
-            ...existingReqs,
-            student_faculty_ratio: row.student_faculty_ratio,
-          };
-        }
+          if (Object.keys(patch).length === 0) {
+            // nothing to change, but it's a match — count as updated (no-op)
+            updated.push(match.name);
+            continue;
+          }
 
-        if (Object.keys(patch).length === 0) {
-          unmatched.push(`${row.name} (no data)`);
-          continue;
-        }
+          const { error } = await supabaseAdmin
+            .from("universities_detail")
+            .update(patch as never)
+            .eq("slug", match.slug);
 
-        const { error } = await supabaseAdmin
-          .from("universities_detail")
-          .update(patch as never)
-          .eq("slug", match.slug);
-
-        if (error) {
-          failed.push({ name: row.name, error: error.message });
+          if (error) failed.push({ name: row.name, error: error.message });
+          else updated.push(match.name);
         } else {
-          updated.push(match.name);
+          // INSERT new university
+          let slug = slugify(row.name);
+          if (existingSlugs.has(slug)) {
+            const suffix = row.qs_rank ? `-${row.qs_rank}` : `-${Math.random().toString(36).slice(2, 6)}`;
+            slug = (slug + suffix).slice(0, 80);
+            let i = 2;
+            while (existingSlugs.has(slug)) {
+              slug = `${slugify(row.name)}-${i++}`.slice(0, 80);
+            }
+          }
+
+          const insertRow: Record<string, unknown> = {
+            slug,
+            name: row.name,
+            country: row.country?.trim() || "Unknown",
+            logo_url: null,
+            campus_image_url: null,
+            official_url: null,
+          };
+          if (row.qs_rank != null) insertRow.qs_rank = row.qs_rank;
+          if (row.international_pct) insertRow.international_pct = row.international_pct;
+          if (row.total_students) insertRow.total_students = row.total_students;
+          if (row.student_faculty_ratio) {
+            insertRow.student_faculty_ratio = row.student_faculty_ratio;
+            insertRow.admission_reqs = { student_faculty_ratio: row.student_faculty_ratio };
+          }
+
+          const { error } = await supabaseAdmin
+            .from("universities_detail")
+            .insert(insertRow as never);
+
+          if (error) {
+            failed.push({ name: row.name, error: error.message });
+          } else {
+            inserted.push(row.name);
+            existingSlugs.add(slug);
+            // also add to indexed so later rows in same batch can match
+            indexed.push({
+              slug,
+              name: row.name,
+              admission_reqs: insertRow.admission_reqs ?? {},
+              tokens: qTokens,
+              normName: qName,
+            });
+          }
         }
       } catch (e) {
         failed.push({ name: row.name, error: (e as Error).message });
       }
     }
 
-    return { updated, unmatched, failed };
+    return { updated, inserted, unmatched: [] as string[], failed };
   });
