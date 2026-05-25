@@ -117,7 +117,7 @@ export const qsSyncBatch = createServerFn({ method: "POST" })
 
         const { error } = await supabaseAdmin
           .from("universities_detail")
-          .update(patch)
+          .update(patch as never)
           .eq("slug", match.slug);
 
         if (error) {
