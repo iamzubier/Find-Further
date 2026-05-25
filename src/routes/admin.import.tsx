@@ -58,6 +58,9 @@ function AdminImportPage() {
   const statsFn = useServerFn(getUniStats);
   const hipo = useServerFn(importFromHipolabs);
   const fixImages = useServerFn(fixCampusImagesBatch);
+  const fixOg = useServerFn(fixOgImagesBatch);
+  const [ogProgress, setOgProgress] = useState<{ processed: number; total: number; updated: number; skipped: number; failed: number } | null>(null);
+
 
   async function loadStats() {
     setBusy("stats");
