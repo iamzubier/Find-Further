@@ -330,3 +330,5 @@ function ScholarshipCardV2({ s }: { s: Scholarship }) {
     </article>
   );
 }
+
+export { ScholarshipCardV2 as ScholarshipCard };
