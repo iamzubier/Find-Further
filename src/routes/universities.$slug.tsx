@@ -16,6 +16,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
 import { Heart, GitCompare, Share2, ExternalLink, ArrowLeft, MapPin, Calendar, GraduationCap, DollarSign, BookOpen, Lightbulb, Award, Search, ThumbsUp } from "lucide-react";
 import { toast } from "sonner";
+import { SmartLogo } from "@/components/SmartLogo";
+import { SmartCampusImage } from "@/components/SmartCampusImage";
 
 const detailQuery = (slug: string) => queryOptions({
   queryKey: ["uni-detail", slug],
