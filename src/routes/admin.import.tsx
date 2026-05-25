@@ -70,8 +70,9 @@ function AdminImportPage() {
   const [allProgress, setAllProgress] = useState<{ processed: number; total: number; logos: number; campus: number; fallback: number; failed: number } | null>(null);
   const qsSync = useServerFn(qsSyncBatch);
   const [qsState, setQsState] = useState<{
-    processed: number; total: number; updated: number; unmatched: string[]; failed: number; dragging: boolean;
-  }>({ processed: 0, total: 0, updated: 0, unmatched: [], failed: 0, dragging: false });
+    processed: number; total: number; updated: number; inserted: number; failed: number; dragging: boolean;
+  }>({ processed: 0, total: 0, updated: 0, inserted: 0, failed: 0, dragging: false });
+
 
   const schSync = useServerFn(scholarshipsImportBatch);
   type SchTarget = "name" | "host_country" | "degree_level" | "annual_value_usd" | "amount_display" | "deadline" | "official_url" | "eligible_countries" | "description";
@@ -226,7 +227,7 @@ function AdminImportPage() {
 
   async function handleQsCsv(file: File) {
     setBusy("qs-sync");
-    setQsState({ processed: 0, total: 0, updated: 0, unmatched: [], failed: 0, dragging: false });
+    setQsState({ processed: 0, total: 0, updated: 0, inserted: 0, failed: 0, dragging: false });
     try {
       const text = await file.text();
       const parsed = Papa.parse<Record<string, string>>(text, {
@@ -241,6 +242,7 @@ function AdminImportPage() {
           const rank = rankRaw ? parseInt(rankRaw.replace(/[^0-9]/g, ""), 10) : null;
           return {
             name,
+            country: pickField(r, ["country", "location", "country_name", "nation"]) ?? null,
             qs_rank: Number.isFinite(rank) && rank! > 0 ? rank : null,
             international_pct: pickField(r, ["international_students", "international_pct", "intl_students_pct", "international_students_pct"]) ?? null,
             total_students: pickField(r, ["total_students", "size", "student_population", "students"]) ?? null,
@@ -252,22 +254,22 @@ function AdminImportPage() {
       if (!rows.length) throw new Error("No valid rows found in CSV");
 
       const BATCH = 50;
-      let updated = 0, failed = 0;
-      const unmatched: string[] = [];
+      let updated = 0, inserted = 0, failed = 0;
       setQsState((s) => ({ ...s, total: rows.length }));
 
       for (let i = 0; i < rows.length; i += BATCH) {
         const chunk = rows.slice(i, i + BATCH);
         const r = await qsSync({ data: { key, rows: chunk } });
         updated += r.updated.length;
+        inserted += r.inserted.length;
         failed += r.failed.length;
-        unmatched.push(...r.unmatched);
-        setQsState((s) => ({ ...s, processed: Math.min(i + BATCH, rows.length), updated, failed, unmatched: [...unmatched] }));
+        setQsState((s) => ({ ...s, processed: Math.min(i + BATCH, rows.length), updated, inserted, failed }));
       }
-      toast.success(`Synced: ${updated} updated, ${unmatched.length} unmatched, ${failed} failed`);
+      toast.success(`Synced: ${updated} updated, ${inserted} newly created, ${failed} failed`);
     } catch (e) { toast.error((e as Error).message); }
     finally { setBusy(null); }
   }
+
 
   const onQsDrop = useCallback((e: React.DragEvent) => {
     e.preventDefault();
@@ -540,21 +542,10 @@ function AdminImportPage() {
             </div>
             <div className="grid grid-cols-3 gap-3">
               <Stat label="Updated" value={qsState.updated} tone="success" />
-              <Stat label="Unmatched" value={qsState.unmatched.length} tone="warn" />
+              <Stat label="Newly Created" value={qsState.inserted} tone="success" />
               <Stat label="Failed" value={qsState.failed} tone="danger" />
             </div>
-            {qsState.unmatched.length > 0 && (
-              <div>
-                <div className="mb-1 text-xs uppercase text-muted-foreground">Unmatched institutions</div>
-                <div className="max-h-60 overflow-auto rounded-md border border-border bg-secondary/30 p-3 text-sm">
-                  <ul className="space-y-1">
-                    {qsState.unmatched.map((n, i) => (
-                      <li key={`${n}-${i}`} className="font-mono text-xs">{n}</li>
-                    ))}
-                  </ul>
-                </div>
-              </div>
-            )}
+
           </div>
         )}
       </Card>
