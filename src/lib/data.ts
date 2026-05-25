@@ -97,6 +97,15 @@ export function daysLeft(iso: string): number {
   return Math.ceil((t - now) / (1000 * 60 * 60 * 24));
 }
 
+export function scholarshipSlug(s: { id: string; name: string }): string {
+  const base = s.name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 60);
+  return `${base}-${s.id}`;
+}
+
+export function findScholarshipBySlug(slug: string): Scholarship | undefined {
+  return SCHOLARSHIPS.find((s) => scholarshipSlug(s) === slug);
+}
+
 export const WTF_FACTS = [
   { flag:"🇫🇮", country:"Finland", tag:"Tuition Free", image:"https://images.unsplash.com/photo-1559551409-dadc959f76b8?w=800&q=80", fact:"Finland charges ZERO tuition — even for international students at most public unis with scholarship.", filter:{ country:"Finland" } },
   { flag:"🇩🇪", country:"Germany", tag:"Tuition Free", image:"https://images.unsplash.com/photo-1467269204594-9661b134dd2b?w=800&q=80", fact:"Public German universities charge under €400/semester. World-top engineering, basically free.", filter:{ country:"Germany" } },
