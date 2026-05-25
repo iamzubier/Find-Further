@@ -4,6 +4,8 @@ import { useCompare } from "@/lib/compare-store";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { X, GitCompare, ExternalLink, Trophy } from "lucide-react";
+import { SmartLogo } from "@/components/SmartLogo";
+import { SmartCampusImage } from "@/components/SmartCampusImage";
 
 export const Route = createFileRoute("/compare")({
   head: () => ({ meta: [
