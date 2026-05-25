@@ -34,12 +34,7 @@ export function CompareTray() {
             }
             return (
               <div key={it.slug} className="flex h-12 min-w-[180px] items-center gap-2 rounded-lg bg-white/5 px-2 pr-1">
-                <img
-                  src={it.logoUrl || it.imageUrl || FALLBACK_IMG}
-                  alt=""
-                  className="h-9 w-9 flex-none rounded-full border border-white/10 bg-white object-cover"
-                  onError={(e) => { (e.target as HTMLImageElement).src = FALLBACK_IMG; }}
-                />
+                <SmartLogo name={it.name} logoUrl={it.logoUrl} size={36} />
                 <span className="min-w-0 flex-1 truncate text-xs font-medium text-white">{it.name}</span>
                 <button
                   onClick={() => remove(it.slug)}
