@@ -15,6 +15,7 @@ import {
 import { getUniStats } from "@/lib/admin-stats.functions";
 import { fixCampusImagesBatch } from "@/lib/admin-wiki-images.functions";
 import { fixOgImagesBatch } from "@/lib/admin-og-images.functions";
+import { fixAllImagesBatch } from "@/lib/admin-fix-all-images.functions";
 import { qsSyncBatch } from "@/lib/admin-qs-sync.functions";
 import { scholarshipsImportBatch } from "@/lib/admin-scholarships-sync.functions";
 import { GraduationCap } from "lucide-react";
@@ -64,7 +65,9 @@ function AdminImportPage() {
   const hipo = useServerFn(importFromHipolabs);
   const fixImages = useServerFn(fixCampusImagesBatch);
   const fixOg = useServerFn(fixOgImagesBatch);
+  const fixAll = useServerFn(fixAllImagesBatch);
   const [ogProgress, setOgProgress] = useState<{ processed: number; total: number; updated: number; skipped: number; failed: number } | null>(null);
+  const [allProgress, setAllProgress] = useState<{ processed: number; total: number; logos: number; campus: number; fallback: number; failed: number } | null>(null);
   const qsSync = useServerFn(qsSyncBatch);
   const [qsState, setQsState] = useState<{
     processed: number; total: number; updated: number; unmatched: string[]; failed: number; dragging: boolean;
@@ -183,6 +186,31 @@ function AdminImportPage() {
     } catch (e) { toast.error((e as Error).message); }
     finally { setBusy(null); }
   }
+
+  async function handleFixAllImages() {
+    setBusy("all");
+    setAllProgress({ processed: 0, total: 0, logos: 0, campus: 0, fallback: 0, failed: 0 });
+    try {
+      const limit = 8;
+      let processed = 0, logos = 0, campus = 0, fallback = 0, failed = 0, total = 0;
+      let safety = 0;
+      // Updated rows leave the filter, so we don't advance offset.
+      while (safety++ < 3000) {
+        const r = await fixAll({ data: { key, offset: 0, limit } });
+        logos += r.logosUpdated;
+        campus += r.campusUpdated;
+        fallback += r.fallbackUsed;
+        failed += r.failed;
+        total = r.total + logos + campus; // approximate
+        processed += r.batch;
+        setAllProgress({ processed, total, logos, campus, fallback, failed });
+        if (r.done || r.batch === 0) break;
+      }
+      toast.success(`Done: ${logos} logos, ${campus} campus images (${fallback} fallback), ${failed} failed`);
+    } catch (e) { toast.error((e as Error).message); }
+    finally { setBusy(null); }
+  }
+
 
   function pickField(row: Record<string, string>, keys: string[]): string | undefined {
     for (const k of keys) {
@@ -455,6 +483,31 @@ function AdminImportPage() {
           </div>
         )}
       </Card>
+
+      <Card title="Fix All Images (Logos + Campus, Bulletproof)" icon={<ImageIcon className="h-5 w-5" />}
+        desc="One-shot bulletproof pipeline. For every university missing a logo: derive domain from official_url and fetch via Clearbit. For every university missing a campus image: try Wikipedia → og:image → curated Unsplash campus photo. Guarantees every card has a logo and an image.">
+        <Button onClick={handleFixAllImages} disabled={busy !== null}>
+          {busy === "all" ? "Running…" : "Fix All Images"}
+        </Button>
+        {allProgress && (
+          <div className="mt-4 space-y-2">
+            <div className="h-2 w-full overflow-hidden rounded bg-secondary">
+              <div
+                className="h-full bg-primary transition-all"
+                style={{ width: `${allProgress.total ? Math.min(100, (allProgress.processed / allProgress.total) * 100) : 0}%` }}
+              />
+            </div>
+            <div className="flex flex-wrap gap-4 text-xs text-muted-foreground tabular-nums">
+              <span>Processed: <b className="text-foreground">{allProgress.processed}</b></span>
+              <span>Logos: <b className="text-foreground">{allProgress.logos}</b></span>
+              <span>Campus: <b className="text-foreground">{allProgress.campus}</b></span>
+              <span>Fallback: <b className="text-foreground">{allProgress.fallback}</b></span>
+              <span>Failed: <b className="text-foreground">{allProgress.failed}</b></span>
+            </div>
+          </div>
+        )}
+      </Card>
+
 
       <Card title="QS Rankings Sync" icon={<Trophy className="h-5 w-5" />}
         desc="Drop a QS World University Rankings CSV. Fuzzy-matches institutions to the database and updates qs_rank, international_pct, total_students, and student_faculty_ratio. Never overwrites images, logos, or curated content.">
