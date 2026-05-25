@@ -407,8 +407,8 @@ function EmptyState({ reset }: { reset: () => void }) {
 
 function levelBadge(level: EnrichedScholarship["level"]): string {
   switch (level) {
-    case "ug": return "Bachelor's";
-    case "pg": return "Master's";
+    case "undergraduate": return "Bachelor's";
+    case "postgraduate": return "Master's";
     case "phd": return "PhD";
     case "all": return "All Levels";
     default: return String(level ?? "").toUpperCase();
