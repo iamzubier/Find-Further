@@ -158,6 +158,74 @@ function AdminImportPage() {
     finally { setBusy(null); }
   }
 
+  function pickField(row: Record<string, string>, keys: string[]): string | undefined {
+    for (const k of keys) {
+      for (const rk of Object.keys(row)) {
+        if (rk.toLowerCase().replace(/[^a-z0-9]/g, "") === k.toLowerCase().replace(/[^a-z0-9]/g, "")) {
+          const v = row[rk]?.trim();
+          if (v) return v;
+        }
+      }
+    }
+    return undefined;
+  }
+
+  async function handleQsCsv(file: File) {
+    setBusy("qs-sync");
+    setQsState({ processed: 0, total: 0, updated: 0, unmatched: [], failed: 0, dragging: false });
+    try {
+      const text = await file.text();
+      const parsed = Papa.parse<Record<string, string>>(text, {
+        header: true, skipEmptyLines: true, transformHeader: (h) => h.trim(),
+      });
+      const rawRows = parsed.data.filter((r) => r && typeof r === "object");
+      const rows = rawRows
+        .map((r) => {
+          const name = pickField(r, ["institution", "institution_name", "university", "university_name", "name"]);
+          if (!name) return null;
+          const rankRaw = pickField(r, ["rank", "qs_rank", "ranking", "world_rank", "2024_rank", "2025_rank"]);
+          const rank = rankRaw ? parseInt(rankRaw.replace(/[^0-9]/g, ""), 10) : null;
+          return {
+            name,
+            qs_rank: Number.isFinite(rank) && rank! > 0 ? rank : null,
+            international_pct: pickField(r, ["international_students", "international_pct", "intl_students_pct", "international_students_pct"]) ?? null,
+            total_students: pickField(r, ["total_students", "size", "student_population", "students"]) ?? null,
+            student_faculty_ratio: pickField(r, ["student_faculty_ratio", "faculty_student_ratio", "student_to_faculty"]) ?? null,
+          };
+        })
+        .filter((r): r is NonNullable<typeof r> => r !== null);
+
+      if (!rows.length) throw new Error("No valid rows found in CSV");
+
+      const BATCH = 50;
+      let updated = 0, failed = 0;
+      const unmatched: string[] = [];
+      setQsState((s) => ({ ...s, total: rows.length }));
+
+      for (let i = 0; i < rows.length; i += BATCH) {
+        const chunk = rows.slice(i, i + BATCH);
+        const r = await qsSync({ data: { key, rows: chunk } });
+        updated += r.updated.length;
+        failed += r.failed.length;
+        unmatched.push(...r.unmatched);
+        setQsState((s) => ({ ...s, processed: Math.min(i + BATCH, rows.length), updated, failed, unmatched: [...unmatched] }));
+      }
+      toast.success(`Synced: ${updated} updated, ${unmatched.length} unmatched, ${failed} failed`);
+    } catch (e) { toast.error((e as Error).message); }
+    finally { setBusy(null); }
+  }
+
+  const onQsDrop = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    setQsState((s) => ({ ...s, dragging: false }));
+    const f = e.dataTransfer.files?.[0];
+    if (f) handleQsCsv(f);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [key]);
+
+
+
+
 
   if (!verified) {
     return (
