@@ -4,6 +4,8 @@ import { useCompare } from "@/lib/compare-store";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { X, GitCompare, ExternalLink, Trophy } from "lucide-react";
+import { SmartLogo } from "@/components/SmartLogo";
+import { SmartCampusImage } from "@/components/SmartCampusImage";
 
 export const Route = createFileRoute("/compare")({
   head: () => ({ meta: [
@@ -127,10 +129,8 @@ function ComparePage() {
               <th className="w-44 p-0"></th>
               {unis.map((u, idx) => (
                 <th key={u.slug} className="p-0 align-top">
-                  <div
-                    className="relative h-32 w-full bg-cover bg-center"
-                    style={{ backgroundImage: `url('${u.campus_image_url || u.imageUrl || FALLBACK_IMG}')` }}
-                  >
+                  <div className="relative h-32 w-full overflow-hidden">
+                    <SmartCampusImage src={u.campus_image_url || u.imageUrl} name={u.name} noOverlay />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/85 to-black/30" />
                     {idx === overallWinner && wins[idx] > 0 && (
                       <div className="absolute left-2 top-2 inline-flex items-center gap-1 rounded-full bg-emerald-500 px-2 py-0.5 text-[10px] font-bold text-white">
@@ -146,11 +146,12 @@ function ComparePage() {
                     </button>
                     <div className="absolute inset-x-0 bottom-0 p-3 text-left text-white">
                       <div className="flex items-center gap-2">
-                        {u.logo_url && (
-                          <div className="flex h-8 w-8 items-center justify-center rounded bg-white p-1">
-                            <img src={u.logo_url} alt="" className="max-h-full max-w-full" onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }} />
-                          </div>
-                        )}
+                        <SmartLogo
+                          name={u.name}
+                          logoUrl={u.logo_url}
+                          website={u.official_url}
+                          size={32}
+                        />
                         <Link
                           to="/universities/$slug"
                           params={{ slug: u.slug }}
