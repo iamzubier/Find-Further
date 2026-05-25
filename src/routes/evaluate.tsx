@@ -19,6 +19,8 @@ import type { ScoreBreakdown, MatchedUni } from "@/lib/evaluation";
 import { useAuth } from "@/lib/auth";
 import { saveEvalSummary } from "@/lib/evaluation-store";
 import { ArrowRight, CheckCircle2, AlertTriangle, Lightbulb, Share2, Loader2 } from "lucide-react";
+import { SmartLogo } from "@/components/SmartLogo";
+import { SmartCampusImage } from "@/components/SmartCampusImage";
 
 export const Route = createFileRoute("/evaluate")({
   head: () => ({
