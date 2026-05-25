@@ -185,7 +185,7 @@ function Stats() {
     { num: "120+", label: "Countries" },
   ];
   return (
-    <section className="mx-auto max-w-6xl px-4 py-6">
+    <section className="mx-auto max-w-6xl px-4 py-16">
       <div className="card-surface p-6 md:p-8">
         <div className="grid gap-6 md:grid-cols-3">
           {stats.map((s) => (
