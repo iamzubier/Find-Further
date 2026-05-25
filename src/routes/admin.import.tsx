@@ -249,7 +249,98 @@ function AdminImportPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [key]);
 
+  function guessSchMapping(headers: string[]): Partial<Record<SchTarget, string>> {
+    const norm = (s: string) => s.toLowerCase().replace(/[^a-z0-9]/g, "");
+    const idx: Record<string, string> = {};
+    headers.forEach((h) => { idx[norm(h)] = h; });
+    const pick = (...alts: string[]) => {
+      for (const a of alts) { const h = idx[norm(a)]; if (h) return h; }
+      for (const a of alts) {
+        const found = headers.find((h) => norm(h).includes(norm(a)));
+        if (found) return found;
+      }
+      return undefined;
+    };
+    return {
+      name: pick("name", "scholarship", "title", "scholarshipname"),
+      host_country: pick("host_country", "country", "hostcountry", "location"),
+      degree_level: pick("degree_level", "degree", "level", "study_level", "studylevel"),
+      annual_value_usd: pick("annual_value_usd", "value_usd", "amount_usd", "usd"),
+      amount_display: pick("amount", "value", "award", "funding"),
+      deadline: pick("deadline", "application_deadline", "closing_date", "duedate"),
+      official_url: pick("official_url", "url", "link", "website", "apply_url"),
+      eligible_countries: pick("eligible_countries", "eligibility_countries", "open_to", "for_students_of"),
+      description: pick("description", "details", "about", "summary"),
+    };
+  }
 
+  async function onSchFile(file: File) {
+    const text = await file.text();
+    const parsed = Papa.parse<Record<string, string>>(text, {
+      header: true, skipEmptyLines: true, transformHeader: (h) => h.trim(),
+    });
+    const headers = parsed.meta.fields ?? [];
+    const rows = parsed.data.filter((r) => r && typeof r === "object");
+    if (!rows.length) { toast.error("No rows found in CSV"); return; }
+    setSchState((s) => ({
+      ...s, headers, rows, mapping: guessSchMapping(headers),
+      processed: 0, total: 0, inserted: 0, updated: 0, failed: 0,
+    }));
+  }
+
+  const onSchDrop = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    setSchState((s) => ({ ...s, dragging: false }));
+    const f = e.dataTransfer.files?.[0];
+    if (f) onSchFile(f);
+  }, []);
+
+  async function runSchImport() {
+    const { rows, mapping } = schState;
+    if (!mapping.name) { toast.error("Please map the 'Name' column"); return; }
+    setBusy("sch");
+    setSchState((s) => ({ ...s, importing: true, processed: 0, total: rows.length, inserted: 0, updated: 0, failed: 0 }));
+    try {
+      const splitList = (v: string | undefined) =>
+        v ? v.split(/[,;|]/).map((x) => x.trim()).filter(Boolean).slice(0, 100) : [];
+      const num = (v: string | undefined) => {
+        if (!v) return null;
+        const m = v.replace(/,/g, "").match(/(\d+(?:\.\d+)?)/);
+        return m ? parseFloat(m[1]) : null;
+      };
+      const get = (r: Record<string, string>, t: SchTarget) => {
+        const col = mapping[t]; return col ? (r[col] ?? "").trim() : "";
+      };
+      const mapped = rows
+        .map((r) => {
+          const name = get(r, "name");
+          if (!name) return null;
+          return {
+            name,
+            host_country: get(r, "host_country") || null,
+            degree_level: get(r, "degree_level") || null,
+            annual_value_usd: num(get(r, "annual_value_usd")),
+            amount_display: get(r, "amount_display") || null,
+            deadline: get(r, "deadline") || null,
+            official_url: get(r, "official_url") || null,
+            eligible_countries: splitList(get(r, "eligible_countries")),
+            description: get(r, "description") || null,
+          };
+        })
+        .filter((r): r is NonNullable<typeof r> => r !== null);
+
+      const BATCH = 50;
+      let inserted = 0, updated = 0, failed = 0;
+      for (let i = 0; i < mapped.length; i += BATCH) {
+        const chunk = mapped.slice(i, i + BATCH);
+        const r = await schSync({ data: { key, rows: chunk } });
+        inserted += r.inserted; updated += r.updated; failed += r.failed.length;
+        setSchState((s) => ({ ...s, processed: Math.min(i + BATCH, mapped.length), inserted, updated, failed }));
+      }
+      toast.success(`Imported: ${inserted} new, ${updated} updated, ${failed} failed`);
+    } catch (e) { toast.error((e as Error).message); }
+    finally { setBusy(null); setSchState((s) => ({ ...s, importing: false })); }
+  }
 
 
 
