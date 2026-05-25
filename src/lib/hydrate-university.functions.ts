@@ -151,14 +151,14 @@ export const hydrateUniversity = createServerFn({ method: "POST" })
         display: aiJson.tuition_display ?? null,
         per_year_usd: tuitionUsd,
         currency: "USD",
-      },
-      admission_reqs: admissionReqs,
+      } as any,
+      admission_reqs: admissionReqs as any,
       updated_at: new Date().toISOString(),
     };
 
     const { error: upsertErr } = await supabaseAdmin
       .from("universities_detail")
-      .upsert(detailRow, { onConflict: "slug" });
+      .upsert(detailRow as any, { onConflict: "slug" });
     if (upsertErr) {
       console.error("[hydrate-university] upsert failed", upsertErr);
       return { ok: false, error: upsertErr.message, slug: data.slug };
