@@ -505,3 +505,86 @@ export function LoginNudge({ text }: { text: string }) {
     </div>
   );
 }
+
+function slugifyName(name: string): string {
+  return name
+    .toLowerCase()
+    .normalize("NFKD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .slice(0, 80);
+}
+
+type HipoUni = { name: string; country: string; web_pages?: string[]; alpha_two_code?: string };
+
+function HipolabsFallback({ query }: { query: string }) {
+  const hipoQuery = useQuery({
+    queryKey: ["hipolabs", query],
+    queryFn: async (): Promise<HipoUni[]> => {
+      const res = await fetch(`https://universities.hipolabs.com/search?name=${encodeURIComponent(query)}`);
+      if (!res.ok) throw new Error("Hipolabs lookup failed");
+      const json = (await res.json()) as HipoUni[];
+      return json.slice(0, 12);
+    },
+    staleTime: 5 * 60 * 1000,
+    retry: 1,
+  });
+
+  return (
+    <div className="card-surface mt-6 p-6">
+      <div className="mb-4 flex items-center gap-2">
+        <Globe className="h-4 w-4 text-primary" />
+        <h3 className="font-heading text-base font-bold">No local matches — checking the global registry…</h3>
+      </div>
+      {hipoQuery.isFetching && (
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          {[0, 1, 2].map((i) => (
+            <div key={i} className="h-24 animate-pulse rounded-md border border-dashed border-border bg-neutral-50" />
+          ))}
+        </div>
+      )}
+      {hipoQuery.isError && (
+        <p className="text-sm text-muted-foreground">Couldn't reach the external registry. Try a different search.</p>
+      )}
+      {!hipoQuery.isFetching && hipoQuery.data && hipoQuery.data.length === 0 && (
+        <p className="text-sm text-muted-foreground">No universities anywhere match "{query}".</p>
+      )}
+      {!hipoQuery.isFetching && hipoQuery.data && hipoQuery.data.length > 0 && (
+        <>
+          <p className="mb-4 text-xs text-muted-foreground">
+            We'll build a complete profile for these institutions on demand — click any card to start.
+          </p>
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            {hipoQuery.data.map((u, i) => {
+              const slug = slugifyName(u.name);
+              const site = u.web_pages?.[0];
+              return (
+                <Link
+                  key={`${slug}-${i}`}
+                  to="/universities/$slug"
+                  params={{ slug }}
+                  search={{ name: u.name, country: u.country }}
+                  className="group flex flex-col rounded-md border border-dashed border-border bg-white p-4 transition-all hover:-translate-y-0.5 hover:border-primary/60 hover:shadow-sm"
+                >
+                  <div className="flex items-start gap-3">
+                    <SmartLogo name={u.name} website={site} size={40} />
+                    <div className="min-w-0 flex-1">
+                      <div className="font-heading text-sm font-bold leading-snug text-foreground line-clamp-2">
+                        {u.name}
+                      </div>
+                      <div className="mt-0.5 text-xs text-muted-foreground">{u.country}</div>
+                    </div>
+                  </div>
+                  <div className="mt-3 inline-flex items-center gap-1 text-xs font-semibold text-primary opacity-0 transition-opacity group-hover:opacity-100">
+                    <Sparkles className="h-3 w-3" /> Build profile <ArrowRight className="h-3 w-3" />
+                  </div>
+                </Link>
+              );
+            })}
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
