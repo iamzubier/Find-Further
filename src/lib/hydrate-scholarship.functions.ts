@@ -57,6 +57,7 @@ const AI_TOOL = {
         eligible_countries: { type: "array", items: { type: "string" } },
         required_documents_checklist: { type: "array", items: { type: "string" } },
         insider_reddit_hacks: { type: "array", items: { type: "string" }, description: "3–6 short tactical tips from Reddit/Quora/past awardees." },
+        banner_image_url: { type: ["string", "null"], description: "Direct, high-resolution public image URL of the host country (iconic landmark, skyline, or campus). Prefer Wikimedia Commons (upload.wikimedia.org) or official press URLs. Must end in .jpg/.jpeg/.png/.webp. Return null if none is found." },
       },
       required: [
         "name",
