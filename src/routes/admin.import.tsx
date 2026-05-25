@@ -1,10 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { useServerFn } from "@tanstack/react-start";
+import Papa from "papaparse";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
-import { Upload, Database, FileSpreadsheet, Lock, BarChart3, Image as ImageIcon, Globe } from "lucide-react";
+import { Upload, Database, FileSpreadsheet, Lock, BarChart3, Image as ImageIcon, Globe, Trophy } from "lucide-react";
 import {
   verifyAdmin,
   importFromHipolabs,
@@ -14,6 +15,7 @@ import {
 import { getUniStats } from "@/lib/admin-stats.functions";
 import { fixCampusImagesBatch } from "@/lib/admin-wiki-images.functions";
 import { fixOgImagesBatch } from "@/lib/admin-og-images.functions";
+import { qsSyncBatch } from "@/lib/admin-qs-sync.functions";
 
 
 export const Route = createFileRoute("/admin/import")({
