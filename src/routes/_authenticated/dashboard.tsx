@@ -7,6 +7,7 @@ import { UNIVERSITIES, SCHOLARSHIPS, daysLeft } from "@/lib/data";
 import { gpaConversionLine } from "@/lib/gpa";
 import { UniversityCard } from "../universities.index";
 import { ScholarshipCard } from "../scholarships.index";
+import { enrich } from "@/lib/scholarship-enrich";
 import { matchUniversity } from "@/lib/matching";
 import { ArrowRight, Sparkles, TrendingUp, AlertCircle, Target } from "lucide-react";
 
@@ -77,7 +78,7 @@ function Dashboard() {
           <h2 className="font-heading text-2xl font-extrabold">Deadlines Coming Up</h2>
           <Link to="/scholarships" className="text-sm text-primary hover:underline">See all</Link>
         </div>
-        <div className="grid gap-3">{deadlines.map((s) => <ScholarshipCard key={s.id} s={s} />)}</div>
+        <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">{deadlines.map((s) => <ScholarshipCard key={s.id} s={enrich(s)} variant="active" />)}</div>
       </section>
     </div>
   );
