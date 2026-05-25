@@ -495,20 +495,15 @@ function FeedbackBlock({ title, tone, items, Icon }: { title: string; tone: "goo
 const FALLBACK_CAMPUS_IMG = "https://images.unsplash.com/photo-1541339907198-e08756dedf3f?w=1200&q=80&auto=format&fit=crop";
 
 function UniMatchCard({ m }: { m: MatchedUni }) {
-  const [imgSrc, setImgSrc] = useState<string>(m.campus_image_url || FALLBACK_CAMPUS_IMG);
   return (
-    <Link to="/universities/$slug" params={{ slug: m.slug }} className="group block overflow-hidden rounded-xl border border-border bg-card transition hover:shadow-lg">
-      <div className="relative h-32 bg-muted">
-        <img
-          src={imgSrc}
-          alt=""
-          className="h-full w-full object-cover"
-          loading="lazy"
-          onError={() => { if (imgSrc !== FALLBACK_CAMPUS_IMG) setImgSrc(FALLBACK_CAMPUS_IMG); }}
-        />
+    <Link to="/universities/$slug" params={{ slug: m.slug }} className="group block overflow-hidden rounded-md border border-border bg-card transition hover:shadow-lg">
+      <div className="relative h-32 bg-muted overflow-hidden">
+        <SmartCampusImage src={m.campus_image_url} name={m.name} noOverlay />
         <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
         <div className="absolute right-2 top-2 rounded-full bg-emerald-500 px-2.5 py-1 text-xs font-bold text-white">{m.matchPct}% match</div>
-        {m.logo_url && <img src={m.logo_url} alt="" className="absolute bottom-2 left-2 h-10 w-10 rounded bg-white p-1" />}
+        <div className="absolute bottom-2 left-2">
+          <SmartLogo name={m.name} logoUrl={m.logo_url} size={40} />
+        </div>
       </div>
       <div className="p-3">
         <p className="line-clamp-1 font-semibold text-foreground group-hover:text-primary">{m.name}</p>
