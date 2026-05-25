@@ -191,23 +191,20 @@ function UniDetailPage() {
   );
 }
 
-const FALLBACK_CAMPUS = "https://images.unsplash.com/photo-1541339907198-e08756dedf3f?w=1600&q=80&auto=format&fit=crop";
-
 function Hero({ uni }: { uni: any }) {
   return (
     <header className="relative h-[420px] min-h-[400px] w-full overflow-hidden bg-slate-900">
-      {/* Background image */}
-      <div className="absolute inset-0 -z-20 h-full w-full">
-        <SmartCampusImage
-          src={uni.campus_image_url}
-          name={uni.name}
-          loading="eager"
-          noOverlay
-          className="object-cover"
-        />
-      </div>
+      {/* Background image — absolute, behind everything */}
+      <SmartCampusImage
+        src={uni.campus_image_url}
+        name={uni.name}
+        loading="eager"
+        noOverlay
+        className="absolute inset-0 -z-20 h-full w-full object-cover"
+      />
       {/* Gradient overlay — guarantees text legibility */}
-      <div className="absolute inset-0 -z-10 bg-gradient-to-t from-slate-950 via-slate-900/70 to-slate-900/30" />
+      <div className="absolute inset-0 -z-10 bg-gradient-to-t from-slate-950 via-slate-900/80 to-transparent" />
+
 
       {/* Back link */}
       <div className="absolute inset-x-0 top-0 z-10 p-4">
@@ -228,7 +225,7 @@ function Hero({ uni }: { uni: any }) {
           />
 
           <div>
-            <h1 className="font-heading text-4xl font-bold leading-tight text-white drop-shadow-md md:text-5xl">
+            <h1 className="font-serif text-4xl font-bold leading-tight text-white drop-shadow-lg md:text-5xl">
               {uni.name}
             </h1>
             <div className="mt-2 flex flex-wrap items-center gap-3 text-lg text-slate-200">

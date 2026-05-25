@@ -41,6 +41,7 @@ const AI_TOOL = {
             additionalProperties: false,
           },
         },
+        campus_image_url: { type: ["string", "null"], description: "Direct, high-resolution public image URL of the campus or a notable building. Prefer Wikimedia Commons (upload.wikimedia.org) or official university press URLs. Must end in .jpg/.jpeg/.png/.webp. Return null if no reliable image is found." },
       },
       required: ["tuition_display", "acceptance_rate", "about", "reddit_tips"],
       additionalProperties: false,
@@ -92,32 +93,27 @@ export const hydrateUniversity = createServerFn({ method: "POST" })
       return { ok: false, error: "AI gateway not configured", slug: data.slug };
     }
 
-    const prompt = `Search the live web for the university "${name}" in ${country}. Return a strict JSON object containing verified 2026 admission data for international undergraduate applicants. Include 4 to 6 community admission tips synthesised from Reddit, Quora, and YouTube discussions (each with a believable upvote count and a relevant tag). If exact figures are unavailable, give the best public estimate. Do not refuse — always return the tool call.`;
-
-    // Fire AI gateway + campus image fetch in parallel.
-    const aiPromise = fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${LOVABLE_API_KEY}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model: "google/gemini-3-flash-preview",
-        messages: [
-          { role: "system", content: "You are a university admissions data extractor. Always call the return_university_profile tool with the best available data for the requested institution." },
-          { role: "user", content: prompt },
-        ],
-        tools: [AI_TOOL],
-        tool_choice: { type: "function", function: { name: "return_university_profile" } },
-      }),
-    });
-    const campusImagePromise = fetchUniversityCampusImage(name);
+    const prompt = `Search the live web for the university "${name}" in ${country}. Return a strict JSON object containing verified 2026 admission data for international undergraduate applicants. Include 4 to 6 community admission tips synthesised from Reddit, Quora, and YouTube discussions (each with a believable upvote count and a relevant tag). Also include campus_image_url: a direct, high-resolution public image URL (preferably Wikimedia Commons or an official press photo) of the campus or a notable building — must be a direct image URL ending in .jpg/.jpeg/.png/.webp, or null if none exists. If exact figures are unavailable, give the best public estimate. Do not refuse — always return the tool call.`;
 
     let aiJson: any = null;
     let campusImageUrl: string | null = null;
     try {
-      const [res, campus] = await Promise.all([aiPromise, campusImagePromise]);
-      campusImageUrl = campus;
+      const res = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${LOVABLE_API_KEY}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          model: "google/gemini-3-flash-preview",
+          messages: [
+            { role: "system", content: "You are a university admissions data extractor. Always call the return_university_profile tool with the best available data for the requested institution, including a real public image URL when one is verifiable." },
+            { role: "user", content: prompt },
+          ],
+          tools: [AI_TOOL],
+          tool_choice: { type: "function", function: { name: "return_university_profile" } },
+        }),
+      });
 
       if (!res.ok) {
         const errText = await res.text().catch(() => "");
@@ -134,6 +130,9 @@ export const hydrateUniversity = createServerFn({ method: "POST" })
         return { ok: false, error: "AI returned no structured data", slug: data.slug };
       }
       aiJson = JSON.parse(toolCall.function.arguments);
+
+      const aiUrl = typeof aiJson.campus_image_url === "string" && /^https?:\/\//i.test(aiJson.campus_image_url) ? aiJson.campus_image_url : null;
+      campusImageUrl = aiUrl ?? (await fetchUniversityCampusImage(name));
     } catch (err) {
       console.error("[hydrate-university] fetch failed", err);
       return { ok: false, error: "Network error contacting AI gateway", slug: data.slug };

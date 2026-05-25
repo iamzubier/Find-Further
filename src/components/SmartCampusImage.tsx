@@ -61,26 +61,34 @@ export function SmartCampusImage({
 
   const positionClass = inline ? "block h-full w-full" : "absolute inset-0 h-full w-full";
 
-  // Letter-based gradient fallback when no image is available.
+  // Premium "blueprint" CSS fallback — dark slate with a faint 1px white grid.
   if (!currentSrc) {
+    const blueprintStyle: CSSProperties = {
+      backgroundColor: "#0f172a", // slate-900
+      backgroundImage:
+        "linear-gradient(rgba(255,255,255,0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px)",
+      backgroundSize: "40px 40px, 40px 40px",
+      ...style,
+    };
     return (
       <>
         <div
-          aria-label={alt ?? `${name} hero`}
+          aria-label={alt ?? `${name} blueprint`}
           role="img"
-          className={`${positionClass} ${className}`}
-          style={{ background: gradientForName(name), ...style }}
+          className={`${positionClass} bg-slate-900 ${className}`}
+          style={blueprintStyle}
         />
         {!noOverlay && (
           <div
             aria-hidden
             className="pointer-events-none absolute inset-0"
-            style={{ backgroundColor: "rgba(255,255,255,0.04)" }}
+            style={{ background: "radial-gradient(ellipse at center, rgba(15,23,42,0) 0%, rgba(15,23,42,0.45) 100%)" }}
           />
         )}
       </>
     );
   }
+
 
   return (
     <>

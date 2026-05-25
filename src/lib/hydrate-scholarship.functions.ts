@@ -57,6 +57,7 @@ const AI_TOOL = {
         eligible_countries: { type: "array", items: { type: "string" } },
         required_documents_checklist: { type: "array", items: { type: "string" } },
         insider_reddit_hacks: { type: "array", items: { type: "string" }, description: "3–6 short tactical tips from Reddit/Quora/past awardees." },
+        banner_image_url: { type: ["string", "null"], description: "Direct, high-resolution public image URL of the host country (iconic landmark, skyline, or campus). Prefer Wikimedia Commons (upload.wikimedia.org) or official press URLs. Must end in .jpg/.jpeg/.png/.webp. Return null if none is found." },
       },
       required: [
         "name",
@@ -114,29 +115,24 @@ export const hydrateScholarship = createServerFn({ method: "POST" })
       return { ok: false, error: "AI gateway not configured", slug: data.slug };
     }
 
-    const prompt = `Research the scholarship "${name}"${country !== "Unknown" ? ` (host country: ${country})` : ""} for the 2026 international intake. Use the live web. Return a strict JSON tool-call covering: official funding type, provider, exact cycle status (open / prep mode / rolling), full allowance breakdown, application fee, MOI-in-lieu-of-IELTS acceptance, hidden costs the student still pays, hidden obligations (bonds, GPA, TA hours), required documents, and 3–6 tactical insider tips from Reddit/Quora/past recipients. If currently closed, set cycle_status to closed_prep_mode and fill expected_next_open_month. Always emit the tool call, never refuse.`;
-
-    // Fire AI gateway + image fetch in parallel — neither blocks the other.
-    const aiPromise = fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-      method: "POST",
-      headers: { Authorization: `Bearer ${LOVABLE_API_KEY}`, "Content-Type": "application/json" },
-      body: JSON.stringify({
-        model: "google/gemini-3-flash-preview",
-        messages: [
-          { role: "system", content: "You are a scholarship intelligence analyst. Return only structured data via the return_scholarship_profile tool. Use verified figures; estimate conservatively when exact data is unavailable." },
-          { role: "user", content: prompt },
-        ],
-        tools: [AI_TOOL],
-        tool_choice: { type: "function", function: { name: "return_scholarship_profile" } },
-      }),
-    });
-    const bannerPromise = fetchCountryBannerImage(country);
+    const prompt = `Research the scholarship "${name}"${country !== "Unknown" ? ` (host country: ${country})` : ""} for the 2026 international intake. Use the live web. Return a strict JSON tool-call covering: official funding type, provider, exact cycle status (open / prep mode / rolling), full allowance breakdown, application fee, MOI-in-lieu-of-IELTS acceptance, hidden costs the student still pays, hidden obligations (bonds, GPA, TA hours), required documents, and 3–6 tactical insider tips from Reddit/Quora/past recipients. Also include banner_image_url: a direct, high-resolution public image URL (preferably Wikimedia Commons or an official press photo) representing the host country or program — must be a direct image URL ending in .jpg/.jpeg/.png/.webp, or null if none exists. If currently closed, set cycle_status to closed_prep_mode and fill expected_next_open_month. Always emit the tool call, never refuse.`;
 
     let ai: any = null;
     let bannerUrl: string | null = null;
     try {
-      const [res, banner] = await Promise.all([aiPromise, bannerPromise]);
-      bannerUrl = banner;
+      const res = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+        method: "POST",
+        headers: { Authorization: `Bearer ${LOVABLE_API_KEY}`, "Content-Type": "application/json" },
+        body: JSON.stringify({
+          model: "google/gemini-3-flash-preview",
+          messages: [
+            { role: "system", content: "You are a scholarship intelligence analyst. Return only structured data via the return_scholarship_profile tool. Use verified figures; estimate conservatively when exact data is unavailable. Include a real public image URL for the host country when one is verifiable." },
+            { role: "user", content: prompt },
+          ],
+          tools: [AI_TOOL],
+          tool_choice: { type: "function", function: { name: "return_scholarship_profile" } },
+        }),
+      });
 
       if (!res.ok) {
         const errText = await res.text().catch(() => "");
@@ -153,6 +149,9 @@ export const hydrateScholarship = createServerFn({ method: "POST" })
         return { ok: false, error: "AI returned no structured data", slug: data.slug };
       }
       ai = JSON.parse(toolCall.function.arguments);
+
+      const aiUrl = typeof ai.banner_image_url === "string" && /^https?:\/\//i.test(ai.banner_image_url) ? ai.banner_image_url : null;
+      bannerUrl = aiUrl ?? (await fetchCountryBannerImage(ai.host_country ?? country));
     } catch (err) {
       console.error("[hydrate-scholarship] fetch failed", err);
       return { ok: false, error: "Network error contacting AI gateway", slug: data.slug };
