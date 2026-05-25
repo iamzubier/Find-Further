@@ -10,7 +10,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { LoginNudge } from "./universities.index";
 
-export const Route = createFileRoute("/scholarships")({
+export const Route = createFileRoute("/scholarships/")({
   head: () => ({ meta: [
     { title: "Scholarships — BeyondBorder" },
     { name: "description", content: "Live international scholarships sorted by deadline. For students worldwide." },
