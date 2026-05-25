@@ -182,7 +182,7 @@ function UniDetailPage() {
           {tab === "Admissions" && <Admissions uni={uni} />}
           {tab === "Tuition & Aid" && <Tuition uni={uni} />}
           {tab === "Programs" && <Programs uni={uni} />}
-          {tab === "Community Tips" && <Tips uni={uni} tips={data.tips} />}
+          {tab === "How to Get In" && <Tips uni={uni} tips={data.tips} />}
           {tab === "Entrance Exams" && <Exams uni={uni} />}
         </main>
         <Sidebar uni={uni} />
