@@ -1,56 +1,12 @@
-// Server-only dynamic image fetcher.
-// Pulls from Unsplash first (high-quality editorial photos), then falls back
-// to Wikipedia's pageimages API for university campuses.
+// Server-only image fetcher.
 //
-// Safe to import from createServerFn handlers ONLY.
+// We no longer call any third-party image API (Unsplash etc.). Primary image
+// URLs are returned directly by the Lovable AI Gateway as part of the
+// hydration tool call. This module only provides a free, no-key Wikipedia
+// fallback used by the backfill job and as a last resort if the AI omits
+// the field.
 
-const UNSPLASH_ENDPOINT = "https://api.unsplash.com/search/photos";
 const WIKI_ENDPOINT = "https://en.wikipedia.org/w/api.php";
-
-/**
- * Force every Unsplash image we store through their Imgix CDN with strict
- * web-optimized params. Targets ~1200px wide, q=75, WebP. Massively reduces
- * payload size vs urls.regular/raw/full defaults.
- */
-function optimizeUnsplashUrl(raw: string): string {
-  try {
-    const u = new URL(raw);
-    // Strip any pre-existing sizing params to avoid duplicates / conflicts.
-    ["w", "h", "q", "fm", "auto", "fit", "crop"].forEach((p) => u.searchParams.delete(p));
-    u.searchParams.set("w", "1200");
-    u.searchParams.set("q", "75");
-    u.searchParams.set("fm", "webp");
-    u.searchParams.set("auto", "format");
-    return u.toString();
-  } catch {
-    return raw;
-  }
-}
-
-async function fetchUnsplash(query: string): Promise<string | null> {
-  const key = process.env.UNSPLASH_ACCESS_KEY;
-  if (!key) {
-    console.warn("[image-fetch] UNSPLASH_ACCESS_KEY missing");
-    return null;
-  }
-  try {
-    const url = `${UNSPLASH_ENDPOINT}?query=${encodeURIComponent(query)}&per_page=1&orientation=landscape&content_filter=high&client_id=${encodeURIComponent(key)}`;
-    const r = await fetch(url, { headers: { "Accept-Version": "v1" } });
-    if (!r.ok) {
-      console.warn("[image-fetch] unsplash status", r.status, query);
-      return null;
-    }
-    const j: any = await r.json();
-    const photo = j?.results?.[0];
-    // Always prefer urls.regular (pre-sized ~1080w), never raw/full.
-    const regular = photo?.urls?.regular;
-    if (typeof regular !== "string" || !regular) return null;
-    return optimizeUnsplashUrl(regular);
-  } catch (e) {
-    console.warn("[image-fetch] unsplash error", e);
-    return null;
-  }
-}
 
 async function fetchWikipediaPageImage(title: string): Promise<string | null> {
   try {
@@ -80,19 +36,14 @@ async function fetchWikipediaPageImage(title: string): Promise<string | null> {
   }
 }
 
-/** Fetch a campus / building photo for a university. */
+/** Fetch a campus / building photo for a university (Wikipedia fallback). */
 export async function fetchUniversityCampusImage(name: string): Promise<string | null> {
   if (!name) return null;
-  const unsplash = await fetchUnsplash(`${name} campus building architecture`);
-  if (unsplash) return unsplash;
   return await fetchWikipediaPageImage(name);
 }
 
-/** Fetch a stunning landmark / landscape photo of a country. */
+/** Fetch a landmark / landscape photo of a country (Wikipedia fallback). */
 export async function fetchCountryBannerImage(country: string): Promise<string | null> {
   if (!country) return null;
-  const q = `${country} famous landmark landscape high quality`;
-  const u = await fetchUnsplash(q);
-  if (u) return u;
-  return await fetchUnsplash(`${country} cityscape skyline`);
+  return await fetchWikipediaPageImage(country);
 }
