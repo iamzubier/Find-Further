@@ -139,6 +139,9 @@ export const hydrateUniversity = createServerFn({ method: "POST" })
     if (typeof aiJson.ielts_min === "number") admissionReqs.ielts = aiJson.ielts_min;
     if (typeof aiJson.toefl_min === "number") admissionReqs.toefl = aiJson.toefl_min;
 
+    // Fetch a campus image (Unsplash → Wikipedia fallback). Best-effort.
+    const campusImageUrl = await fetchUniversityCampusImage(name);
+
     const detailRow = {
       slug: data.slug,
       name,
@@ -148,6 +151,7 @@ export const hydrateUniversity = createServerFn({ method: "POST" })
       about: aiJson.about ?? `${name} is a higher education institution in ${country}.`,
       acceptance_rate: aiJson.acceptance_rate ?? null,
       official_url: aiJson.official_url ?? null,
+      campus_image_url: campusImageUrl,
       tuition: {
         display: aiJson.tuition_display ?? null,
         per_year_usd: tuitionUsd,
