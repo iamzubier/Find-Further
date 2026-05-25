@@ -516,4 +516,71 @@ function ScholarshipCard({
   );
 }
 
+/* ─────────────────── WTF Scholarships Carousel ─────────────────── */
+
+function WtfScholarshipsCarousel() {
+  const wtf = useMemo(() => {
+    return [
+      {
+        title: "$0 application fee",
+        items: ENRICHED_SCHOLARSHIPS.filter((s) => s.application_fee_usd === 0 && s.funding_type === "fully_funded").slice(0, 6),
+        emoji: "💸",
+        tone: "from-emerald-50 to-white border-emerald-200",
+      },
+      {
+        title: "MOI accepted (skip IELTS)",
+        items: ENRICHED_SCHOLARSHIPS.filter((s) => s.accepts_moi_waiver && s.funding_type === "fully_funded").slice(0, 6),
+        emoji: "📝",
+        tone: "from-sky-50 to-white border-sky-200",
+      },
+      {
+        title: "Government-backed fully funded",
+        items: ENRICHED_SCHOLARSHIPS.filter((s) => s.provider_type === "government" && s.funding_type === "fully_funded").slice(0, 6),
+        emoji: "🏛️",
+        tone: "from-amber-50 to-white border-amber-200",
+      },
+    ];
+  }, []);
+
+  return (
+    <section className="mb-8">
+      <div className="mb-3 flex items-center gap-2">
+        <Sparkles className="h-4 w-4 text-primary" />
+        <h2 className="font-heading text-sm font-bold uppercase tracking-wide text-foreground">
+          WTF scholarships
+        </h2>
+        <span className="text-xs text-muted-foreground">— the ones most people don't know exist</span>
+      </div>
+      <div className="grid gap-4 md:grid-cols-3">
+        {wtf.map((bucket) => (
+          <div key={bucket.title} className={`rounded-md border bg-gradient-to-b p-4 ${bucket.tone}`}>
+            <div className="mb-2 flex items-center gap-2">
+              <span className="text-lg">{bucket.emoji}</span>
+              <h3 className="font-heading text-sm font-bold text-foreground">{bucket.title}</h3>
+            </div>
+            <ul className="space-y-1.5">
+              {bucket.items.slice(0, 4).map((s) => (
+                <li key={s.id}>
+                  <Link
+                    to="/scholarships/$slug"
+                    params={{ slug: scholarshipSlug(s) }}
+                    className="group flex items-start gap-2 text-xs text-foreground/85 hover:text-primary"
+                  >
+                    <span className="text-sm leading-none">{s.countryFlag}</span>
+                    <span className="line-clamp-1 flex-1 font-medium group-hover:underline">{s.name}</span>
+                  </Link>
+                </li>
+              ))}
+              {bucket.items.length === 0 && (
+                <li className="text-xs text-muted-foreground">Nothing indexed in this bucket yet.</li>
+              )}
+            </ul>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+
 export { ScholarshipCard };
