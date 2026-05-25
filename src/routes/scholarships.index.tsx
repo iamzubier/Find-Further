@@ -83,6 +83,27 @@ function ScholarshipsHub() {
   const [moiOnly, setMoiOnly] = useState(false);
   const [q, setQ] = useState("");
 
+  // Slug → banner_image_url map (fetched from DB scholarships table).
+  const bannerQuery = useQuery({
+    queryKey: ["scholarship-banners"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("scholarships")
+        .select("slug, banner_image_url")
+        .not("banner_image_url", "is", null);
+      if (error) throw error;
+      const map = new Map<string, string>();
+      for (const r of data ?? []) {
+        if ((r as any).slug && (r as any).banner_image_url) {
+          map.set((r as any).slug, (r as any).banner_image_url);
+        }
+      }
+      return map;
+    },
+    staleTime: 5 * 60 * 1000,
+  });
+  const bannerMap = bannerQuery.data ?? new Map<string, string>();
+
   const filtered = useMemo(() => {
     return ENRICHED_SCHOLARSHIPS.filter((s) => {
       if (budget === "free" && s.funding_type !== "fully_funded") return false;
