@@ -139,6 +139,11 @@ function ScholarshipsHub() {
         </p>
       </div>
 
+      {/* ─── WTF Scholarships carousel ─── */}
+      <WtfScholarshipsCarousel />
+
+
+
       {/* ─── Intent matrix ─── */}
       <section className="rounded-md border border-border bg-white p-5 md:p-6">
         <div className="grid gap-6 md:grid-cols-3">
