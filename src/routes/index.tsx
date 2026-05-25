@@ -42,43 +42,45 @@ function Hero() {
   const countLabel = countData?.count ? `${countData.count.toLocaleString()}+` : "10,000+";
 
   return (
-    <section className="relative overflow-hidden border-b border-border">
-      {/* Campus photo background */}
-      <div
-        className="absolute inset-0 -z-10 bg-cover bg-center"
-        aria-hidden
-        style={{
-          backgroundImage:
-            "linear-gradient(to right, rgba(10,10,15,0.95) 20%, rgba(10,10,15,0.4) 100%), url('https://images.unsplash.com/photo-1541339907198-e08756dedf3f?w=1600&q=80')",
-        }}
-      />
-      <CrestArt variant="c" className="pointer-events-none absolute right-10 bottom-4 h-44 w-44 text-white/10" />
+    <section className="relative overflow-hidden border-b border-border bg-background">
+      <div className="relative mx-auto grid max-w-6xl gap-10 px-4 pb-10 pt-16 md:grid-cols-[1.2fr_1fr] md:pt-24">
+        <div>
+          <LogoMark className="mb-6 h-12 w-12 text-primary" />
 
-      <div className="relative mx-auto max-w-6xl px-4 pb-16 pt-16 md:pt-24">
-        <LogoMark className="mb-6 h-14 w-14 text-white" />
+          <div className="inline-flex items-center gap-2 border-y border-foreground/70 px-3 py-1 text-[11px] uppercase tracking-[0.22em] text-foreground">
+            <Zap className="h-3 w-3" /> A field guide for students worldwide · est. MMXXVI
+          </div>
 
-        <div className="inline-flex items-center gap-2 border-y border-white/80 px-3 py-1 text-[11px] uppercase tracking-[0.22em] text-white">
-          <Zap className="h-3 w-3" /> A field guide for students worldwide · est. MMXXVI
+          <h1 className="mt-7 font-heading text-[3rem] font-bold leading-[1.02] tracking-tight text-foreground md:text-[5.25rem]">
+            Find your <em className="font-medium italic text-primary">university.</em>
+            <br />
+            <span className="text-foreground/55">Know your chances. Get in.</span>
+          </h1>
+
+          <div className="mt-6 flex items-center gap-4 text-[11px] uppercase tracking-[0.25em] text-muted-foreground">
+            <span>Vol. II</span>
+            <span className="h-px flex-1 bg-border" />
+            <span>{new Date().toLocaleDateString("en-US", { month: "long", year: "numeric" })}</span>
+          </div>
+
+          <p className="mt-8 max-w-2xl text-lg leading-relaxed text-foreground/80">
+            {countLabel} real universities. Live scholarships. An AI advisor named <em className="serif-italic">Aria</em>.
+            One honest atlas for students applying to the world's best universities.
+          </p>
         </div>
 
-        <h1 className="mt-7 max-w-5xl font-heading text-[3.2rem] font-bold leading-[1] tracking-tight text-white md:text-[6.5rem]">
-          Find your <em className="font-medium not-italic italic">university.</em>
-          <br />
-          <span className="text-white/70">Know your chances. Get in.</span>
-        </h1>
-
-        <div className="mt-6 flex items-center gap-4 text-[11px] uppercase tracking-[0.25em] text-white/70">
-          <span>Vol. II</span>
-          <span className="h-px flex-1 bg-white/30" />
-          <span>{new Date().toLocaleDateString("en-US", { month: "long", year: "numeric" })}</span>
+        <div className="relative hidden min-h-[380px] md:block">
+          <div
+            className="absolute inset-0 rounded-md border border-border bg-cover bg-center"
+            aria-hidden
+            style={{ backgroundImage: "url('https://images.unsplash.com/photo-1541339907198-e08756dedf3f?w=1200&q=80')" }}
+          />
+          <CrestArt variant="c" className="pointer-events-none absolute right-4 bottom-4 h-32 w-32 text-white/80" />
         </div>
+      </div>
 
-        <p className="mt-10 max-w-2xl text-lg leading-relaxed text-white/85 md:text-xl">
-          {countLabel} real universities. Live scholarships. An AI advisor named <em>Aria</em>.
-          One honest atlas for students applying to the world's best universities.
-        </p>
-
-        <div className="card-surface mt-10 p-3 md:p-4 shadow-[0_1px_0_0_var(--color-border),0_18px_40px_-24px_rgba(0,0,0,0.18)]">
+      <div className="relative mx-auto max-w-6xl px-4 pb-14">
+        <div className="card-surface p-3 md:p-4">
           <div className="grid gap-2 md:grid-cols-[1fr_1fr_1fr_auto]">
             <Select value={country} onValueChange={setCountry}>
               <SelectTrigger className="h-12 bg-secondary"><SelectValue placeholder="Country" /></SelectTrigger>
