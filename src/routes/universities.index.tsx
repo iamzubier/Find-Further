@@ -177,19 +177,29 @@ function FeaturedList({ initial }: { initial: { country?: string; program?: stri
   );
 }
 
-const PAGE_SIZE = 25;
+const PAGE_SIZE = 60;
+
+const QS_RANGES = [
+  { value: "all", label: "All QS Ranks", min: null, max: null },
+  { value: "top50", label: "Top 50", min: 1, max: 50 },
+  { value: "top100", label: "Top 100", min: 1, max: 100 },
+  { value: "top200", label: "Top 200", min: 1, max: 200 },
+  { value: "top500", label: "Top 500", min: 1, max: 500 },
+  { value: "501plus", label: "501+", min: 501, max: 9999 },
+  { value: "unranked", label: "Unranked", min: null, max: null },
+] as const;
 
 function CatalogBrowser() {
   const [q, setQ] = useState("");
   const [region, setRegion] = useState("all");
   const [country, setCountry] = useState("all");
+  const [qsRange, setQsRange] = useState<string>("all");
+  const [scholarshipOnly, setScholarshipOnly] = useState(false);
   const [page, setPage] = useState(0);
 
-  // Reset page when filters change
-  const filterKey = `${q}|${region}|${country}`;
+  const filterKey = `${q}|${region}|${country}|${qsRange}|${scholarshipOnly}`;
   useMemo(() => { setPage(0); }, [filterKey]);
 
-  // Countries list — derive from REGION choice with a static map
   const countriesQuery = useQuery({
     queryKey: ["catalog-countries", region],
     queryFn: async () => {
@@ -203,15 +213,26 @@ function CatalogBrowser() {
   });
 
   const listQuery = useQuery({
-    queryKey: ["catalog-list", q, region, country, page],
+    queryKey: ["catalog-list", q, region, country, qsRange, scholarshipOnly, page],
     queryFn: async () => {
       let query = supabase
         .from("universities_catalog")
-        .select("id,name,country,region,website,state_province,has_curated_data,slug", { count: "exact" });
+        .select("id,name,country,region,website,state_province,has_curated_data,slug,qs_rank", { count: "exact" });
       if (region !== "all") query = query.eq("region", region);
       if (country !== "all") query = query.eq("country", country);
+      if (scholarshipOnly) query = query.eq("has_curated_data", true);
       if (q.trim()) query = query.ilike("name", `%${q.trim()}%`);
-      query = query.order("has_curated_data", { ascending: false }).order("qs_rank", { ascending: true, nullsFirst: false }).order("name").range(page * PAGE_SIZE, page * PAGE_SIZE + PAGE_SIZE - 1);
+      const rng = QS_RANGES.find(r => r.value === qsRange);
+      if (qsRange === "unranked") {
+        query = query.is("qs_rank", null);
+      } else if (rng && rng.min !== null && rng.max !== null) {
+        query = query.gte("qs_rank", rng.min).lte("qs_rank", rng.max);
+      }
+      query = query
+        .order("country", { ascending: true })
+        .order("qs_rank", { ascending: true, nullsFirst: false })
+        .order("name")
+        .range(page * PAGE_SIZE, page * PAGE_SIZE + PAGE_SIZE - 1);
       const { data, error, count } = await query;
       if (error) throw error;
       return { rows: data ?? [], count: count ?? 0 };
@@ -222,93 +243,75 @@ function CatalogBrowser() {
   const total = listQuery.data?.count ?? 0;
   const pages = Math.max(1, Math.ceil(total / PAGE_SIZE));
 
+  const grouped = useMemo(() => {
+    const rows = listQuery.data?.rows ?? [];
+    const map = new Map<string, any[]>();
+    for (const r of rows) {
+      const key = r.country || "Other";
+      if (!map.has(key)) map.set(key, []);
+      map.get(key)!.push(r);
+    }
+    return Array.from(map.entries());
+  }, [listQuery.data]);
+
   return (
     <>
-      <div className="card-surface mt-6 grid gap-2 p-3 md:grid-cols-[1fr_180px_220px]">
+      <div className="card-surface mt-6 grid gap-2 p-4 md:grid-cols-[1fr_180px_200px_180px_auto]">
         <div className="relative">
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <Input
             value={q}
             onChange={(e) => { setQ(e.target.value); setPage(0); }}
-            placeholder="Search 5,900+ universities by name…"
-            className="h-11 bg-secondary pl-9"
+            placeholder="Search universities by name…"
+            className="h-11 bg-white pl-9"
           />
         </div>
         <Select value={region} onValueChange={(v) => { setRegion(v); setCountry("all"); setPage(0); }}>
-          <SelectTrigger className="h-11 bg-secondary"><SelectValue placeholder="Region" /></SelectTrigger>
+          <SelectTrigger className="h-11 bg-white"><SelectValue placeholder="Region" /></SelectTrigger>
           <SelectContent>{REGIONS.map(r => <SelectItem key={r.value} value={r.value}>{r.label}</SelectItem>)}</SelectContent>
         </Select>
         <Select value={country} onValueChange={(v) => { setCountry(v); setPage(0); }}>
-          <SelectTrigger className="h-11 bg-secondary"><SelectValue placeholder="Country" /></SelectTrigger>
+          <SelectTrigger className="h-11 bg-white"><SelectValue placeholder="Country" /></SelectTrigger>
           <SelectContent>
             <SelectItem value="all">All countries</SelectItem>
             {(countriesQuery.data ?? []).map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}
           </SelectContent>
         </Select>
+        <Select value={qsRange} onValueChange={(v) => { setQsRange(v); setPage(0); }}>
+          <SelectTrigger className="h-11 bg-white"><SelectValue placeholder="QS Rank" /></SelectTrigger>
+          <SelectContent>{QS_RANGES.map(r => <SelectItem key={r.value} value={r.value}>{r.label}</SelectItem>)}</SelectContent>
+        </Select>
+        <label className="flex items-center gap-2 whitespace-nowrap px-3 text-sm text-foreground">
+          <Switch checked={scholarshipOnly} onCheckedChange={(v) => { setScholarshipOnly(v); setPage(0); }} /> Scholarships
+        </label>
       </div>
 
-      <div className="mt-3 flex items-center justify-between text-xs text-muted-foreground">
+      <div className="mt-4 flex items-center justify-between text-xs text-muted-foreground">
         <span>{listQuery.isFetching ? "Searching…" : `${total.toLocaleString()} universities`}</span>
         <span>Page {page + 1} of {pages}</span>
       </div>
 
-      <div className="mt-4 grid gap-2">
-        {(listQuery.data?.rows ?? []).map((u: any) => (
-          <div key={u.id} className="card-surface flex flex-wrap items-center justify-between gap-3 p-4">
-            <div className="flex min-w-0 flex-1 items-center gap-3">
-              <UniLogo website={u.website} name={u.name} />
-              <div className="min-w-0 flex-1">
-                <div className="flex flex-wrap items-center gap-2">
-                  {u.slug ? (
-                    <Link
-                      to="/universities/$slug"
-                      params={{ slug: u.slug }}
-                      className="font-heading text-base font-bold leading-tight hover:text-primary hover:underline"
-                    >
-                      {u.name}
-                    </Link>
-                  ) : (
-                    <h3 className="font-heading text-base font-bold leading-tight">{u.name}</h3>
-                  )}
-                  {u.has_curated_data && (
-                    <span className="rounded-full bg-primary/15 px-2 py-0.5 text-[10px] font-semibold text-primary ring-1 ring-primary/30">
-                      <Sparkles className="mr-0.5 inline h-2.5 w-2.5" /> Curated
-                    </span>
-                  )}
-                </div>
-                <div className="mt-0.5 text-xs text-muted-foreground">
-                  {u.country}{u.state_province ? ` · ${u.state_province}` : ""}
-                </div>
-              </div>
-            </div>
+      {!listQuery.isFetching && grouped.length === 0 && (
+        <div className="card-surface mt-6 p-12 text-center text-sm text-muted-foreground">
+          No universities match those filters.
+        </div>
+      )}
 
-            <div className="flex items-center gap-3">
-              {u.slug && (
-                <Button asChild size="sm" className="h-8 bg-primary text-primary-foreground hover:bg-primary/90">
-                  <Link to="/universities/$slug" params={{ slug: u.slug }}>
-                    View page <ArrowRight className="ml-1 h-3.5 w-3.5" />
-                  </Link>
-                </Button>
-              )}
-              {u.website && (
-                <a
-                  href={u.website}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-xs text-muted-foreground hover:text-primary hover:underline"
-                >
-                  Visit site ↗
-                </a>
-              )}
+      <div className="mt-6 space-y-10">
+        {grouped.map(([countryName, rows]) => (
+          <section key={countryName}>
+            <div className="mb-4 flex items-baseline justify-between border-b border-border pb-2">
+              <h2 className="font-heading text-2xl font-bold text-foreground">{countryName}</h2>
+              <span className="text-xs uppercase tracking-wide text-muted-foreground">{rows.length} on this page</span>
             </div>
-          </div>
+            <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+              {rows.map((u: any) => <CatalogCard key={u.id} u={u} />)}
+            </div>
+          </section>
         ))}
-        {!listQuery.isFetching && (listQuery.data?.rows.length ?? 0) === 0 && (
-          <div className="card-surface p-10 text-center text-sm text-muted-foreground">No universities match those filters.</div>
-        )}
       </div>
 
-      <div className="mt-6 flex items-center justify-center gap-2">
+      <div className="mt-10 flex items-center justify-center gap-2">
         <Button variant="outline" size="sm" disabled={page === 0} onClick={() => setPage(p => Math.max(0, p - 1))}>
           <ChevronLeft className="h-4 w-4" /> Prev
         </Button>
@@ -316,21 +319,61 @@ function CatalogBrowser() {
           Next <ChevronRight className="h-4 w-4" />
         </Button>
       </div>
-
-      <p className="mt-4 text-center text-xs text-muted-foreground">
-        Tuition, deadlines, and admission hacks are available on hand-curated universities.{" "}
-        <button onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })} className="text-primary hover:underline">
-          Switch to Featured ↑
-        </button>
-      </p>
     </>
   );
 }
 
-
-function UniLogo({ website, name, size = 48 }: { website?: string | null; name: string; size?: number }) {
-  return <SmartLogo name={name} website={website} size={size} />;
+function CatalogCard({ u }: { u: any }) {
+  return (
+    <article className="group flex h-full flex-col overflow-hidden rounded-md border border-border bg-white transition-all hover:-translate-y-0.5 hover:shadow-[0_4px_6px_-1px_rgba(0,0,0,0.1)]">
+      <div className="relative h-40 w-full overflow-hidden bg-neutral-100">
+        <SmartCampusImage src={null} name={u.name} noOverlay />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/10 via-transparent to-black/60" aria-hidden />
+        {u.qs_rank && (
+          <span className="absolute right-3 top-3 rounded bg-white px-2 py-0.5 text-xs font-bold text-foreground ring-1 ring-border">
+            QS #{u.qs_rank}
+          </span>
+        )}
+        <div className="absolute bottom-3 left-3">
+          <SmartLogo name={u.name} website={u.website} size={48} className="ring-2 ring-white" />
+        </div>
+      </div>
+      <div className="flex flex-1 flex-col p-5">
+        <h3 className="font-heading text-base font-bold leading-snug text-foreground line-clamp-2">{u.name}</h3>
+        <div className="mt-1 text-xs text-muted-foreground">
+          {u.state_province ? `${u.state_province}, ` : ""}{u.country}
+        </div>
+        {u.has_curated_data && (
+          <span className="mt-3 inline-flex w-fit items-center rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-semibold text-primary ring-1 ring-primary/30">
+            <Sparkles className="mr-0.5 inline h-2.5 w-2.5" /> Curated
+          </span>
+        )}
+        <div className="mt-auto flex items-center justify-between gap-2 pt-4">
+          {u.slug ? (
+            <Button asChild size="sm" className="h-8 bg-primary text-primary-foreground hover:bg-primary/90">
+              <Link to="/universities/$slug" params={{ slug: u.slug }}>
+                View Details <ArrowRight className="ml-1 h-3.5 w-3.5" />
+              </Link>
+            </Button>
+          ) : (
+            <span className="text-xs text-muted-foreground">Details coming soon</span>
+          )}
+          {u.website && (
+            <a
+              href={u.website}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-xs text-muted-foreground hover:text-primary hover:underline"
+            >
+              Site ↗
+            </a>
+          )}
+        </div>
+      </div>
+    </article>
+  );
 }
+
 
 
 export function UniversityCard({ u, match }: { u: University; match?: number }) {
