@@ -158,9 +158,7 @@ export const hydrateScholarship = createServerFn({ method: "POST" })
       return { ok: false, error: "Network error contacting AI gateway", slug: data.slug };
     }
 
-    // Fetch a stunning country banner photo (best-effort).
     const hostCountry = ai.host_country ?? country;
-    const bannerUrl = await fetchCountryBannerImage(hostCountry);
 
     // Normalise + upsert
     const row: Record<string, unknown> = {
