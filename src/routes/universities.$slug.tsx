@@ -47,7 +47,7 @@ export const Route = createFileRoute("/universities/$slug")({
   component: UniDetailPage,
 });
 
-const TABS = ["Overview","Admissions","Tuition & Aid","Programs","How To Get In","Entrance Exams"] as const;
+const TABS = ["Overview","Admissions","Tuition & Aid","Programs","Entrance Exams","Community Tips"] as const;
 
 function UniDetailPage() {
   const { slug } = Route.useParams();
