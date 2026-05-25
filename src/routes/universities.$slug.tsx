@@ -90,9 +90,9 @@ const FALLBACK_CAMPUS = "https://images.unsplash.com/photo-1541339907198-e08756d
 
 function Hero({ uni }: { uni: any }) {
   return (
-    <div className="relative h-[420px] w-full overflow-hidden bg-neutral-900">
+    <div className="relative h-[420px] min-h-[400px] w-full overflow-hidden bg-neutral-900">
       <SmartCampusImage src={uni.campus_image_url} name={uni.name} loading="eager" noOverlay />
-      <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-black/20" />
+      <div className="absolute inset-0 bg-gradient-to-b from-black/20 to-black/85" />
       <div className="absolute inset-x-0 top-0 p-4">
         <Link to="/universities" className="inline-flex items-center gap-1 text-sm text-white/80 hover:text-white">
           <ArrowLeft className="h-4 w-4" /> All universities
@@ -105,7 +105,7 @@ function Hero({ uni }: { uni: any }) {
             logoUrl={uni.logo_url}
             website={uni.official_url}
             size={80}
-            className="shadow-2xl"
+            className="ring-4 ring-white shadow-2xl"
           />
 
           <div className="text-white">
