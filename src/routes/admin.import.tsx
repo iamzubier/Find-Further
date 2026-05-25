@@ -542,21 +542,10 @@ function AdminImportPage() {
             </div>
             <div className="grid grid-cols-3 gap-3">
               <Stat label="Updated" value={qsState.updated} tone="success" />
-              <Stat label="Unmatched" value={qsState.unmatched.length} tone="warn" />
+              <Stat label="Newly Created" value={qsState.inserted} tone="success" />
               <Stat label="Failed" value={qsState.failed} tone="danger" />
             </div>
-            {qsState.unmatched.length > 0 && (
-              <div>
-                <div className="mb-1 text-xs uppercase text-muted-foreground">Unmatched institutions</div>
-                <div className="max-h-60 overflow-auto rounded-md border border-border bg-secondary/30 p-3 text-sm">
-                  <ul className="space-y-1">
-                    {qsState.unmatched.map((n, i) => (
-                      <li key={`${n}-${i}`} className="font-mono text-xs">{n}</li>
-                    ))}
-                  </ul>
-                </div>
-              </div>
-            )}
+
           </div>
         )}
       </Card>
