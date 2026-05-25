@@ -506,6 +506,75 @@ function AdminImportPage() {
         )}
       </Card>
 
+      <Card title="Scholarship CSV Sync" icon={<GraduationCap className="h-5 w-5" />}
+        desc="Drop a Kaggle/GitHub scholarships CSV. Map columns to our schema, then bulk-import. Duplicates (same name + host country) are updated instead of duplicated.">
+        <label
+          onDragOver={(e) => { e.preventDefault(); setSchState((s) => ({ ...s, dragging: true })); }}
+          onDragLeave={() => setSchState((s) => ({ ...s, dragging: false }))}
+          onDrop={onSchDrop}
+          className={`flex cursor-pointer flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed p-10 text-center transition-colors ${
+            schState.dragging ? "border-primary bg-primary/5" : "border-border hover:border-primary/60 hover:bg-secondary/40"
+          } ${busy ? "pointer-events-none opacity-50" : ""}`}
+        >
+          <GraduationCap className="h-8 w-8 text-primary" />
+          <div className="font-heading text-base font-semibold">Drop Kaggle Scholarships CSV Here</div>
+          <div className="text-xs text-muted-foreground">or click to browse — you'll map the columns before importing</div>
+          <input type="file" accept=".csv" className="hidden" onChange={(e) => {
+            const f = e.target.files?.[0]; if (f) onSchFile(f); e.target.value = "";
+          }} />
+        </label>
+
+        {schState.headers.length > 0 && (
+          <div className="mt-4 space-y-4">
+            <div className="text-sm text-muted-foreground">
+              Detected <b className="text-foreground">{schState.rows.length.toLocaleString()}</b> rows
+              and <b className="text-foreground">{schState.headers.length}</b> columns. Map fields below:
+            </div>
+            <div className="grid gap-3 sm:grid-cols-2">
+              {SCH_TARGETS.map((t) => (
+                <label key={t.key} className="flex flex-col gap-1">
+                  <span className="text-xs uppercase text-muted-foreground">
+                    {t.label}{t.required && <span className="text-destructive"> *</span>}
+                  </span>
+                  <select
+                    value={schState.mapping[t.key] ?? ""}
+                    onChange={(e) => setSchState((s) => ({ ...s, mapping: { ...s.mapping, [t.key]: e.target.value || undefined } }))}
+                    className="rounded-md border border-border bg-background px-2 py-1.5 text-sm"
+                  >
+                    <option value="">— ignore —</option>
+                    {schState.headers.map((h) => (<option key={h} value={h}>{h}</option>))}
+                  </select>
+                </label>
+              ))}
+            </div>
+            <Button onClick={runSchImport} disabled={busy !== null || !schState.mapping.name}>
+              {schState.importing ? "Importing…" : `Import ${schState.rows.length.toLocaleString()} scholarships`}
+            </Button>
+
+            {schState.total > 0 && (
+              <div className="space-y-2">
+                <div className="h-2 w-full overflow-hidden rounded bg-secondary">
+                  <div className="h-full bg-primary transition-all"
+                    style={{ width: `${(schState.processed / schState.total) * 100}%` }} />
+                </div>
+                <div className="text-sm tabular-nums text-muted-foreground">
+                  {schState.importing
+                    ? `Importing Scholarship ${schState.processed} of ${schState.total.toLocaleString()}…`
+                    : `Processed ${schState.processed} of ${schState.total.toLocaleString()}`}
+                </div>
+                <div className="grid grid-cols-3 gap-3">
+                  <Stat label="Inserted" value={schState.inserted} tone="success" />
+                  <Stat label="Updated" value={schState.updated} tone="warn" />
+                  <Stat label="Failed" value={schState.failed} tone="danger" />
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+      </Card>
+
+
+
 
       <Card title="1. Hipolabs Universities API" icon={<Database className="h-5 w-5" />}
         desc="Fetch ~10k universities from 15 countries. Free public API.">
