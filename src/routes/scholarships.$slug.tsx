@@ -10,6 +10,9 @@ import {
 } from "@/lib/data";
 import { enrich, fundingLabel, providerLabel, type EnrichedScholarship } from "@/lib/scholarship-enrich";
 import { Button } from "@/components/ui/button";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { Input } from "@/components/ui/input";
+import { Progress } from "@/components/ui/progress";
 import {
   ArrowLeft,
   Clock,
@@ -28,12 +31,17 @@ import {
   Languages,
   CalendarClock,
   Sparkles,
+  Trophy,
+  Users,
+  Calculator,
+  AlertCircle,
 } from "lucide-react";
 import { SmartCampusImage } from "@/components/SmartCampusImage";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { hydrateScholarship } from "@/lib/hydrate-scholarship.functions";
+
 
 type DbScholarship = {
   id: string;
