@@ -50,7 +50,7 @@ function AdminImportPage() {
   const [verified, setVerified] = useState(false);
   const [busy, setBusy] = useState<string | null>(null);
   const [stats, setStats] = useState<Stats | null>(null);
-  const [wikiProgress, setWikiProgress] = useState<{ processed: number; total: number; wiki: number; fallback: number; failed: number } | null>(null);
+  const [wikiProgress, setWikiProgress] = useState<{ processed: number; total: number; updated: number; skipped: number; failed: number } | null>(null);
 
   const verify = useServerFn(verifyAdmin);
   const statsFn = useServerFn(getUniStats);
@@ -101,21 +101,21 @@ function AdminImportPage() {
 
   async function handleFixImages() {
     setBusy("wiki");
-    setWikiProgress({ processed: 0, total: 0, wiki: 0, fallback: 0, failed: 0 });
+    setWikiProgress({ processed: 0, total: 0, updated: 0, skipped: 0, failed: 0 });
     try {
       let offset = 0;
       const limit = 10;
-      let wiki = 0, fallback = 0, failed = 0, total = 0;
+      let updated = 0, skipped = 0, failed = 0, total = 0;
       // eslint-disable-next-line no-constant-condition
       while (true) {
         const r = await fixImages({ data: { key, offset, limit } });
-        wiki += r.wiki; fallback += r.fallback; failed += r.failed;
+        updated += r.updated; skipped += r.skipped; failed += r.failed;
         total = r.total;
-        setWikiProgress({ processed: r.processed, total, wiki, fallback, failed });
+        setWikiProgress({ processed: r.processed, total, updated, skipped, failed });
         if (r.done || r.batch === 0) break;
         offset += limit;
       }
-      toast.success(`Done: ${wiki} from Wikipedia, ${fallback} fallback, ${failed} failed`);
+      toast.success(`Done: ${updated} updated, ${skipped} skipped (no Wikipedia image), ${failed} failed`);
     } catch (e) { toast.error((e as Error).message); }
     finally { setBusy(null); }
   }
@@ -201,8 +201,8 @@ function AdminImportPage() {
             </div>
             <div className="flex flex-wrap gap-4 text-xs text-muted-foreground tabular-nums">
               <span>{wikiProgress.processed} / {wikiProgress.total}</span>
-              <span>Wikipedia: <b className="text-foreground">{wikiProgress.wiki}</b></span>
-              <span>Fallback: <b className="text-foreground">{wikiProgress.fallback}</b></span>
+              <span>Updated: <b className="text-foreground">{wikiProgress.updated}</b></span>
+              <span>Skipped (no image): <b className="text-foreground">{wikiProgress.skipped}</b></span>
               <span>Failed: <b className="text-foreground">{wikiProgress.failed}</b></span>
             </div>
           </div>
