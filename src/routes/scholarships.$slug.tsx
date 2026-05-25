@@ -907,12 +907,12 @@ function CommonErrors() {
 
 function RecipientTips({ v }: { v: View }) {
   const { data: tips } = useQuery({
-    queryKey: ["scholarship-tips", v.slug ?? v.id],
+    queryKey: ["scholarship-tips", scholarshipSlug(v)],
     queryFn: async () => {
       const { data } = await supabase
         .from("scholarship_tips")
         .select("*")
-        .eq("scholarship_slug", v.slug ?? "")
+        .eq("scholarship_slug", scholarshipSlug(v))
         .order("source_upvotes", { ascending: false })
         .limit(20);
       return data ?? [];
@@ -960,12 +960,12 @@ function RecipientTips({ v }: { v: View }) {
 
 function SuccessStories({ v }: { v: View }) {
   const { data: stories } = useQuery({
-    queryKey: ["scholarship-stories", v.slug ?? v.id],
+    queryKey: ["scholarship-stories", scholarshipSlug(v)],
     queryFn: async () => {
       const { data } = await supabase
         .from("scholarship_success_stories")
         .select("*")
-        .eq("scholarship_slug", v.slug ?? "")
+        .eq("scholarship_slug", scholarshipSlug(v))
         .order("year_awarded", { ascending: false })
         .limit(8);
       return data ?? [];
