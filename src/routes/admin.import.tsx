@@ -50,10 +50,12 @@ function AdminImportPage() {
   const [verified, setVerified] = useState(false);
   const [busy, setBusy] = useState<string | null>(null);
   const [stats, setStats] = useState<Stats | null>(null);
+  const [wikiProgress, setWikiProgress] = useState<{ processed: number; total: number; wiki: number; fallback: number; failed: number } | null>(null);
 
   const verify = useServerFn(verifyAdmin);
   const statsFn = useServerFn(getUniStats);
   const hipo = useServerFn(importFromHipolabs);
+  const fixImages = useServerFn(fixCampusImagesBatch);
 
   async function loadStats() {
     setBusy("stats");
