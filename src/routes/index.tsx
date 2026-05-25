@@ -143,7 +143,7 @@ function FeatureTrio() {
   ];
 
   return (
-    <section className="mx-auto max-w-6xl px-4 pt-14 pb-4">
+    <section className="mx-auto max-w-6xl px-4 pt-28 pb-12">
       <div className="mb-6 flex items-end justify-between">
         <h2 className="font-heading text-3xl font-bold md:text-4xl">
           One umbrella. <em className="font-medium">Three doors in.</em>
@@ -185,7 +185,7 @@ function Stats() {
     { num: "120+", label: "Countries" },
   ];
   return (
-    <section className="mx-auto max-w-6xl px-4 py-6">
+    <section className="mx-auto max-w-6xl px-4 py-16">
       <div className="card-surface p-6 md:p-8">
         <div className="grid gap-6 md:grid-cols-3">
           {stats.map((s) => (
@@ -203,7 +203,7 @@ function Stats() {
 
 function WtfSection() {
   return (
-    <section className="mx-auto max-w-6xl px-4 py-16">
+    <section className="mx-auto max-w-6xl px-4 py-28">
       <div className="mb-8">
         <h2 className="font-heading text-3xl font-extrabold md:text-5xl">
           Wait… you didn't know this? <span>🤯</span>
