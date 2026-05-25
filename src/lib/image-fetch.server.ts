@@ -7,6 +7,26 @@
 const UNSPLASH_ENDPOINT = "https://api.unsplash.com/search/photos";
 const WIKI_ENDPOINT = "https://en.wikipedia.org/w/api.php";
 
+/**
+ * Force every Unsplash image we store through their Imgix CDN with strict
+ * web-optimized params. Targets ~1200px wide, q=75, WebP. Massively reduces
+ * payload size vs urls.regular/raw/full defaults.
+ */
+function optimizeUnsplashUrl(raw: string): string {
+  try {
+    const u = new URL(raw);
+    // Strip any pre-existing sizing params to avoid duplicates / conflicts.
+    ["w", "h", "q", "fm", "auto", "fit", "crop"].forEach((p) => u.searchParams.delete(p));
+    u.searchParams.set("w", "1200");
+    u.searchParams.set("q", "75");
+    u.searchParams.set("fm", "webp");
+    u.searchParams.set("auto", "format");
+    return u.toString();
+  } catch {
+    return raw;
+  }
+}
+
 async function fetchUnsplash(query: string): Promise<string | null> {
   const key = process.env.UNSPLASH_ACCESS_KEY;
   if (!key) {
@@ -22,9 +42,10 @@ async function fetchUnsplash(query: string): Promise<string | null> {
     }
     const j: any = await r.json();
     const photo = j?.results?.[0];
-    if (!photo) return null;
-    // Use a sized URL to keep payload reasonable and consistent.
-    return (photo.urls?.regular as string) ?? (photo.urls?.full as string) ?? null;
+    // Always prefer urls.regular (pre-sized ~1080w), never raw/full.
+    const regular = photo?.urls?.regular;
+    if (typeof regular !== "string" || !regular) return null;
+    return optimizeUnsplashUrl(regular);
   } catch (e) {
     console.warn("[image-fetch] unsplash error", e);
     return null;
