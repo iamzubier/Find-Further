@@ -155,6 +155,51 @@ export type Database = {
         }
         Relationships: []
       }
+      scholarships: {
+        Row: {
+          amount_display: string | null
+          annual_value_usd: number | null
+          created_at: string
+          deadline: string | null
+          degree_level: string | null
+          description: string | null
+          eligible_countries: string[] | null
+          host_country: string | null
+          id: string
+          name: string
+          official_url: string | null
+          updated_at: string
+        }
+        Insert: {
+          amount_display?: string | null
+          annual_value_usd?: number | null
+          created_at?: string
+          deadline?: string | null
+          degree_level?: string | null
+          description?: string | null
+          eligible_countries?: string[] | null
+          host_country?: string | null
+          id?: string
+          name: string
+          official_url?: string | null
+          updated_at?: string
+        }
+        Update: {
+          amount_display?: string | null
+          annual_value_usd?: number | null
+          created_at?: string
+          deadline?: string | null
+          degree_level?: string | null
+          description?: string | null
+          eligible_countries?: string[] | null
+          host_country?: string | null
+          id?: string
+          name?: string
+          official_url?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       shortlist: {
         Row: {
           created_at: string
