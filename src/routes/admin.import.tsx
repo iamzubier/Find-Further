@@ -4,7 +4,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
-import { Upload, Database, FileSpreadsheet, Lock, BarChart3, Image as ImageIcon } from "lucide-react";
+import { Upload, Database, FileSpreadsheet, Lock, BarChart3, Image as ImageIcon, Globe } from "lucide-react";
 import {
   verifyAdmin,
   importFromHipolabs,
@@ -13,6 +13,8 @@ import {
 } from "@/lib/admin-import.functions";
 import { getUniStats } from "@/lib/admin-stats.functions";
 import { fixCampusImagesBatch } from "@/lib/admin-wiki-images.functions";
+import { fixOgImagesBatch } from "@/lib/admin-og-images.functions";
+
 
 export const Route = createFileRoute("/admin/import")({
   head: () => ({ meta: [{ title: "Admin — Import Data" }, { name: "robots", content: "noindex" }] }),
