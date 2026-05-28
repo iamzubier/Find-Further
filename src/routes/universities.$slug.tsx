@@ -225,10 +225,10 @@ function Hero({ uni }: { uni: any }) {
           />
 
           <div>
-            <h1 className="font-serif text-4xl font-bold leading-tight text-white drop-shadow-lg md:text-5xl">
+            <h1 className="text-4xl md:text-5xl font-serif font-bold !text-white drop-shadow-lg tracking-tight">
               {uni.name}
             </h1>
-            <div className="mt-2 flex flex-wrap items-center gap-3 text-lg text-slate-200">
+            <div className="mt-2 flex flex-wrap items-center gap-3 text-lg !text-slate-200">
               {uni.country_flag && <span className="text-xl">{uni.country_flag}</span>}
               <span className="inline-flex items-center gap-1.5">
                 <MapPin className="h-4 w-4" />

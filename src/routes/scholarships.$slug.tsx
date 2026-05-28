@@ -433,13 +433,10 @@ function Hero({ v }: { v: View }) {
                 {providerLabel(v.provider_type)}
               </span>
             </div>
-            <h1
-              className="mt-3 font-heading text-3xl font-extrabold leading-tight md:text-5xl"
-              style={{ color: "#F9FAFB" }}
-            >
+            <h1 className="mt-3 text-4xl md:text-5xl font-serif font-bold !text-white drop-shadow-lg tracking-tight">
               {v.name}
             </h1>
-            <p className="mt-2 text-sm text-white/75">{v.provider}</p>
+            <p className="mt-2 text-lg !text-slate-200">{v.provider}</p>
             {v.description && (
               <p className="mt-3 max-w-2xl text-sm text-white/85 md:text-base">{v.description}</p>
             )}
