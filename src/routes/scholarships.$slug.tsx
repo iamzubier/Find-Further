@@ -413,7 +413,7 @@ function Hero({ v }: { v: View }) {
     <div className="relative w-full overflow-hidden border-b border-border" style={{ minHeight: 400 }}>
       <TopoBackground />
 
-      <div className="relative mx-auto max-w-6xl px-4 py-10 text-white">
+      <div className="relative z-10 mx-auto max-w-6xl px-4 py-10 text-white">
         <Link to="/scholarships" className="inline-flex items-center gap-1 text-sm text-white/80 hover:text-white">
           <ArrowLeft className="h-4 w-4" /> All scholarships
         </Link>
