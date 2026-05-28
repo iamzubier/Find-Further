@@ -44,6 +44,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { hydrateScholarship } from "@/lib/hydrate-scholarship.functions";
 import { DocumentTracker } from "@/components/DocumentTracker";
+import { loadEvalSummary } from "@/lib/evaluation-store";
 
 
 type DbScholarship = {
