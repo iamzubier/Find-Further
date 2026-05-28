@@ -71,12 +71,11 @@ export function SmartLogo({
   if (stage === 2) {
     return (
       <div
-        className={`flex flex-none items-center justify-center rounded-full font-heading font-bold text-white ${className}`}
+        className={`flex flex-none items-center justify-center rounded-xl bg-slate-900 font-serif font-bold text-white shadow-md ${className}`}
         style={{
           width: size,
           height: size,
-          backgroundColor: "#1E3A8A",
-          fontSize: Math.round(size * 0.46),
+          fontSize: Math.round(size * 0.5),
           lineHeight: 1,
         }}
         aria-label={`${name} logo`}
