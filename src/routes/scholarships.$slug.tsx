@@ -1176,9 +1176,9 @@ function OddsCalculator({ v }: { v: View }) {
 
   useEffect(() => {
     if (!localEval) return;
-    if (!gpa && localEval.converted?.gpa4) setGpa(localEval.converted.gpa4.toFixed(2));
+    if (!gpa && localEval.converted?.us4) setGpa(localEval.converted.us4.toFixed(2));
     if (!ielts && localEval.tests?.ielts) setIelts(String(localEval.tests.ielts));
-    if (!submitted && (localEval.converted?.gpa4 || localEval.tests?.ielts)) {
+    if (!submitted && (localEval.converted?.us4 || localEval.tests?.ielts)) {
       setSubmitted(true);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
