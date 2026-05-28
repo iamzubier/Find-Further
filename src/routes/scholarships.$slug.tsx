@@ -307,6 +307,8 @@ function buildView(staticS: Scholarship | undefined, db: DbScholarship | null): 
     expected_next_open_month: db.expected_next_open_month ?? undefined,
     applyUrl: db.official_url ?? enriched.applyUrl,
     banner_image_url: (db as any).banner_image_url ?? null,
+    avg_gpa_recipients: (db as any).avg_gpa_recipients ?? null,
+    avg_ielts_recipients: (db as any).avg_ielts_recipients ?? null,
   };
 }
 
