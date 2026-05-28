@@ -179,7 +179,24 @@ function ScholarshipDetailPage() {
             <CommonErrors />
           </TabsContent>
           <TabsContent value="docs">
-            <DocChecklist v={view} />
+            <DocumentTracker
+              slug={slug}
+              docs={
+                view.required_documents_checklist?.length
+                  ? view.required_documents_checklist
+                  : [
+                      "Academic transcripts (all post-secondary)",
+                      "Statement of Purpose (SOP)",
+                      "2 Letters of Recommendation",
+                      "Passport copy (data page)",
+                      "Updated CV / Résumé",
+                      view.accepts_moi_waiver
+                        ? "MOI certificate (in lieu of IELTS)"
+                        : "IELTS / TOEFL score report",
+                      "Bank Solvency Certificate (6+ months funds)",
+                    ]
+              }
+            />
           </TabsContent>
           <TabsContent value="tips">
             <RecipientTips v={view} />
