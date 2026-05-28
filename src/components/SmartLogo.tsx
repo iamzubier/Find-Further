@@ -89,14 +89,14 @@ export function SmartLogo({
 
   return (
     <div
-      className={`flex flex-none items-center justify-center overflow-hidden rounded-md border border-border bg-white ${className}`}
+      className={`flex flex-none items-center justify-center overflow-hidden rounded-xl border border-border bg-white ${className}`}
       style={{ width: size, height: size }}
     >
       <img
         src={src}
         alt={`${name} logo`}
         loading="lazy"
-        className="max-h-full max-w-full object-contain p-1"
+        className="h-full w-full object-contain p-3 drop-shadow-sm"
         onError={() => setStage((s) => s + 1)}
       />
     </div>
