@@ -409,17 +409,9 @@ function Hero({ v }: { v: View }) {
     else toast.success(`Saved ${v.name}`);
   };
 
-  const heroImg = getCountryImage(v.country);
   return (
-    <div className="relative w-full overflow-hidden border-b border-border bg-neutral-900" style={{ minHeight: 400 }}>
-      <img
-        src={heroImg}
-        alt={`${v.country} hero`}
-        loading="eager"
-        decoding="async"
-        className="absolute inset-0 -z-20 h-full w-full object-cover"
-      />
-      <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-900/80 to-slate-900/40 -z-10" />
+    <div className="relative w-full overflow-hidden border-b border-border" style={{ minHeight: 400 }}>
+      <TopoBackground />
 
       <div className="relative mx-auto max-w-6xl px-4 py-10 text-white">
         <Link to="/scholarships" className="inline-flex items-center gap-1 text-sm text-white/80 hover:text-white">
