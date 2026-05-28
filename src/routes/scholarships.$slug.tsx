@@ -266,6 +266,8 @@ type View = EnrichedScholarship & {
   expected_next_open_month?: string;
   applyUrl?: string;
   banner_image_url?: string | null;
+  avg_gpa_recipients?: string | null;
+  avg_ielts_recipients?: string | null;
 };
 
 function buildView(staticS: Scholarship | undefined, db: DbScholarship | null): View {
