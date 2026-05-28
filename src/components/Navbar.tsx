@@ -30,12 +30,6 @@ export function Navbar({ profileStrength }: { profileStrength?: number }) {
 
 
         <div className="hidden items-center gap-4 ml-auto md:flex">
-          <Link
-            to="/evaluate"
-            className="px-4 py-2 bg-emerald-50 text-emerald-700 rounded-full font-semibold whitespace-nowrap hover:bg-emerald-100 transition-colors"
-          >
-            ✨ Evaluate My Profile
-          </Link>
           {typeof profileStrength === "number" && user && (
             <div className="flex items-center gap-2 rounded-full border border-border bg-card px-3 py-1 text-xs">
               <Sparkles className="h-3 w-3 text-primary" />
@@ -66,8 +60,7 @@ export function Navbar({ profileStrength }: { profileStrength?: number }) {
       {open && (
         <div className="border-t border-border bg-background md:hidden">
           <div className="mx-auto flex max-w-7xl flex-col gap-3 px-4 py-4">
-            <Link to="/evaluate" className="rounded-md bg-emerald-500/15 px-2 py-1 text-sm font-semibold text-emerald-700" onClick={() => setOpen(false)}>✨ Evaluate My Profile</Link>
-            <Link to="/universities" className={linkClass} onClick={() => setOpen(false)}>Universities</Link>
+          <Link to="/universities" className={linkClass} onClick={() => setOpen(false)}>Universities</Link>
 
             <Link to="/scholarships" className={linkClass} onClick={() => setOpen(false)}>Scholarships</Link>
             {user && <Link to="/dashboard" className={linkClass} onClick={() => setOpen(false)}>Dashboard</Link>}
