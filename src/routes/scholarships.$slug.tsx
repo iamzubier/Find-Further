@@ -39,6 +39,7 @@ import {
   AlertCircle,
 } from "lucide-react";
 import { SmartCampusImage } from "@/components/SmartCampusImage";
+import { getCountryImage } from "@/lib/constants/images";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
