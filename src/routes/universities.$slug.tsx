@@ -194,20 +194,20 @@ function UniDetailPage() {
 
 function Hero({ uni }: { uni: any }) {
   return (
-    <header className="relative h-[420px] min-h-[400px] w-full overflow-hidden bg-slate-900">
+    <header className="relative h-[420px] min-h-[400px] w-full overflow-hidden">
       {/* Background image — campus image when available, otherwise deterministic country hero */}
       <img
         src={uni.campus_image_url || getCountryImage(uni.country)}
         alt={`${uni.name} hero`}
         loading="eager"
         decoding="async"
-        className="absolute inset-0 -z-20 h-full w-full object-cover"
+        className="absolute inset-0 z-0 h-full w-full object-cover"
         onError={(e) => {
           (e.currentTarget as HTMLImageElement).src = getCountryImage(uni.country);
         }}
       />
       {/* Gradient overlay — guarantees text legibility */}
-      <div className="absolute inset-0 -z-10 bg-gradient-to-t from-slate-950 via-slate-900/80 to-slate-900/40" />
+      <div className="absolute inset-0 z-[1] bg-gradient-to-t from-slate-950 via-slate-900/80 to-slate-900/30" />
 
 
       {/* Back link */}
