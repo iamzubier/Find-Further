@@ -73,6 +73,8 @@ type DbScholarship = {
   insider_tips: string[] | null;
   hydrated_at: string | null;
   banner_image_url: string | null;
+  avg_gpa_recipients: string | null;
+  avg_ielts_recipients: string | null;
 };
 
 export const Route = createFileRoute("/scholarships/$slug")({
