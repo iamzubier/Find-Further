@@ -19,12 +19,6 @@ export function Navbar({ profileStrength }: { profileStrength?: number }) {
 
 
         <nav className="hidden items-center gap-7 md:flex">
-          <Link
-            to="/evaluate"
-            className="flex items-center gap-2 rounded-full bg-emerald-50 px-4 py-2 text-sm font-medium text-emerald-700 transition-colors hover:bg-emerald-100"
-          >
-            ✨ Evaluate My Profile
-          </Link>
           <Link to="/universities" className={linkClass}>Universities</Link>
           <Link to="/scholarships" className={linkClass}>Scholarships</Link>
           <Link to="/compare" className={linkClass}>Compare</Link>
@@ -35,7 +29,13 @@ export function Navbar({ profileStrength }: { profileStrength?: number }) {
         </nav>
 
 
-        <div className="hidden items-center gap-3 md:flex">
+        <div className="hidden items-center gap-4 ml-auto md:flex">
+          <Link
+            to="/evaluate"
+            className="px-4 py-2 bg-emerald-50 text-emerald-700 rounded-full font-semibold whitespace-nowrap hover:bg-emerald-100 transition-colors"
+          >
+            ✨ Evaluate My Profile
+          </Link>
           {typeof profileStrength === "number" && user && (
             <div className="flex items-center gap-2 rounded-full border border-border bg-card px-3 py-1 text-xs">
               <Sparkles className="h-3 w-3 text-primary" />
