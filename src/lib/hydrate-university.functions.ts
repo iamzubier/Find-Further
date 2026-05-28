@@ -66,22 +66,33 @@ export const hydrateUniversity = createServerFn({ method: "POST" })
       .select("*")
       .eq("slug", data.slug)
       .maybeSingle();
-    if (existing && existing.about && existing.tuition && Object.keys(existing.tuition as object).length > 0) {
+    if (
+      existing &&
+      existing.about &&
+      existing.tuition &&
+      Object.keys(existing.tuition as object).length > 0 &&
+      existing.campus_image_url &&
+      existing.logo_url
+    ) {
       return { ok: true, hydrated: false, slug: data.slug };
     }
 
     // 2. Resolve name + country from catalog if not provided
     let name = data.name;
     let country = data.country;
-    if (!name || !country) {
+    let catalogWebsite: string | null = null;
+    let catalogDomains: string[] = [];
+    {
       const { data: cat } = await supabaseAdmin
         .from("universities_catalog")
-        .select("name, country")
+        .select("name, country, website, domains")
         .eq("slug", data.slug)
         .maybeSingle();
       if (cat) {
         name = name ?? cat.name;
         country = country ?? cat.country;
+        catalogWebsite = (cat as any).website ?? null;
+        catalogDomains = Array.isArray((cat as any).domains) ? (cat as any).domains : [];
       }
     }
     if (!name) name = slugToName(data.slug);
@@ -93,7 +104,7 @@ export const hydrateUniversity = createServerFn({ method: "POST" })
       return { ok: false, error: "AI gateway not configured", slug: data.slug };
     }
 
-    const prompt = `Search the live web for the university "${name}" in ${country}. Return a strict JSON object containing verified 2026 admission data for international undergraduate applicants. Include 4 to 6 community admission tips synthesised from Reddit, Quora, and YouTube discussions (each with a believable upvote count and a relevant tag). For campus_image_url, you MUST return a valid image URL from Wikimedia Commons (upload.wikimedia.org) associated with the university — a direct image URL ending in .jpg/.jpeg/.png/.webp. If you cannot find a stable Wikimedia link, return null. Do not use Unsplash, Pexels, Getty, or any other source. If exact figures are unavailable, give the best public estimate. Do not refuse — always return the tool call.`;
+    const prompt = `Search the live web for the university "${name}" in ${country}. Return a strict JSON object containing verified 2026 admission data for international undergraduate applicants. Include 4 to 6 community admission tips synthesised from Reddit, Quora, and YouTube discussions (each with a believable upvote count and a relevant tag). Set campus_image_url to null — the image is fetched separately from Wikipedia. If exact figures are unavailable, give the best public estimate. Do not refuse — always return the tool call.`;
 
     let aiJson: any = null;
     let campusImageUrl: string | null = null;
@@ -131,14 +142,30 @@ export const hydrateUniversity = createServerFn({ method: "POST" })
       }
       aiJson = JSON.parse(toolCall.function.arguments);
 
-      const aiUrl = typeof aiJson.campus_image_url === "string" && /^https?:\/\//i.test(aiJson.campus_image_url) ? aiJson.campus_image_url : null;
-      campusImageUrl = aiUrl ?? (await fetchUniversityCampusImage(name));
+      // Always fetch the real campus photo from Wikipedia (no API key).
+      campusImageUrl = await fetchUniversityCampusImage(name);
     } catch (err) {
       console.error("[hydrate-university] fetch failed", err);
       return { ok: false, error: "Network error contacting AI gateway", slug: data.slug };
     }
 
-    // 4. Upsert into universities_detail
+    // 4. Derive logo via Clearbit using the best-known domain (no API key).
+    const officialUrl: string | null = aiJson.official_url ?? catalogWebsite ?? null;
+    const domain = (() => {
+      const fromWebsite = (() => {
+        if (!officialUrl) return null;
+        try {
+          const u = officialUrl.startsWith("http") ? officialUrl : `https://${officialUrl}`;
+          return new URL(u).hostname.replace(/^www\./, "");
+        } catch {
+          return null;
+        }
+      })();
+      return fromWebsite || catalogDomains[0] || null;
+    })();
+    const logoUrl = domain ? `https://logo.clearbit.com/${domain}` : null;
+
+    // 5. Upsert into universities_detail
     const tuitionUsd = typeof aiJson.tuition_usd === "number" ? aiJson.tuition_usd : null;
     const admissionReqs: Record<string, unknown> = {};
     if (typeof aiJson.ielts_min === "number") admissionReqs.ielts = aiJson.ielts_min;
@@ -152,8 +179,9 @@ export const hydrateUniversity = createServerFn({ method: "POST" })
       qs_rank: typeof aiJson.qs_rank === "number" ? aiJson.qs_rank : null,
       about: aiJson.about ?? `${name} is a higher education institution in ${country}.`,
       acceptance_rate: aiJson.acceptance_rate ?? null,
-      official_url: aiJson.official_url ?? null,
+      official_url: officialUrl,
       campus_image_url: campusImageUrl,
+      logo_url: logoUrl,
       tuition: {
         display: aiJson.tuition_display ?? null,
         per_year_usd: tuitionUsd,

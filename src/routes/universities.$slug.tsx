@@ -193,10 +193,26 @@ function UniDetailPage() {
 }
 
 function Hero({ uni }: { uni: any }) {
+  const hasCampus = typeof uni.campus_image_url === "string" && uni.campus_image_url.length > 0;
   return (
     <header className="relative h-[420px] min-h-[400px] w-full overflow-hidden">
-      <TopoBackground />
-
+      {hasCampus ? (
+        <>
+          <img
+            src={uni.campus_image_url}
+            alt={`${uni.name} campus`}
+            loading="eager"
+            decoding="async"
+            className="absolute inset-0 z-0 h-full w-full object-cover"
+          />
+          <div
+            aria-hidden
+            className="absolute inset-0 z-[1] bg-gradient-to-t from-slate-950 via-slate-900/80 to-transparent"
+          />
+        </>
+      ) : (
+        <TopoBackground />
+      )}
 
       {/* Back link */}
       <div className="absolute inset-x-0 top-0 z-10 p-4">
@@ -212,12 +228,12 @@ function Hero({ uni }: { uni: any }) {
             name={uni.name}
             logoUrl={uni.logo_url}
             website={uni.official_url}
-            size={80}
+            size={96}
             className="ring-4 ring-white shadow-2xl"
           />
 
           <div>
-            <h1 className="text-4xl md:text-5xl font-serif font-bold !text-white drop-shadow-lg tracking-tight">
+            <h1 className="text-4xl md:text-5xl font-serif font-bold !text-white drop-shadow-lg tracking-tight m-0">
               {uni.name}
             </h1>
             <div className="mt-2 flex flex-wrap items-center gap-3 text-lg !text-slate-200">
