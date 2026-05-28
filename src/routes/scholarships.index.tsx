@@ -29,7 +29,7 @@ import { useAuth } from "@/lib/auth";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { gradientForName } from "@/components/SmartCampusImage";
-import { getCountryImage } from "@/lib/constants/images";
+import { TopoBackground } from "@/components/TopoBackground";
 import { LoginNudge } from "./universities.index";
 
 export const Route = createFileRoute("/scholarships/")({
@@ -459,26 +459,14 @@ function ScholarshipCard({
     else toast.success(`Saved ${s.name}`);
   };
 
-  // Background: deterministic country hero image (lightning fast, no AI fetch).
-  const bgUrl = getCountryImage(s.country);
-
   return (
     <Link
       to="/scholarships/$slug"
       params={{ slug }}
       className="group relative block h-[360px] overflow-hidden rounded-lg ring-1 ring-border shadow-sm transition-shadow hover:shadow-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
     >
-      {/* Background image */}
-      <div
-        className="absolute inset-0 bg-cover bg-center transition-transform duration-500 ease-out group-hover:scale-105"
-        style={{ backgroundImage: `url(${bgUrl})` }}
-        aria-hidden
-      />
-      {/* Dark gradient overlay for legibility */}
-      <div
-        className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-900/80 to-transparent"
-        aria-hidden
-      />
+      {/* Premium topographic background — pure CSS/SVG, no stock photos */}
+      <TopoBackground />
 
       {/* Top-right level badge */}
       <div className="absolute right-3 top-3 z-10 flex items-center gap-1.5">
