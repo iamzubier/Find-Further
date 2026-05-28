@@ -21,7 +21,7 @@ export function Navbar({ profileStrength }: { profileStrength?: number }) {
         <nav className="hidden items-center gap-7 md:flex">
           <Link
             to="/evaluate"
-            className="rounded-full bg-emerald-500/15 px-3 py-1 text-sm font-semibold text-emerald-700 ring-1 ring-emerald-500/30 transition hover:bg-emerald-500/25"
+            className="flex items-center gap-2 rounded-full bg-emerald-50 px-4 py-2 text-sm font-medium text-emerald-700 transition-colors hover:bg-emerald-100"
           >
             ✨ Evaluate My Profile
           </Link>
