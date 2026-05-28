@@ -135,8 +135,8 @@ export const hydrateUniversity = createServerFn({ method: "POST" })
       }
       aiJson = JSON.parse(toolCall.function.arguments);
 
-      const aiUrl = typeof aiJson.campus_image_url === "string" && /^https?:\/\//i.test(aiJson.campus_image_url) ? aiJson.campus_image_url : null;
-      campusImageUrl = aiUrl ?? (await fetchUniversityCampusImage(name));
+      // Always fetch the real campus photo from Wikipedia (no API key).
+      campusImageUrl = await fetchUniversityCampusImage(name);
     } catch (err) {
       console.error("[hydrate-university] fetch failed", err);
       return { ok: false, error: "Network error contacting AI gateway", slug: data.slug };
