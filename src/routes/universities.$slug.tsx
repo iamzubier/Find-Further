@@ -194,26 +194,27 @@ function UniDetailPage() {
 }
 
 function Hero({ uni }: { uni: any }) {
-  const hasCampus = typeof uni.campus_image_url === "string" && uni.campus_image_url.length > 0;
+  const fallbackAvatar = `https://ui-avatars.com/api/?name=${encodeURIComponent(uni?.name || "U")}&background=020617&color=fff&size=256&font-size=0.4&bold=true`;
+  const logoSrc =
+    uni?.logo_url && typeof uni.logo_url === "string" && uni.logo_url.includes("http")
+      ? uni.logo_url
+      : fallbackAvatar;
+  const bgSrc =
+    uni?.campus_image_url ||
+    COUNTRY_IMAGE_MAP[uni?.country_code as string] ||
+    COUNTRY_IMAGE_MAP[uni?.country as string] ||
+    COUNTRY_IMAGE_MAP.DEFAULT;
+
   return (
-    <header className="relative h-[420px] min-h-[400px] w-full overflow-hidden">
-      {hasCampus ? (
-        <>
-          <img
-            src={uni.campus_image_url}
-            alt={`${uni.name} campus`}
-            loading="eager"
-            decoding="async"
-            className="absolute inset-0 z-0 h-full w-full object-cover"
-          />
-          <div
-            aria-hidden
-            className="absolute inset-0 z-[1] bg-gradient-to-t from-slate-950 via-slate-900/80 to-transparent"
-          />
-        </>
-      ) : (
-        <TopoBackground />
-      )}
+    <header className="relative w-full h-[350px] flex items-end pb-8 px-6 md:px-12 bg-slate-950 overflow-hidden">
+      <img
+        src={bgSrc}
+        alt="Campus background"
+        loading="eager"
+        decoding="async"
+        className="absolute inset-0 w-full h-full object-cover opacity-40 -z-20"
+      />
+      <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/60 to-transparent -z-10" />
 
       {/* Back link */}
       <div className="absolute inset-x-0 top-0 z-10 p-4">
@@ -222,18 +223,20 @@ function Hero({ uni }: { uni: any }) {
         </Link>
       </div>
 
-      {/* Bottom-anchored content */}
-      <div className="relative z-10 mx-auto flex h-full max-w-6xl flex-col justify-end px-6 pb-8 md:px-12">
-        <div className="flex flex-wrap items-end gap-5">
-          <SmartLogo
-            name={uni.name}
-            logoUrl={uni.logo_url}
-            website={uni.official_url}
-            size={96}
-            className="ring-4 ring-white shadow-2xl"
-          />
+      <div className="mx-auto w-full max-w-6xl">
+        <div className="flex items-center gap-6 z-10 relative">
+          <div className="w-24 h-24 bg-white rounded-2xl shadow-xl flex items-center justify-center p-2 shrink-0 overflow-hidden z-10 relative">
+            <img
+              src={logoSrc}
+              alt={`${uni?.name ?? "University"} logo`}
+              className="w-full h-full object-contain"
+              onError={(e) => {
+                e.currentTarget.src = fallbackAvatar;
+              }}
+            />
+          </div>
 
-          <div>
+          <div className="min-w-0">
             <h1 className="text-4xl md:text-5xl font-serif font-bold !text-white drop-shadow-lg tracking-tight m-0">
               {uni.name}
             </h1>
