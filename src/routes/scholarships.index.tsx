@@ -508,18 +508,18 @@ function ScholarshipCard({
       </div>
 
       {/* Bottom content */}
-      <div className="relative z-10 flex h-full flex-col justify-end p-5 text-white">
-        <div className="flex items-center gap-2 text-sm text-white/85">
+      <div className="relative z-10 flex h-full flex-col justify-end p-5 !text-white">
+        <div className="flex items-center gap-2 text-sm !text-white">
           <span className="text-xl leading-none">{s.countryFlag}</span>
           <span className="font-medium">{s.country}</span>
-          <span aria-hidden className="text-white/40">·</span>
-          <span className="text-xs text-white/70">{providerLabel(s.provider_type)}</span>
+          <span aria-hidden className="!text-white/60">·</span>
+          <span className="text-xs !text-white/80">{providerLabel(s.provider_type)}</span>
         </div>
 
-        <h3 className="mt-2 font-heading text-xl font-extrabold leading-tight text-white line-clamp-2 drop-shadow">
+        <h3 className="mt-2 font-heading text-xl font-extrabold leading-tight !text-white line-clamp-2 drop-shadow-lg">
           {s.name}
         </h3>
-        <div className="mt-1 truncate text-xs text-white/70">{s.provider}</div>
+        <div className="mt-1 truncate text-xs !text-white/80">{s.provider}</div>
 
         <div className="mt-4 flex items-center justify-between gap-2 border-t border-white/15 pt-3">
           <div className="min-w-0">
