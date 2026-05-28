@@ -194,29 +194,26 @@ function UniDetailPage() {
 }
 
 function Hero({ uni }: { uni: any }) {
-  const fallbackAvatar = `https://ui-avatars.com/api/?name=${encodeURIComponent(uni?.name || "U")}&background=020617&color=fff&size=256&font-size=0.4&bold=true`;
-  const logoSrc =
-    uni?.logo_url && typeof uni.logo_url === "string" && uni.logo_url.includes("http")
-      ? uni.logo_url
-      : fallbackAvatar;
-  const bgSrc =
-    uni?.campus_image_url ||
-    COUNTRY_IMAGE_MAP[uni?.country_code as string] ||
-    COUNTRY_IMAGE_MAP[uni?.country as string] ||
-    COUNTRY_IMAGE_MAP.DEFAULT;
+  const hasValidImage =
+    uni?.campus_image_url && typeof uni.campus_image_url === "string" && uni.campus_image_url.trim() !== "";
+  const bgImage = hasValidImage
+    ? uni.campus_image_url
+    : COUNTRY_IMAGE_MAP[uni?.country_code as string] ||
+      COUNTRY_IMAGE_MAP[uni?.country as string] ||
+      "https://images.unsplash.com/photo-1541339907198-e08756dedf3f?fm=webp&w=1600&q=80";
+
+  const hasValidLogo =
+    uni?.logo_url && typeof uni.logo_url === "string" && uni.logo_url.trim() !== "";
 
   return (
-    <header className="relative w-full h-[350px] flex items-end pb-8 px-6 md:px-12 bg-slate-950 overflow-hidden">
+    <header className="relative w-full h-[400px] flex flex-col justify-end pb-10 px-8 bg-[#020617] overflow-hidden">
       <img
-        src={bgSrc}
-        alt="Campus background"
-        loading="eager"
-        decoding="async"
-        className="absolute inset-0 w-full h-full object-cover opacity-40 -z-20"
+        src={bgImage}
+        alt="Campus"
+        className="absolute inset-0 w-full h-full object-cover opacity-50 -z-20"
       />
-      <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/60 to-transparent -z-10" />
+      <div className="absolute inset-0 bg-gradient-to-t from-[#020617] via-[#020617]/80 to-transparent -z-10" />
 
-      {/* Back link */}
       <div className="absolute inset-x-0 top-0 z-10 p-4">
         <Link to="/universities" className="inline-flex items-center gap-1 text-sm text-white/90 hover:text-white drop-shadow">
           <ArrowLeft className="h-4 w-4" /> All universities
@@ -224,23 +221,33 @@ function Hero({ uni }: { uni: any }) {
       </div>
 
       <div className="mx-auto w-full max-w-6xl">
-        <div className="flex items-center gap-6 z-10 relative">
-          <div className="w-24 h-24 bg-white rounded-2xl shadow-xl flex items-center justify-center p-2 shrink-0 overflow-hidden z-10 relative">
-            <img
-              src={logoSrc}
-              alt={`${uni?.name ?? "University"} logo`}
-              className="w-full h-full object-contain"
-              onError={(e) => {
-                e.currentTarget.src = fallbackAvatar;
-              }}
-            />
+        <div className="flex items-end gap-6 relative z-10">
+          <div className="w-28 h-28 bg-white rounded-2xl shadow-2xl flex items-center justify-center shrink-0 overflow-hidden relative z-10 border-4 border-[#020617]/10">
+            {hasValidLogo ? (
+              <img
+                src={uni.logo_url}
+                alt="Logo"
+                className="w-full h-full object-contain p-3"
+                onError={(e) => {
+                  e.currentTarget.style.display = "none";
+                  const sib = e.currentTarget.nextElementSibling as HTMLElement | null;
+                  if (sib) sib.style.display = "flex";
+                }}
+              />
+            ) : null}
+            <div
+              className="w-full h-full bg-slate-900 items-center justify-center text-5xl font-serif font-bold text-white text-center"
+              style={{ display: hasValidLogo ? "none" : "flex" }}
+            >
+              {uni?.name ? uni.name.charAt(0) : "U"}
+            </div>
           </div>
 
           <div className="min-w-0">
-            <h1 className="text-4xl md:text-5xl font-serif font-bold !text-white drop-shadow-lg tracking-tight m-0">
+            <h1 className="text-4xl md:text-5xl font-serif font-bold text-white drop-shadow-lg tracking-tight m-0">
               {uni.name}
             </h1>
-            <div className="mt-2 flex flex-wrap items-center gap-3 text-lg !text-slate-200">
+            <div className="mt-2 flex flex-wrap items-center gap-3 text-lg text-slate-200">
               {uni.country_flag && <span className="text-xl">{uni.country_flag}</span>}
               <span className="inline-flex items-center gap-1.5">
                 <MapPin className="h-4 w-4" />
