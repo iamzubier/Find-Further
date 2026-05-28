@@ -97,7 +97,7 @@ export const hydrateUniversity = createServerFn({ method: "POST" })
       return { ok: false, error: "AI gateway not configured", slug: data.slug };
     }
 
-    const prompt = `Search the live web for the university "${name}" in ${country}. Return a strict JSON object containing verified 2026 admission data for international undergraduate applicants. Include 4 to 6 community admission tips synthesised from Reddit, Quora, and YouTube discussions (each with a believable upvote count and a relevant tag). For campus_image_url, you MUST return a valid image URL from Wikimedia Commons (upload.wikimedia.org) associated with the university — a direct image URL ending in .jpg/.jpeg/.png/.webp. If you cannot find a stable Wikimedia link, return null. Do not use Unsplash, Pexels, Getty, or any other source. If exact figures are unavailable, give the best public estimate. Do not refuse — always return the tool call.`;
+    const prompt = `Search the live web for the university "${name}" in ${country}. Return a strict JSON object containing verified 2026 admission data for international undergraduate applicants. Include 4 to 6 community admission tips synthesised from Reddit, Quora, and YouTube discussions (each with a believable upvote count and a relevant tag). Set campus_image_url to null — the image is fetched separately from Wikipedia. If exact figures are unavailable, give the best public estimate. Do not refuse — always return the tool call.`;
 
     let aiJson: any = null;
     let campusImageUrl: string | null = null;
