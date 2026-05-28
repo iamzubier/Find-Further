@@ -142,7 +142,23 @@ export const hydrateUniversity = createServerFn({ method: "POST" })
       return { ok: false, error: "Network error contacting AI gateway", slug: data.slug };
     }
 
-    // 4. Upsert into universities_detail
+    // 4. Derive logo via Clearbit using the best-known domain (no API key).
+    const officialUrl: string | null = aiJson.official_url ?? catalogWebsite ?? null;
+    const domain = (() => {
+      const fromWebsite = (() => {
+        if (!officialUrl) return null;
+        try {
+          const u = officialUrl.startsWith("http") ? officialUrl : `https://${officialUrl}`;
+          return new URL(u).hostname.replace(/^www\./, "");
+        } catch {
+          return null;
+        }
+      })();
+      return fromWebsite || catalogDomains[0] || null;
+    })();
+    const logoUrl = domain ? `https://logo.clearbit.com/${domain}` : null;
+
+    // 5. Upsert into universities_detail
     const tuitionUsd = typeof aiJson.tuition_usd === "number" ? aiJson.tuition_usd : null;
     const admissionReqs: Record<string, unknown> = {};
     if (typeof aiJson.ielts_min === "number") admissionReqs.ielts = aiJson.ielts_min;
@@ -156,8 +172,9 @@ export const hydrateUniversity = createServerFn({ method: "POST" })
       qs_rank: typeof aiJson.qs_rank === "number" ? aiJson.qs_rank : null,
       about: aiJson.about ?? `${name} is a higher education institution in ${country}.`,
       acceptance_rate: aiJson.acceptance_rate ?? null,
-      official_url: aiJson.official_url ?? null,
+      official_url: officialUrl,
       campus_image_url: campusImageUrl,
+      logo_url: logoUrl,
       tuition: {
         display: aiJson.tuition_display ?? null,
         per_year_usd: tuitionUsd,
