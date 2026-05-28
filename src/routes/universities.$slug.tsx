@@ -197,13 +197,13 @@ function Hero({ uni }: { uni: any }) {
     <header className="relative h-[420px] min-h-[400px] w-full overflow-hidden">
       {/* Background image — campus image when available, otherwise deterministic country hero */}
       <img
-        src={uni.campus_image_url || getCountryImage(uni.country_code) || getCountryImage(uni.country)}
+        src={getCountryImage(uni.country_code) || getCountryImage(uni.country)}
         alt={`${uni.name} hero`}
         loading="eager"
         decoding="async"
         className="absolute inset-0 z-0 h-full w-full object-cover"
         onError={(e) => {
-          (e.currentTarget as HTMLImageElement).src = getCountryImage(uni.country_code || uni.country);
+          (e.currentTarget as HTMLImageElement).src = getCountryImage("DEFAULT");
         }}
       />
       {/* Gradient overlay — guarantees text legibility */}
