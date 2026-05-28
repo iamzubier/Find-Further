@@ -66,7 +66,14 @@ export const hydrateUniversity = createServerFn({ method: "POST" })
       .select("*")
       .eq("slug", data.slug)
       .maybeSingle();
-    if (existing && existing.about && existing.tuition && Object.keys(existing.tuition as object).length > 0) {
+    if (
+      existing &&
+      existing.about &&
+      existing.tuition &&
+      Object.keys(existing.tuition as object).length > 0 &&
+      existing.campus_image_url &&
+      existing.logo_url
+    ) {
       return { ok: true, hydrated: false, slug: data.slug };
     }
 
