@@ -29,6 +29,7 @@ import { useAuth } from "@/lib/auth";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { gradientForName } from "@/components/SmartCampusImage";
+import { getCountryImage } from "@/lib/constants/images";
 import { LoginNudge } from "./universities.index";
 
 export const Route = createFileRoute("/scholarships/")({
@@ -458,11 +459,8 @@ function ScholarshipCard({
     else toast.success(`Saved ${s.name}`);
   };
 
-  // Background: real banner image when available, else letter-based gradient.
-  const hasImg = Boolean(bannerUrl);
-  const bgStyle: React.CSSProperties = hasImg
-    ? { backgroundImage: `url(${bannerUrl})` }
-    : { background: gradientForName(s.country || s.name) };
+  // Background: deterministic country hero image (lightning fast, no AI fetch).
+  const bgUrl = getCountryImage(s.country);
 
   return (
     <Link
@@ -470,19 +468,15 @@ function ScholarshipCard({
       params={{ slug }}
       className="group relative block h-[360px] overflow-hidden rounded-lg ring-1 ring-border shadow-sm transition-shadow hover:shadow-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
     >
-      {/* Background image / gradient */}
+      {/* Background image */}
       <div
         className="absolute inset-0 bg-cover bg-center transition-transform duration-500 ease-out group-hover:scale-105"
-        style={bgStyle}
+        style={{ backgroundImage: `url(${bgUrl})` }}
         aria-hidden
       />
       {/* Dark gradient overlay for legibility */}
       <div
-        className="absolute inset-0"
-        style={{
-          background:
-            "linear-gradient(to bottom, rgba(15,23,42,0.4) 0%, rgba(15,23,42,0.75) 55%, rgba(15,23,42,0.95) 100%)",
-        }}
+        className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-900/80 to-transparent"
         aria-hidden
       />
 
@@ -514,18 +508,18 @@ function ScholarshipCard({
       </div>
 
       {/* Bottom content */}
-      <div className="relative z-10 flex h-full flex-col justify-end p-5 text-white">
-        <div className="flex items-center gap-2 text-sm text-white/85">
+      <div className="relative z-10 flex h-full flex-col justify-end p-5 !text-white">
+        <div className="flex items-center gap-2 text-sm !text-white">
           <span className="text-xl leading-none">{s.countryFlag}</span>
           <span className="font-medium">{s.country}</span>
-          <span aria-hidden className="text-white/40">·</span>
-          <span className="text-xs text-white/70">{providerLabel(s.provider_type)}</span>
+          <span aria-hidden className="!text-white/60">·</span>
+          <span className="text-xs !text-white/80">{providerLabel(s.provider_type)}</span>
         </div>
 
-        <h3 className="mt-2 font-heading text-xl font-extrabold leading-tight text-white line-clamp-2 drop-shadow">
+        <h3 className="mt-2 font-heading text-xl font-extrabold leading-tight !text-white line-clamp-2 drop-shadow-lg">
           {s.name}
         </h3>
-        <div className="mt-1 truncate text-xs text-white/70">{s.provider}</div>
+        <div className="mt-1 truncate text-xs !text-white/80">{s.provider}</div>
 
         <div className="mt-4 flex items-center justify-between gap-2 border-t border-white/15 pt-3">
           <div className="min-w-0">

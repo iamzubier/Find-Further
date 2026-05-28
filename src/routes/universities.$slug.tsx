@@ -20,6 +20,7 @@ import { Heart, GitCompare, Share2, ExternalLink, ArrowLeft, MapPin, Calendar, G
 import { toast } from "sonner";
 import { SmartLogo } from "@/components/SmartLogo";
 import { SmartCampusImage } from "@/components/SmartCampusImage";
+import { getCountryImage } from "@/lib/constants/images";
 
 const detailQuery = (slug: string) => queryOptions({
   queryKey: ["uni-detail", slug],
@@ -194,16 +195,19 @@ function UniDetailPage() {
 function Hero({ uni }: { uni: any }) {
   return (
     <header className="relative h-[420px] min-h-[400px] w-full overflow-hidden bg-slate-900">
-      {/* Background image — absolute, behind everything */}
-      <SmartCampusImage
-        src={uni.campus_image_url}
-        name={uni.name}
+      {/* Background image — campus image when available, otherwise deterministic country hero */}
+      <img
+        src={uni.campus_image_url || getCountryImage(uni.country)}
+        alt={`${uni.name} hero`}
         loading="eager"
-        noOverlay
+        decoding="async"
         className="absolute inset-0 -z-20 h-full w-full object-cover"
+        onError={(e) => {
+          (e.currentTarget as HTMLImageElement).src = getCountryImage(uni.country);
+        }}
       />
       {/* Gradient overlay — guarantees text legibility */}
-      <div className="absolute inset-0 -z-10 bg-gradient-to-t from-slate-950 via-slate-900/80 to-transparent" />
+      <div className="absolute inset-0 -z-10 bg-gradient-to-t from-slate-950 via-slate-900/80 to-slate-900/40" />
 
 
       {/* Back link */}
