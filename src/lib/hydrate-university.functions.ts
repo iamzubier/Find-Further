@@ -73,15 +73,19 @@ export const hydrateUniversity = createServerFn({ method: "POST" })
     // 2. Resolve name + country from catalog if not provided
     let name = data.name;
     let country = data.country;
-    if (!name || !country) {
+    let catalogWebsite: string | null = null;
+    let catalogDomains: string[] = [];
+    {
       const { data: cat } = await supabaseAdmin
         .from("universities_catalog")
-        .select("name, country")
+        .select("name, country, website, domains")
         .eq("slug", data.slug)
         .maybeSingle();
       if (cat) {
         name = name ?? cat.name;
         country = country ?? cat.country;
+        catalogWebsite = (cat as any).website ?? null;
+        catalogDomains = Array.isArray((cat as any).domains) ? (cat as any).domains : [];
       }
     }
     if (!name) name = slugToName(data.slug);
