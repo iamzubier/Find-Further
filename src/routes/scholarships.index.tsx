@@ -29,7 +29,7 @@ import { useAuth } from "@/lib/auth";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { gradientForName } from "@/components/SmartCampusImage";
-import { getCountryImage } from "@/lib/constants/images";
+import { TopoBackground } from "@/components/TopoBackground";
 import { LoginNudge } from "./universities.index";
 
 export const Route = createFileRoute("/scholarships/")({
