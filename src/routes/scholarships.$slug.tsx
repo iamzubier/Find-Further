@@ -44,6 +44,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { hydrateScholarship } from "@/lib/hydrate-scholarship.functions";
 import { DocumentTracker } from "@/components/DocumentTracker";
+import { loadEvalSummary } from "@/lib/evaluation-store";
 
 
 type DbScholarship = {
@@ -73,6 +74,8 @@ type DbScholarship = {
   insider_tips: string[] | null;
   hydrated_at: string | null;
   banner_image_url: string | null;
+  avg_gpa_recipients: string | null;
+  avg_ielts_recipients: string | null;
 };
 
 export const Route = createFileRoute("/scholarships/$slug")({
@@ -264,6 +267,8 @@ type View = EnrichedScholarship & {
   expected_next_open_month?: string;
   applyUrl?: string;
   banner_image_url?: string | null;
+  avg_gpa_recipients?: string | null;
+  avg_ielts_recipients?: string | null;
 };
 
 function buildView(staticS: Scholarship | undefined, db: DbScholarship | null): View {
@@ -303,6 +308,8 @@ function buildView(staticS: Scholarship | undefined, db: DbScholarship | null): 
     expected_next_open_month: db.expected_next_open_month ?? undefined,
     applyUrl: db.official_url ?? enriched.applyUrl,
     banner_image_url: (db as any).banner_image_url ?? null,
+    avg_gpa_recipients: (db as any).avg_gpa_recipients ?? null,
+    avg_ielts_recipients: (db as any).avg_ielts_recipients ?? null,
   };
 }
 
@@ -1051,6 +1058,90 @@ function SuccessStories({ v }: { v: View }) {
 
 /* ─────────────────── Odds Calculator ─────────────────── */
 
+type EcaLevel = "none" | "average" | "national" | "international";
+
+function parseGpaFromText(text: string | null | undefined): number | null {
+  if (!text) return null;
+  // Prefer X.X / 4.0 patterns
+  const slash = text.match(/(\d(?:\.\d+)?)\s*\/\s*4(?:\.0)?/);
+  if (slash) {
+    const n = parseFloat(slash[1]);
+    if (n > 0 && n <= 4.0) return n;
+  }
+  // 5.0 scale
+  const five = text.match(/(\d(?:\.\d+)?)\s*\/\s*5(?:\.0)?/);
+  if (five) {
+    const n = parseFloat(five[1]);
+    if (n > 0 && n <= 5.0) return (n / 5) * 4;
+  }
+  // Bare decimal in 2.0–4.0 range
+  const bare = text.match(/(?:GPA|CGPA)?\s*~?\s*(\d\.\d{1,2})/i);
+  if (bare) {
+    const n = parseFloat(bare[1]);
+    if (n >= 2.0 && n <= 4.0) return n;
+  }
+  // Percentages → rough GPA
+  const pct = text.match(/(\d{2,3})\s*%/);
+  if (pct) {
+    const p = parseInt(pct[1], 10);
+    if (p >= 50 && p <= 100) return Math.min(4, (p / 100) * 4);
+  }
+  if (/first\s*class/i.test(text)) return 3.6;
+  if (/2:1|upper\s*second/i.test(text)) return 3.3;
+  return null;
+}
+
+function parseIeltsFromText(text: string | null | undefined): number | null {
+  if (!text) return null;
+  const m = text.match(/IELTS[^\d]*(\d(?:\.\d)?)/i) ?? text.match(/(\d(?:\.\d)?)/);
+  if (m) {
+    const n = parseFloat(m[1]);
+    if (n >= 4 && n <= 9) return n;
+  }
+  return null;
+}
+
+function ecaPoints(level: EcaLevel): number {
+  switch (level) {
+    case "international": return 40;
+    case "national": return 30;
+    case "average": return 15;
+    default: return 0;
+  }
+}
+
+function computeOdds(opts: {
+  gpa: number;
+  gpaTarget: number;
+  ielts: number;
+  ieltsTarget: number;
+  eca: EcaLevel;
+  moiWaiver: boolean;
+}) {
+  const acaPts = opts.gpa >= opts.gpaTarget
+    ? 40
+    : Math.max(0, Math.round(40 * (opts.gpa / opts.gpaTarget)));
+  const langPts = opts.moiWaiver
+    ? 20
+    : opts.ielts >= opts.ieltsTarget
+      ? 20
+      : Math.max(0, Math.round(20 * (opts.ielts / opts.ieltsTarget)));
+  const ecaPts = ecaPoints(opts.eca);
+  const total = acaPts + langPts + ecaPts;
+  return {
+    aca: acaPts, lang: langPts, eca: ecaPts,
+    acaMax: 40, langMax: 20, ecaMax: 40,
+    total: Math.min(100, total),
+  };
+}
+
+const ECA_OPTIONS: { v: EcaLevel; label: string; hint: string }[] = [
+  { v: "none", label: "None", hint: "0 pts" },
+  { v: "average", label: "Average", hint: "15 pts" },
+  { v: "national", label: "National level", hint: "30 pts" },
+  { v: "international", label: "International", hint: "40 pts" },
+];
+
 function OddsCalculator({ v }: { v: View }) {
   const { user } = useAuth();
   const { data: profile } = useQuery({
@@ -1063,92 +1154,230 @@ function OddsCalculator({ v }: { v: View }) {
     enabled: !!user,
   });
 
+  // Load saved local eval (from /evaluate flow)
+  const [localEval, setLocalEval] = useState<ReturnType<typeof loadEvalSummary>>(null);
+  useEffect(() => { setLocalEval(loadEvalSummary()); }, []);
+
+  const gpaTarget = parseGpaFromText(v.avg_gpa_recipients) ?? v.minGpa ?? 3.5;
+  const ieltsTarget = parseIeltsFromText(v.avg_ielts_recipients) ?? 6.5;
+
   const [gpa, setGpa] = useState("");
   const [ielts, setIelts] = useState("");
-  const [eca, setEca] = useState("3");
+  const [workYrs, setWorkYrs] = useState("0");
+  const [eca, setEca] = useState<EcaLevel>("average");
+  const [submitted, setSubmitted] = useState(false);
 
+  // Auto-fill from profile / local eval
   useEffect(() => {
-    if (profile) {
-      if (profile.hsc_gpa) setGpa(String((profile.hsc_gpa / 5) * 4));
-      if (profile.ielts) setIelts(String(profile.ielts));
-    }
+    if (profile?.hsc_gpa && !gpa) setGpa(((profile.hsc_gpa / 5) * 4).toFixed(2));
+    if (profile?.ielts && !ielts) setIelts(String(profile.ielts));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [profile]);
 
-  const target = v.minGpa ?? 3.5;
+  useEffect(() => {
+    if (!localEval) return;
+    if (!gpa && localEval.converted?.us4) setGpa(localEval.converted.us4.toFixed(2));
+    if (!ielts && localEval.tests?.ielts) setIelts(String(localEval.tests.ielts));
+    if (!submitted && (localEval.converted?.us4 || localEval.tests?.ielts)) {
+      setSubmitted(true);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [localEval]);
+
+  const hasInputs = parseFloat(gpa) > 0 || parseFloat(ielts) > 0;
+
+  if (!submitted || !hasInputs) {
+    return (
+      <section className="rounded-md border border-border bg-white p-6 shadow-sm">
+        <div className="flex items-center gap-2">
+          <Calculator className="h-5 w-5 text-primary" />
+          <h2 className="font-heading text-2xl font-bold text-foreground">Live odds calculator</h2>
+        </div>
+        <p className="mt-1 text-sm text-muted-foreground">
+          Enter your stats — we'll compare them to {v.avg_gpa_recipients ? "this award's historical recipient averages" : "the competitive baseline"}.
+        </p>
+
+        <div className="mt-6 grid gap-4 md:grid-cols-2">
+          <div>
+            <label className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">GPA (US 4.0)</label>
+            <Input type="number" step="0.01" min="0" max="4" value={gpa} onChange={(e) => setGpa(e.target.value)} placeholder="3.70" className="mt-1" />
+            <p className="mt-1 text-[11px] text-muted-foreground">Target: {gpaTarget.toFixed(2)}</p>
+          </div>
+          <div>
+            <label className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">IELTS / TOEFL eq.</label>
+            <Input type="number" step="0.1" min="0" max="9" value={ielts} onChange={(e) => setIelts(e.target.value)} placeholder="7.0" className="mt-1" disabled={v.accepts_moi_waiver} />
+            {v.accepts_moi_waiver
+              ? <p className="mt-1 text-[11px] text-emerald-700">MOI accepted — language counted as full marks</p>
+              : <p className="mt-1 text-[11px] text-muted-foreground">Target: {ieltsTarget.toFixed(1)}</p>}
+          </div>
+          <div>
+            <label className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Work experience (yrs)</label>
+            <Input type="number" min="0" max="20" value={workYrs} onChange={(e) => setWorkYrs(e.target.value)} className="mt-1" />
+          </div>
+          <div>
+            <label className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Extracurricular strength</label>
+            <select
+              value={eca}
+              onChange={(e) => setEca(e.target.value as EcaLevel)}
+              className="mt-1 h-10 w-full rounded-md border border-border bg-white px-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
+            >
+              {ECA_OPTIONS.map((o) => (
+                <option key={o.v} value={o.v}>{o.label} — {o.hint}</option>
+              ))}
+            </select>
+          </div>
+        </div>
+
+        <div className="mt-6">
+          <Button onClick={() => setSubmitted(true)} className="bg-primary text-primary-foreground hover:bg-primary/90">
+            Calculate My Odds
+          </Button>
+        </div>
+
+        <p className="mt-6 text-xs italic text-muted-foreground">
+          This is a statistical estimate based on community-reported data and minimum requirements. A low score does not mean automatic rejection. Apply regardless of estimated odds.
+        </p>
+      </section>
+    );
+  }
+
+  const odds = computeOdds({
+    gpa: parseFloat(gpa) || 0,
+    gpaTarget,
+    ielts: parseFloat(ielts) || 0,
+    ieltsTarget,
+    eca,
+    moiWaiver: !!v.accepts_moi_waiver,
+  });
+
+  const colour =
+    odds.total >= 70 ? "#1E3A8A" :
+    odds.total >= 45 ? "#D97706" :
+                       "#DC2626";
+  const verdictLabel =
+    odds.total >= 70 ? "Strong fit" :
+    odds.total >= 45 ? "Competitive — sharpen profile" :
+                       "Stretch — bold application needed";
+
+  // Action plan
+  const strong: string[] = [];
+  const weak: string[] = [];
   const gpaN = parseFloat(gpa) || 0;
   const ieltsN = parseFloat(ielts) || 0;
-  const ecaN = parseInt(eca, 10) || 0;
 
-  // Simple weighted score (0-100)
-  const gpaScore = Math.min(100, (gpaN / target) * 70);
-  const ieltsScore = v.accepts_moi_waiver ? 80 : Math.min(100, (ieltsN / 7.5) * 100);
-  const ecaScore = (ecaN / 5) * 100;
-  const overall = Math.round(gpaScore * 0.55 + ieltsScore * 0.25 + ecaScore * 0.2);
-  const clamped = Math.max(2, Math.min(95, overall));
+  if (gpaN >= gpaTarget) strong.push(`Your GPA ${gpaN.toFixed(2)} meets the recipient average of ${gpaTarget.toFixed(2)}.`);
+  else weak.push(`Your GPA is ${(gpaTarget - gpaN).toFixed(2)} points below the competitive threshold (${gpaTarget.toFixed(2)}). Offset with a flawless Statement of Purpose and a recommender who can vouch for your trajectory.`);
 
-  const verdict =
-    clamped >= 75 ? { label: "Strong match", tone: "text-emerald-700 bg-emerald-50 border-emerald-200" }
-    : clamped >= 50 ? { label: "Competitive", tone: "text-amber-700 bg-amber-50 border-amber-200" }
-    : { label: "Stretch goal", tone: "text-destructive bg-destructive/5 border-destructive/30" };
+  if (v.accepts_moi_waiver) strong.push(`This award accepts an MOI letter — you skip the IELTS bottleneck entirely.`);
+  else if (ieltsN >= ieltsTarget) strong.push(`Your IELTS ${ieltsN.toFixed(1)} exceeds the historical average of ${ieltsTarget.toFixed(1)}.`);
+  else if (ieltsN > 0) weak.push(`Your IELTS ${ieltsN.toFixed(1)} is below the ${ieltsTarget.toFixed(1)} benchmark. A single retake usually moves the needle.`);
+  else weak.push(`No language score entered. Most committees require IELTS ${ieltsTarget.toFixed(1)}+ unless you qualify for an MOI waiver.`);
 
-  const improvements: string[] = [];
-  if (gpaN < target) improvements.push(`Lift GPA to ${target.toFixed(1)}+ (you're at ${gpaN.toFixed(2)}). One strong semester can move the needle.`);
-  if (!v.accepts_moi_waiver && ieltsN < 7) improvements.push(`Aim for IELTS 7.0+ overall, no band below 6.5. Worth $300 for the test re-take.`);
-  if (ecaN < 4) improvements.push(`Add depth to 1-2 ECAs — long commitment beats scattered participation. Selectors look for a story.`);
-  improvements.push(`Line up 2 recommenders 6 weeks early and brief them on this specific award.`);
-  improvements.push(`Draft your SOP around a single thread: why this country, why now, why you.`);
+  if (eca === "international") strong.push("International-level ECAs are a top-decile signal — lead with this story in your SOP.");
+  else if (eca === "national") strong.push("National-level ECAs are a clear differentiator. Quantify your impact in the application.");
+  else if (eca === "average") weak.push("Average ECAs blend in. Pick one activity and demonstrate 12+ months of sustained, measurable impact before the deadline.");
+  else weak.push("No ECAs reported. Volunteer leadership or a research project in the next 8 weeks beats nothing — selectors read for narrative.");
+
+  const wy = parseInt(workYrs, 10) || 0;
+  if (wy >= 2) strong.push(`${wy} years of work experience adds maturity weight — frame it as the bridge to your study goal.`);
+
+  const r = 54;
+  const C = 2 * Math.PI * r;
+  const offset = C - (odds.total / 100) * C;
 
   return (
-    <section className="rounded-md border border-border bg-white p-6">
-      <div className="flex items-center gap-2">
-        <Calculator className="h-5 w-5 text-primary" />
-        <h2 className="font-heading text-2xl font-bold text-foreground">Your odds</h2>
-      </div>
-      <p className="mt-1 text-sm text-muted-foreground">
-        {user ? "Pre-filled from your profile — adjust to model 'what if I improve' scenarios." : "Enter your stats to estimate matching probability."}
-      </p>
+    <section className="space-y-6">
+      <div className="rounded-md border border-border bg-white p-6 shadow-sm">
+        <div className="flex items-center gap-2">
+          <Calculator className="h-5 w-5 text-primary" />
+          <h2 className="font-heading text-2xl font-bold text-foreground">Your match score</h2>
+        </div>
 
-      <div className="mt-6 grid gap-4 md:grid-cols-3">
-        <div>
-          <label className="text-xs font-semibold uppercase text-muted-foreground">GPA (US 4.0)</label>
-          <Input type="number" step="0.01" value={gpa} onChange={(e) => setGpa(e.target.value)} placeholder="3.7" className="mt-1" />
-        </div>
-        <div>
-          <label className="text-xs font-semibold uppercase text-muted-foreground">IELTS</label>
-          <Input type="number" step="0.1" value={ielts} onChange={(e) => setIelts(e.target.value)} placeholder="7.0" className="mt-1" disabled={v.accepts_moi_waiver} />
-          {v.accepts_moi_waiver && <p className="mt-1 text-[10px] text-emerald-700">MOI accepted — IELTS skipped</p>}
-        </div>
-        <div>
-          <label className="text-xs font-semibold uppercase text-muted-foreground">ECA depth (1-5)</label>
-          <Input type="number" min="1" max="5" value={eca} onChange={(e) => setEca(e.target.value)} className="mt-1" />
-        </div>
-      </div>
-
-      <div className="mt-6 rounded-md border border-border bg-neutral-50 p-5">
-        <div className="flex items-end justify-between gap-4">
-          <div>
-            <div className="text-xs uppercase tracking-wide text-muted-foreground">Match probability</div>
-            <div className="font-heading text-5xl font-extrabold tabular-nums text-foreground">{clamped}%</div>
+        <div className="mt-6 grid items-center gap-8 md:grid-cols-[180px_1fr]">
+          {/* Circular indicator */}
+          <div className="relative mx-auto h-[160px] w-[160px]">
+            <svg viewBox="0 0 140 140" className="h-full w-full -rotate-90">
+              <circle cx="70" cy="70" r={r} fill="none" stroke="#E5E7EB" strokeWidth="12" />
+              <circle
+                cx="70" cy="70" r={r} fill="none"
+                stroke={colour}
+                strokeWidth="12"
+                strokeLinecap="round"
+                strokeDasharray={C}
+                strokeDashoffset={offset}
+                style={{ transition: "stroke-dashoffset 900ms ease-out" }}
+              />
+            </svg>
+            <div className="absolute inset-0 flex flex-col items-center justify-center">
+              <span className="font-heading text-4xl font-bold tabular-nums" style={{ color: colour, fontFamily: "Georgia, 'Times New Roman', serif" }}>
+                {odds.total}%
+              </span>
+              <span className="text-[10px] uppercase tracking-wider text-muted-foreground">match</span>
+            </div>
           </div>
-          <span className={`rounded-full border px-3 py-1 text-xs font-bold ${verdict.tone}`}>{verdict.label}</span>
+
+          {/* Sub-scores */}
+          <div className="space-y-4">
+            <div className="text-sm font-semibold" style={{ color: colour }}>{verdictLabel}</div>
+            <SubScore label="Academics" pts={odds.aca} max={odds.acaMax} />
+            <SubScore label="Language" pts={odds.lang} max={odds.langMax} />
+            <SubScore label="Extracurriculars" pts={odds.eca} max={odds.ecaMax} />
+            <button onClick={() => setSubmitted(false)} className="text-xs font-medium text-primary hover:underline">
+              ← Adjust inputs
+            </button>
+          </div>
         </div>
-        <Progress value={clamped} className="mt-3 h-2" />
       </div>
 
-      <div className="mt-6">
-        <h3 className="font-heading text-sm font-bold uppercase tracking-wide text-foreground">How to raise your odds</h3>
-        <ul className="mt-3 space-y-2 text-sm text-foreground/90">
-          {improvements.map((tip) => (
-            <li key={tip} className="flex items-start gap-2">
-              <Check className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
-              <span>{tip}</span>
-            </li>
-          ))}
-        </ul>
+      {/* Action plan */}
+      <div className="grid gap-4 md:grid-cols-2">
+        <div className="rounded-md border border-emerald-200 bg-emerald-50/40 p-5">
+          <h3 className="flex items-center gap-2 font-heading text-sm font-bold uppercase tracking-wide text-emerald-800">
+            <Check className="h-4 w-4" /> Strong points
+          </h3>
+          <ul className="mt-3 space-y-2 text-sm text-emerald-900">
+            {strong.length === 0
+              ? <li className="text-emerald-800/70">No standout strengths yet — focus the action plan on the right.</li>
+              : strong.map((s, i) => <li key={i} className="flex gap-2"><Check className="mt-0.5 h-4 w-4 shrink-0" /><span>{s}</span></li>)}
+          </ul>
+        </div>
+        <div className="rounded-md border border-amber-300 bg-amber-50/40 p-5">
+          <h3 className="flex items-center gap-2 font-heading text-sm font-bold uppercase tracking-wide text-amber-800">
+            <AlertCircle className="h-4 w-4" /> Vulnerabilities
+          </h3>
+          <ul className="mt-3 space-y-2 text-sm text-amber-900">
+            {weak.length === 0
+              ? <li className="text-amber-800/70">No major gaps detected. Polish the SOP and submit early.</li>
+              : weak.map((s, i) => <li key={i} className="flex gap-2"><AlertCircle className="mt-0.5 h-4 w-4 shrink-0" /><span>{s}</span></li>)}
+          </ul>
+        </div>
       </div>
+
+      <p className="text-xs italic text-muted-foreground">
+        This is a statistical estimate based on community-reported data and minimum requirements. A low score does not mean automatic rejection. Apply regardless of estimated odds.
+      </p>
     </section>
   );
 }
+
+function SubScore({ label, pts, max }: { label: string; pts: number; max: number }) {
+  const pct = Math.round((pts / max) * 100);
+  return (
+    <div>
+      <div className="mb-1 flex items-center justify-between text-xs">
+        <span className="font-semibold uppercase tracking-wide text-muted-foreground">{label}</span>
+        <span className="tabular-nums text-foreground/80">{pts} / {max}</span>
+      </div>
+      <div className="h-2 w-full overflow-hidden rounded-full bg-neutral-200">
+        <div
+          className="h-full rounded-full transition-all duration-700 ease-out"
+          style={{ width: `${pct}%`, backgroundColor: "#1E3A8A" }}
+        />
+      </div>
+    </div>
+  );
+}
+
 
 // Force-include for the static list so tree-shaking doesn't drop the import
 void SCHOLARSHIPS;
