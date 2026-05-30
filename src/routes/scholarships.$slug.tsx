@@ -392,6 +392,7 @@ function Hero({ v }: { v: View }) {
   const c = useCountdown(v.deadline);
   const d = daysLeft(v.deadline);
   const isPrep = v.cycle_status === "closed_prep_mode";
+  const bannerUrl = typeof v.banner_image_url === "string" ? v.banner_image_url.trim() : "";
 
   const save = async () => {
     if (!user) {
@@ -411,7 +412,16 @@ function Hero({ v }: { v: View }) {
 
   return (
     <div className="relative w-full overflow-hidden border-b border-border" style={{ minHeight: 400 }}>
-      <TopoBackground />
+      <div className="absolute inset-0 z-0">
+        <TopoBackground />
+        <SmartCampusImage
+          src={bannerUrl || null}
+          name={v.name}
+          alt={`${v.name} scholarship cover`}
+          className="opacity-35"
+          loading="eager"
+        />
+      </div>
 
       <div className="relative z-10 mx-auto max-w-6xl px-4 py-10 text-white">
         <Link to="/scholarships" className="inline-flex items-center gap-1 text-sm text-white/80 hover:text-white">
