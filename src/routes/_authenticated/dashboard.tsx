@@ -77,7 +77,24 @@ function Dashboard() {
           <h2 className="font-heading text-2xl font-extrabold">Deadlines Coming Up</h2>
           <Link to="/scholarships" className="text-sm text-primary hover:underline">See all</Link>
         </div>
-        <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">{deadlines.map((s) => <ScholarshipCard key={s.id} s={enrich(s)} variant="active" />)}</div>
+        <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+          {deadlines.map((s) => (
+            <Link
+              key={s.id}
+              to="/scholarships/$slug"
+              params={{ slug: scholarshipSlug(s) }}
+              className="card-surface block p-4 transition hover:shadow-md"
+            >
+              <div className="flex items-center gap-2 text-sm">
+                <span className="text-lg">{s.countryFlag}</span>
+                <span className="font-medium">{s.country}</span>
+              </div>
+              <div className="mt-1 font-heading text-base font-bold line-clamp-2">{s.name}</div>
+              <div className="mt-2 text-xs text-muted-foreground">{s.amount}</div>
+              <div className="mt-2 text-xs font-semibold text-primary">{daysLeft(s.deadline)}d left →</div>
+            </Link>
+          ))}
+        </div>
       </section>
     </div>
   );
