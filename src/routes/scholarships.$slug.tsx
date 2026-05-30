@@ -109,6 +109,7 @@ function ScholarshipDetailPage() {
   const staticS = useMemo(() => findScholarshipBySlug(slug), [slug]);
   const queryClient = useQueryClient();
   const hydrateFn = useServerFn(hydrateScholarship);
+  const [hasTriedHydrate, setHasTriedHydrate] = useState(false);
 
   // Pull DB row (if present) — gives us the multi-POV detail when hydrated.
   const dbQuery = useQuery({
@@ -118,9 +119,10 @@ function ScholarshipDetailPage() {
         .from("scholarships")
         .select("*")
         .eq("slug", slug)
-        .maybeSingle();
+        .limit(1);
       if (error) throw error;
-      return (data as DbScholarship | null) ?? null;
+      const row = Array.isArray(data) ? data[0] : data;
+      return (row as DbScholarship | null) ?? null;
     },
   });
 
@@ -132,6 +134,7 @@ function ScholarshipDetailPage() {
     if (staticS) return;
     if (dbQuery.data?.hydrated_at) return;
     if (hydrating) return;
+    setHasTriedHydrate(true);
     setHydrating(true);
     setHydrateErr(null);
     hydrateFn({ data: { slug } })
@@ -144,9 +147,14 @@ function ScholarshipDetailPage() {
   }, [slug, staticS, dbQuery.data, dbQuery.isLoading, hydrating, hydrateFn, queryClient]);
 
   // No data at all → shimmer + rotating status
-  if (!staticS && !dbQuery.data) {
+  if (!staticS && (dbQuery.isLoading || hydrating || !hasTriedHydrate)) {
     if (hydrateErr) return <HydrationError slug={slug} message={hydrateErr} />;
     return <HydrationShimmer />;
+  }
+
+  if (!staticS && !dbQuery.data) {
+    if (hydrateErr) return <HydrationError slug={slug} message={hydrateErr} />;
+    return <HydrationError slug={slug} message="This scholarship profile is temporarily unavailable. Please try again in a moment." />;
   }
 
   // Build a unified enriched view: static enrichment, with DB overrides if present.
