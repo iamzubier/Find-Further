@@ -497,7 +497,7 @@ function AdminImportPage() {
       </Card>
 
       <Card title="Fix All Images (Logos + Campus, Bulletproof)" icon={<ImageIcon className="h-5 w-5" />}
-        desc="One-shot bulletproof pipeline. For every university missing a logo: derive domain from official_url and fetch via Clearbit. For every university missing a campus image: try Wikipedia → og:image → curated Unsplash campus photo. Guarantees every card has a logo and an image.">
+        desc="One-shot bulletproof pipeline. For every university missing or weak logo: fetch the real institutional logo or seal from Wikipedia/Wikimedia. For every university missing a campus image: try Wikipedia → og:image → curated fallback. Guarantees every card has a logo and an image.">
         <Button onClick={handleFixAllImages} disabled={busy !== null}>
           {busy === "all" ? "Running…" : "Fix All Images"}
         </Button>
