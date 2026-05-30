@@ -52,8 +52,8 @@ export const getScholarshipDetail = createServerFn({ method: "GET" })
 
     const dto: ScholarshipDetailDto = {
       id: scholarship.id,
-      slug: scholarship.slug,
-      name: scholarship.name,
+      slug: scholarship.slug ?? data.slug,
+      name: scholarship.name ?? "Scholarship",
       provider: scholarship.provider,
       host_country: scholarship.host_country,
       description: scholarship.description,
@@ -73,8 +73,12 @@ export const getScholarshipDetail = createServerFn({ method: "GET" })
       deadline: scholarship.deadline,
       expected_next_open_month: scholarship.expected_next_open_month,
       official_url: scholarship.official_url,
-      required_documents_checklist: scholarship.required_documents_checklist,
-      insider_tips: scholarship.insider_tips,
+      required_documents_checklist: Array.isArray(scholarship.required_documents_checklist)
+        ? scholarship.required_documents_checklist.filter((item): item is string => typeof item === "string")
+        : null,
+      insider_tips: Array.isArray(scholarship.insider_tips)
+        ? scholarship.insider_tips.filter((item): item is string => typeof item === "string")
+        : null,
       hydrated_at: scholarship.hydrated_at,
       banner_image_url: scholarship.banner_image_url,
       avg_gpa_recipients: scholarship.avg_gpa_recipients,
