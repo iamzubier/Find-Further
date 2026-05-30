@@ -130,6 +130,18 @@ function ScholarshipDetailPage() {
   const [hydrating, setHydrating] = useState(false);
   const [hydrateErr, setHydrateErr] = useState<string | null>(null);
   useEffect(() => {
+    console.log("scholarship-detail-state", {
+      slug,
+      isLoading: dbQuery.isLoading,
+      hasData: !!dbQuery.data,
+      hydrating,
+      hasTriedHydrate,
+      hydrateErr,
+      dbError: dbQuery.error ? String(dbQuery.error) : null,
+    });
+  }, [slug, dbQuery.isLoading, dbQuery.data, dbQuery.error, hydrating, hasTriedHydrate, hydrateErr]);
+
+  useEffect(() => {
     if (dbQuery.isLoading) return;
     if (staticS) return;
     if (dbQuery.data?.hydrated_at) return;
