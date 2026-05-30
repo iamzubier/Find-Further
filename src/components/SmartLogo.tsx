@@ -6,22 +6,11 @@ import { isWeakLogoUrl } from "@/lib/logo-url";
  *
  * Order of preference:
  *   1. Explicit `logoUrl` prop when it's a real image URL
- *   2. Google favicon API derived from `domain` (or `website`)
- *   3. Premium monogram — first letter on a dark slate square
+ *   2. Premium monogram — first letter on a dark slate square
  *
- * Clearbit is intentionally skipped as an automatic fallback because it has
- * proven unreliable in this environment and was the main source of broken logos.
+ * Weak favicon/Clearbit sources are intentionally skipped because they caused
+ * the blurry/broken university marks the user reported.
  */
-
-function domainFromWebsite(website?: string | null): string | null {
-  if (!website) return null;
-  try {
-    const url = website.startsWith("http") ? website : `https://${website}`;
-    return new URL(url).hostname.replace(/^www\./, "");
-  } catch {
-    return null;
-  }
-}
 
 function firstLetter(name: string): string {
   const trimmed = (name || "").trim();
@@ -42,30 +31,21 @@ export interface SmartLogoProps {
 export function SmartLogo({
   name,
   logoUrl,
-  domain,
-  website,
   size = 48,
   className = "",
 }: SmartLogoProps) {
-  const resolvedDomain = domain || domainFromWebsite(website);
-  const faviconSize = Math.max(64, Math.min(256, size * 2));
-  const faviconUrl = resolvedDomain
-    ? `https://www.google.com/s2/favicons?domain=${encodeURIComponent(resolvedDomain)}&sz=${faviconSize}`
-    : null;
-
   const normalizedLogoUrl = logoUrl?.trim() || null;
   const weakPrimary = isWeakLogoUrl(normalizedLogoUrl);
 
   const sources = [
     normalizedLogoUrl && !weakPrimary ? normalizedLogoUrl : null,
-    faviconUrl,
   ].filter((value, index, arr): value is string => Boolean(value) && arr.indexOf(value) === index);
 
   const [stage, setStage] = useState<number>(0);
 
   useEffect(() => {
     setStage(0);
-  }, [normalizedLogoUrl, faviconUrl]);
+  }, [normalizedLogoUrl]);
 
   const advance = () => {
     setStage((s) => s + 1);
