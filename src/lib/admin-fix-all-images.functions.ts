@@ -1,6 +1,8 @@
 import { createServerFn } from "@tanstack/react-start";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { z } from "zod";
+import { fetchUniversityWikipediaLogo } from "@/lib/wikipedia-logo.server";
+import { isWeakLogoUrl } from "@/lib/logo-url";
 
 const UNSPLASH_FALLBACKS = [
   "https://images.unsplash.com/photo-1562774053-701939374585?w=1600&q=80", // campus quad
@@ -14,16 +16,6 @@ function fallbackFor(slug: string): string {
   let h = 0;
   for (let i = 0; i < slug.length; i++) h = (h * 31 + slug.charCodeAt(i)) >>> 0;
   return UNSPLASH_FALLBACKS[h % UNSPLASH_FALLBACKS.length];
-}
-
-function domainFromUrl(url: string | null | undefined): string | null {
-  if (!url) return null;
-  try {
-    const u = new URL(url.startsWith("http") ? url : `https://${url}`);
-    return u.hostname.replace(/^www\./, "");
-  } catch {
-    return null;
-  }
 }
 
 async function headOk(url: string): Promise<boolean> {
@@ -99,11 +91,11 @@ export const fixAllImagesBatch = createServerFn({ method: "POST" })
     for (const u of rows ?? []) {
       const update: { logo_url?: string; campus_image_url?: string } = {};
 
-      if (!u.logo_url) {
-        const domain = domainFromUrl(u.official_url);
-        if (domain) {
-          const logo = `https://logo.clearbit.com/${domain}`;
-          if (await headOk(logo)) { update.logo_url = logo; logosUpdated++; }
+      if (isWeakLogoUrl(u.logo_url)) {
+        const logo = await fetchUniversityWikipediaLogo(u.name);
+        if (logo && (await headOk(logo))) {
+          update.logo_url = logo;
+          logosUpdated++;
         }
       }
 

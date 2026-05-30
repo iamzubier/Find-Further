@@ -3,11 +3,7 @@ import { z } from "zod";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { fetchUniversityCampusImage } from "@/lib/image-fetch.server";
 import { fetchUniversityPlaceImagery } from "@/lib/google-places-images.server";
-
-function faviconUrlFromDomain(domain: string | null): string | null {
-  if (!domain) return null;
-  return `https://www.google.com/s2/favicons?domain=${encodeURIComponent(domain)}&sz=256`;
-}
+import { fetchUniversityWikipediaLogo } from "@/lib/wikipedia-logo.server";
 
 const InputSchema = z.object({
   slug: z.string().min(1).max(120),
@@ -157,21 +153,9 @@ export const hydrateUniversity = createServerFn({ method: "POST" })
       return { ok: false, error: "Network error contacting AI gateway", slug: data.slug };
     }
 
-    // 4. Derive logo via Clearbit using the best-known domain (no API key).
+    // 4. Resolve logo from Wikimedia/Wikipedia first.
     const officialUrl: string | null = aiJson.official_url ?? place.websiteUri ?? catalogWebsite ?? null;
-    const domain = (() => {
-      const fromWebsite = (() => {
-        if (!officialUrl) return null;
-        try {
-          const u = officialUrl.startsWith("http") ? officialUrl : `https://${officialUrl}`;
-          return new URL(u).hostname.replace(/^www\./, "");
-        } catch {
-          return null;
-        }
-      })();
-      return fromWebsite || catalogDomains[0] || null;
-    })();
-    const logoUrl = faviconUrlFromDomain(domain);
+    const logoUrl = await fetchUniversityWikipediaLogo(name);
 
     // 5. Upsert into universities_detail
     const tuitionUsd = typeof aiJson.tuition_usd === "number" ? aiJson.tuition_usd : null;

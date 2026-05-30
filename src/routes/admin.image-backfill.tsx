@@ -64,7 +64,7 @@ function Page() {
     <div className="mx-auto max-w-2xl px-6 py-16 space-y-4">
       <h1 className="text-2xl font-semibold">Dynamic Image Backfill</h1>
       <p className="text-sm text-muted-foreground">
-        Google Maps Places gives a unique campus photo per university. Clearbit derives the logo from each domain.
+        Google Maps Places gives a unique campus photo per university. Logos now come from Wikipedia/Wikimedia instead of blurry favicon sources.
       </p>
       <Input
         type="password"
@@ -78,7 +78,7 @@ function Page() {
       </label>
       <div className="flex flex-wrap gap-2">
         <Button onClick={loopPlaces} disabled={!secret || running !== null}>
-          {running === "places" ? "Fetching from Google Maps…" : "Backfill via Google Maps (recommended)"}
+          {running === "places" ? "Fetching logos and campus images…" : "Backfill logos + campus images"}
         </Button>
         <Button onClick={() => loop("schol")} disabled={!secret || running !== null} variant="outline">
           {running === "schol" ? "Running…" : "Scholarship banners"}
