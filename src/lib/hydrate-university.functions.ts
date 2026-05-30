@@ -2,6 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { fetchUniversityCampusImage } from "@/lib/image-fetch.server";
+import { fetchUniversityPlaceImagery } from "@/lib/google-places-images.server";
 
 const InputSchema = z.object({
   slug: z.string().min(1).max(120),
@@ -142,8 +143,9 @@ export const hydrateUniversity = createServerFn({ method: "POST" })
       }
       aiJson = JSON.parse(toolCall.function.arguments);
 
-      // Always fetch the real campus photo from Wikipedia (no API key).
-      campusImageUrl = await fetchUniversityCampusImage(name);
+      // Prefer Google Maps Places photo (unique per campus). Fall back to Wikipedia.
+      const place = await fetchUniversityPlaceImagery(name, country);
+      campusImageUrl = place.photoUrl ?? (await fetchUniversityCampusImage(name));
     } catch (err) {
       console.error("[hydrate-university] fetch failed", err);
       return { ok: false, error: "Network error contacting AI gateway", slug: data.slug };
