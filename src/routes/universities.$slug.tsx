@@ -198,23 +198,25 @@ function Hero({ uni }: { uni: any }) {
 
   return (
     <header className="relative flex h-[400px] w-full flex-col justify-end overflow-hidden bg-slate-950 px-8 pb-10">
-      <SmartCampusImage
-        src={campusUrl || null}
-        name={uni?.name ?? "University"}
-        alt={`${uni?.name ?? "University"} campus`}
-        className="opacity-40 -z-20"
-        loading="eager"
-      />
-      <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/60 to-transparent -z-10" />
+      <div className="absolute inset-0 z-0">
+        <SmartCampusImage
+          src={campusUrl || null}
+          name={uni?.name ?? "University"}
+          alt={`${uni?.name ?? "University"} campus`}
+          className="opacity-40"
+          loading="eager"
+        />
+      </div>
+      <div className="absolute inset-0 z-10 bg-gradient-to-t from-slate-950 via-slate-950/60 to-transparent" />
 
-      <div className="absolute inset-x-0 top-0 z-10 p-4">
+      <div className="absolute inset-x-0 top-0 z-20 p-4">
         <Link to="/universities" className="inline-flex items-center gap-1 text-sm text-white/90 hover:text-white drop-shadow">
           <ArrowLeft className="h-4 w-4" /> All universities
         </Link>
       </div>
 
-      <div className="mx-auto w-full max-w-6xl">
-        <div className="flex items-end gap-6 relative z-10">
+      <div className="relative z-20 mx-auto w-full max-w-6xl">
+        <div className="flex items-end gap-6">
           <SmartLogo
             name={uni?.name ?? "University"}
             logoUrl={logoUrl || null}
