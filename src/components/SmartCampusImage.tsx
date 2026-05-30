@@ -1,4 +1,4 @@
-import { useState, useEffect, CSSProperties } from "react";
+import { useState, useEffect, useRef, CSSProperties } from "react";
 
 /**
  * SmartCampusImage — dynamic campus/hero photo with an elegant
@@ -57,11 +57,19 @@ export function SmartCampusImage({
   const initial = normalizedSrc && !blockedSource ? normalizedSrc : null;
   const [currentSrc, setCurrentSrc] = useState<string | null>(initial);
   const [loaded, setLoaded] = useState(false);
+  const imageRef = useRef<HTMLImageElement | null>(null);
 
   useEffect(() => {
     setCurrentSrc(normalizedSrc && !blockedSource ? normalizedSrc : null);
     setLoaded(false);
   }, [normalizedSrc, blockedSource]);
+
+  useEffect(() => {
+    const image = imageRef.current;
+    if (image && image.complete && image.naturalWidth > 0) {
+      setLoaded(true);
+    }
+  }, [currentSrc]);
 
   const positionClass = inline ? "block h-full w-full" : "absolute inset-0 h-full w-full";
 
@@ -97,6 +105,7 @@ export function SmartCampusImage({
         />
       )}
       <img
+        ref={imageRef}
         src={currentSrc}
         alt={alt ?? `${name} campus`}
         loading={loading}
