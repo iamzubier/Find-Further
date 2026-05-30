@@ -109,6 +109,7 @@ export const hydrateUniversity = createServerFn({ method: "POST" })
 
     let aiJson: any = null;
     let campusImageUrl: string | null = null;
+    let place: { photoUrl: string | null; iconUrl: string | null; websiteUri: string | null; placeId: string | null } = { photoUrl: null, iconUrl: null, websiteUri: null, placeId: null };
     try {
       const res = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
         method: "POST",
@@ -144,7 +145,7 @@ export const hydrateUniversity = createServerFn({ method: "POST" })
       aiJson = JSON.parse(toolCall.function.arguments);
 
       // Prefer Google Maps Places photo (unique per campus). Fall back to Wikipedia.
-      const place = await fetchUniversityPlaceImagery(name, country);
+      place = await fetchUniversityPlaceImagery(name, country);
       campusImageUrl = place.photoUrl ?? (await fetchUniversityCampusImage(name));
     } catch (err) {
       console.error("[hydrate-university] fetch failed", err);
