@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
-import { queryOptions, useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
+import { queryOptions, useQuery, useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import {
   SCHOLARSHIPS,
@@ -276,6 +276,12 @@ function buildView(staticS: Scholarship | undefined, db: DbScholarship | null): 
   };
   const enriched = enrich(baseStatic);
   if (!db) return { ...enriched, source: "static" };
+  const allowanceBreakdown = db.allowance_breakdown && typeof db.allowance_breakdown === "object" && !Array.isArray(db.allowance_breakdown)
+    ? (db.allowance_breakdown as Record<string, unknown>)
+    : undefined;
+  const upfrontCostsCovered = db.upfront_costs_covered && typeof db.upfront_costs_covered === "object" && !Array.isArray(db.upfront_costs_covered)
+    ? (db.upfront_costs_covered as Record<string, unknown>)
+    : undefined;
   return {
     ...enriched,
     source: staticS ? "merged" : "hydrated",
@@ -287,8 +293,8 @@ function buildView(staticS: Scholarship | undefined, db: DbScholarship | null): 
     accepts_moi_waiver: db.accepts_moi_waiver ?? enriched.accepts_moi_waiver,
     hidden_obligations: db.hidden_obligations ?? undefined,
     hidden_costs_for_student: db.hidden_costs_for_student ?? undefined,
-    allowance_breakdown: db.allowance_breakdown ?? undefined,
-    upfront_costs_covered: db.upfront_costs_covered ?? undefined,
+    allowance_breakdown: allowanceBreakdown,
+    upfront_costs_covered: upfrontCostsCovered,
     required_documents_checklist: db.required_documents_checklist ?? undefined,
     insider_tips: db.insider_tips ?? undefined,
     expected_next_open_month: db.expected_next_open_month ?? undefined,
