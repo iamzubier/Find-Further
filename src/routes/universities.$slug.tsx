@@ -20,7 +20,6 @@ import { Heart, GitCompare, Share2, ExternalLink, ArrowLeft, MapPin, Calendar, G
 import { toast } from "sonner";
 import { SmartLogo } from "@/components/SmartLogo";
 import { SmartCampusImage } from "@/components/SmartCampusImage";
-import { TopoBackground } from "@/components/TopoBackground";
 
 const detailQuery = (slug: string) => queryOptions({
   queryKey: ["uni-detail", slug],
