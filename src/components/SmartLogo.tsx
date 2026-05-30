@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { isWeakLogoUrl } from "@/lib/logo-url";
 
 /**
  * SmartLogo — resilient university/scholarship logo.
@@ -53,12 +54,10 @@ export function SmartLogo({
     : null;
 
   const normalizedLogoUrl = logoUrl?.trim() || null;
-  const looksLikeClearbit = normalizedLogoUrl
-    ? /(^https?:\/\/)?logo\.clearbit\.com\//i.test(normalizedLogoUrl)
-    : false;
+  const weakPrimary = isWeakLogoUrl(normalizedLogoUrl);
 
   const sources = [
-    normalizedLogoUrl && !looksLikeClearbit ? normalizedLogoUrl : null,
+    normalizedLogoUrl && !weakPrimary ? normalizedLogoUrl : null,
     faviconUrl,
   ].filter((value, index, arr): value is string => Boolean(value) && arr.indexOf(value) === index);
 
