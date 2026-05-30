@@ -50,31 +50,35 @@ export function SmartCampusImage({
   noOverlay = false,
   loading = "lazy",
 }: SmartCampusImageProps) {
-  const initial = src && src.trim() ? src : null;
+  const normalizedSrc = src?.trim() || null;
+  const blockedSource = normalizedSrc
+    ? /(^https?:\/\/)?images\.unsplash\.com\//i.test(normalizedSrc)
+    : false;
+  const initial = normalizedSrc && !blockedSource ? normalizedSrc : null;
   const [currentSrc, setCurrentSrc] = useState<string | null>(initial);
   const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
-    setCurrentSrc(src && src.trim() ? src : null);
+    setCurrentSrc(normalizedSrc && !blockedSource ? normalizedSrc : null);
     setLoaded(false);
-  }, [src]);
+  }, [normalizedSrc, blockedSource]);
 
   const positionClass = inline ? "block h-full w-full" : "absolute inset-0 h-full w-full";
 
-  // Premium "mesh gradient" CSS fallback when no image is available.
+  // Deterministic zero-key fallback when no image is available.
   if (!currentSrc) {
     return (
       <>
         <div
           aria-label={alt ?? `${name} background`}
           role="img"
-          className={`${positionClass} bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-slate-800 via-slate-900 to-black ${className}`}
+          className={`${positionClass} bg-slate-950 bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(30,58,138,0.3),rgba(255,255,255,0))] ${className}`}
           style={style}
         />
         {!noOverlay && (
           <div
             aria-hidden
-            className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent"
+            className="pointer-events-none absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/60 to-transparent"
           />
         )}
       </>
