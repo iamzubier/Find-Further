@@ -30,7 +30,8 @@ function extractFileName(value: unknown): string | null {
 
 function isLikelyRealLogo(url: string | null): boolean {
   if (!url) return false;
-  return /upload\.wikimedia\.org|commons\.wikimedia\.org/i.test(url);
+  return /upload\.wikimedia\.org|commons\.wikimedia\.org/i.test(url)
+    && /(logo|seal|crest|shield|arms|wordmark|emblem|coa|symbol|badge|svg)/i.test(url);
 }
 
 async function fetchJson<T>(url: string): Promise<T | null> {
