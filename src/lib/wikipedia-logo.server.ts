@@ -2,15 +2,17 @@ const WIKIPEDIA_SUMMARY = "https://en.wikipedia.org/api/rest_v1/page/summary";
 const WIKIDATA_ENTITY = "https://www.wikidata.org/wiki/Special:EntityData";
 const COMMONS_FILE = "https://commons.wikimedia.org/wiki/Special:FilePath";
 
+type WikidataClaims = Record<string, Array<{
+  mainsnak?: {
+    datavalue?: {
+      value?: unknown;
+    };
+  };
+}>>;
+
 type WikidataEntityResponse = {
   entities?: Record<string, {
-    claims?: Record<string, Array<{
-      mainsnak?: {
-        datavalue?: {
-          value?: unknown;
-        };
-      };
-    }>>;
+    claims?: WikidataClaims;
   }>;
 };
 
@@ -45,7 +47,7 @@ async function fetchJson<T>(url: string): Promise<T | null> {
   }
 }
 
-function pickCommonsAsset(claims?: WikidataEntityResponse["entities"][string]["claims"]): string | null {
+function pickCommonsAsset(claims?: WikidataClaims): string | null {
   if (!claims) return null;
 
   const preferredProps = ["P158", "P94", "P154"];
