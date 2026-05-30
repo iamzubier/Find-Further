@@ -13,6 +13,11 @@ function domainFromUrl(url: string | null | undefined): string | null {
   }
 }
 
+function faviconUrlFromDomain(domain: string | null): string | null {
+  if (!domain) return null;
+  return `https://www.google.com/s2/favicons?domain=${encodeURIComponent(domain)}&sz=256`;
+}
+
 const Input = z.object({
   key: z.string().min(1).max(256),
   offset: z.number().int().min(0).max(20000),
@@ -56,7 +61,8 @@ export const fixPlaceImagesBatch = createServerFn({ method: "POST" })
 
       if (data.force || !u.logo_url) {
         const domain = domainFromUrl(imagery.websiteUri ?? u.official_url);
-        if (domain) update.logo_url = `https://logo.clearbit.com/${domain}`;
+        const faviconUrl = faviconUrlFromDomain(domain);
+        if (faviconUrl) update.logo_url = faviconUrl;
       }
 
       if (Object.keys(update).length === 0) { skipped++; continue; }

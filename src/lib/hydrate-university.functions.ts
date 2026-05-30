@@ -4,6 +4,11 @@ import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { fetchUniversityCampusImage } from "@/lib/image-fetch.server";
 import { fetchUniversityPlaceImagery } from "@/lib/google-places-images.server";
 
+function faviconUrlFromDomain(domain: string | null): string | null {
+  if (!domain) return null;
+  return `https://www.google.com/s2/favicons?domain=${encodeURIComponent(domain)}&sz=256`;
+}
+
 const InputSchema = z.object({
   slug: z.string().min(1).max(120),
   name: z.string().min(1).max(200).optional(),
@@ -166,7 +171,7 @@ export const hydrateUniversity = createServerFn({ method: "POST" })
       })();
       return fromWebsite || catalogDomains[0] || null;
     })();
-    const logoUrl = domain ? `https://logo.clearbit.com/${domain}` : null;
+    const logoUrl = faviconUrlFromDomain(domain);
 
     // 5. Upsert into universities_detail
     const tuitionUsd = typeof aiJson.tuition_usd === "number" ? aiJson.tuition_usd : null;
