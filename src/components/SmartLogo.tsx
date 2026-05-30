@@ -1,13 +1,15 @@
 import { useState, useEffect } from "react";
 
 /**
- * SmartLogo — bulletproof university/scholarship logo.
+ * SmartLogo — resilient university/scholarship logo.
  *
  * Order of preference:
- *   1. Explicit `logoUrl` prop (e.g. stored logo_url from the DB)
- *   2. Clearbit logo API derived from `domain` (or `website`)
- *   3. Google favicon API derived from `domain` (or `website`)
- *   4. Premium monogram — first letter on a dark slate square
+ *   1. Explicit `logoUrl` prop when it's a real image URL
+ *   2. Google favicon API derived from `domain` (or `website`)
+ *   3. Premium monogram — first letter on a dark slate square
+ *
+ * Clearbit is intentionally skipped as an automatic fallback because it has
+ * proven unreliable in this environment and was the main source of broken logos.
  */
 
 function domainFromWebsite(website?: string | null): string | null {
@@ -45,37 +47,33 @@ export function SmartLogo({
   className = "",
 }: SmartLogoProps) {
   const resolvedDomain = domain || domainFromWebsite(website);
-  const clearbitUrl = resolvedDomain ? `https://logo.clearbit.com/${resolvedDomain}` : null;
   const faviconSize = Math.max(64, Math.min(256, size * 2));
   const faviconUrl = resolvedDomain
     ? `https://www.google.com/s2/favicons?domain=${encodeURIComponent(resolvedDomain)}&sz=${faviconSize}`
     : null;
 
-  // Stages: 0=logoUrl, 1=clearbit, 2=favicon, 3=monogram.
-  const computeInitial = () => {
-    if (logoUrl) return 0;
-    if (clearbitUrl) return 1;
-    if (faviconUrl) return 2;
-    return 3;
-  };
-  const [stage, setStage] = useState<number>(computeInitial);
+  const normalizedLogoUrl = logoUrl?.trim() || null;
+  const looksLikeClearbit = normalizedLogoUrl
+    ? /(^https?:\/\/)?logo\.clearbit\.com\//i.test(normalizedLogoUrl)
+    : false;
+
+  const sources = [
+    normalizedLogoUrl && !looksLikeClearbit ? normalizedLogoUrl : null,
+    faviconUrl,
+  ].filter((value, index, arr): value is string => Boolean(value) && arr.indexOf(value) === index);
+
+  const [stage, setStage] = useState<number>(0);
 
   useEffect(() => {
-    setStage(computeInitial());
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [logoUrl, clearbitUrl, faviconUrl]);
+    setStage(0);
+  }, [normalizedLogoUrl, faviconUrl]);
 
   const advance = () => {
-    setStage((s) => {
-      let next = s + 1;
-      if (next === 1 && !clearbitUrl) next = 2;
-      if (next === 2 && !faviconUrl) next = 3;
-      return next;
-    });
+    setStage((s) => s + 1);
   };
 
   // Premium monogram — final fallback.
-  if (stage >= 3) {
+  if (stage >= sources.length) {
     return (
       <div
         className={`flex flex-none items-center justify-center overflow-hidden rounded-xl bg-slate-900 font-serif font-bold text-white shadow-md ${className}`}
@@ -87,7 +85,7 @@ export function SmartLogo({
     );
   }
 
-  const src = stage === 0 ? (logoUrl as string) : stage === 1 ? (clearbitUrl as string) : (faviconUrl as string);
+  const src = sources[stage];
 
   return (
     <div
