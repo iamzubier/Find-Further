@@ -152,7 +152,7 @@ export const hydrateUniversity = createServerFn({ method: "POST" })
     }
 
     // 4. Derive logo via Clearbit using the best-known domain (no API key).
-    const officialUrl: string | null = aiJson.official_url ?? catalogWebsite ?? null;
+    const officialUrl: string | null = aiJson.official_url ?? place.websiteUri ?? catalogWebsite ?? null;
     const domain = (() => {
       const fromWebsite = (() => {
         if (!officialUrl) return null;
