@@ -7,6 +7,7 @@ import {
   backfillScholarshipBanners,
   backfillUniversityCampusImages,
 } from "@/lib/admin-banner-backfill.functions";
+import { fixPlaceImagesBatch } from "@/lib/admin-places-images.functions";
 
 export const Route = createFileRoute("/admin/image-backfill")({
   component: Page,
@@ -15,9 +16,11 @@ export const Route = createFileRoute("/admin/image-backfill")({
 function Page() {
   const [secret, setSecret] = useState("");
   const [log, setLog] = useState<string[]>([]);
-  const [running, setRunning] = useState<null | "schol" | "uni">(null);
+  const [running, setRunning] = useState<null | "schol" | "uni" | "places">(null);
+  const [force, setForce] = useState(false);
   const runSchol = useServerFn(backfillScholarshipBanners);
   const runUni = useServerFn(backfillUniversityCampusImages);
+  const runPlaces = useServerFn(fixPlaceImagesBatch);
 
   const loop = async (which: "schol" | "uni") => {
     setRunning(which);
@@ -38,11 +41,30 @@ function Page() {
     }
   };
 
+  const loopPlaces = async () => {
+    setRunning("places");
+    setLog([]);
+    let offset = 0;
+    const limit = 5;
+    try {
+      for (let i = 0; i < 400; i++) {
+        const r = await runPlaces({ data: { key: secret, offset, limit, force } });
+        setLog((l) => [...l, JSON.stringify(r)]);
+        if ((r as any).done || (r as any).batch === 0) break;
+        offset += limit;
+      }
+    } catch (e: any) {
+      setLog((l) => [...l, `error: ${e?.message ?? String(e)}`]);
+    } finally {
+      setRunning(null);
+    }
+  };
+
   return (
     <div className="mx-auto max-w-2xl px-6 py-16 space-y-4">
       <h1 className="text-2xl font-semibold">Dynamic Image Backfill</h1>
       <p className="text-sm text-muted-foreground">
-        Pulls Unsplash (with Wikipedia fallback for unis) and saves URLs to the database.
+        Google Maps Places gives a unique campus photo per university. Clearbit derives the logo from each domain.
       </p>
       <Input
         type="password"
@@ -50,12 +72,19 @@ function Page() {
         value={secret}
         onChange={(e) => setSecret(e.target.value)}
       />
-      <div className="flex gap-2">
-        <Button onClick={() => loop("schol")} disabled={!secret || running !== null}>
-          {running === "schol" ? "Running…" : "Backfill scholarship banners"}
+      <label className="flex items-center gap-2 text-sm">
+        <input type="checkbox" checked={force} onChange={(e) => setForce(e.target.checked)} />
+        Force re-fetch (overwrite existing photos/logos)
+      </label>
+      <div className="flex flex-wrap gap-2">
+        <Button onClick={loopPlaces} disabled={!secret || running !== null}>
+          {running === "places" ? "Fetching from Google Maps…" : "Backfill via Google Maps (recommended)"}
+        </Button>
+        <Button onClick={() => loop("schol")} disabled={!secret || running !== null} variant="outline">
+          {running === "schol" ? "Running…" : "Scholarship banners"}
         </Button>
         <Button onClick={() => loop("uni")} disabled={!secret || running !== null} variant="outline">
-          {running === "uni" ? "Running…" : "Backfill university campus images"}
+          {running === "uni" ? "Running…" : "Uni campus (legacy)"}
         </Button>
       </div>
       {log.length > 0 && (
