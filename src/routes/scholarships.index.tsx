@@ -16,41 +16,108 @@ import {
   GraduationCap,
   Briefcase,
   Palette,
+  Loader2,
 } from "lucide-react";
-import { daysLeft, scholarshipSlug } from "@/lib/data";
-import {
-  ENRICHED_SCHOLARSHIPS,
-  fundingLabel,
-  providerLabel,
-  type EnrichedScholarship,
-  type ProfileWeight,
-} from "@/lib/scholarship-enrich";
+import { daysLeft } from "@/lib/data";
+import { fundingLabel, providerLabel, type ProfileWeight, type FundingType, type ProviderType, type CycleStatus } from "@/lib/scholarship-enrich";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { gradientForName } from "@/components/SmartCampusImage";
 import { TopoBackground } from "@/components/TopoBackground";
 import { LoginNudge } from "./universities.index";
 
 export const Route = createFileRoute("/scholarships/")({
   head: () => ({
     meta: [
-      { title: "Scholarships — BeyondBorder" },
+      { title: "Scholarships — Every UG, Masters & PhD Award Worth Knowing" },
       {
         name: "description",
         content:
-          "Every international scholarship that matters — filtered by budget, profile, and hidden costs. Active opportunities and next-cycle prep, side by side.",
+          "67+ fully-funded, government, university & NGO scholarships for Bangladeshi & South Asian students. Hidden costs, MOI waivers, real eligibility — one portal.",
       },
       { property: "og:title", content: "Scholarships — BeyondBorder" },
       {
         property: "og:description",
         content:
-          "Intent-driven filters, dual-stream view of active and prep-mode awards, and full visibility into hidden costs.",
+          "Every scholarship that matters — filtered by degree, budget, profile and hidden costs.",
       },
     ],
   }),
   component: ScholarshipsHub,
 });
+
+/* ──────────────── Types ──────────────── */
+
+type DbRow = {
+  id: string;
+  slug: string;
+  name: string;
+  provider: string | null;
+  host_country: string | null;
+  flag_emoji: string | null;
+  description: string | null;
+  funding_type: string | null;
+  provider_type: string | null;
+  cycle_status: string | null;
+  degree_level: string | null;
+  deadline: string | null;
+  expected_next_open_month: string | null;
+  amount_display: string | null;
+  annual_value_usd: number | null;
+  application_fee_usd: number | null;
+  accepts_moi_waiver: boolean | null;
+  academic_profile_weight: string | null;
+  banner_image_url: string | null;
+  eligible_countries: string[] | null;
+  wow_fact: string | null;
+  fully_funded: boolean | null;
+};
+
+type ViewSch = {
+  id: string;
+  slug: string;
+  name: string;
+  provider: string;
+  country: string;
+  countryFlag: string;
+  description: string;
+  funding_type: FundingType;
+  provider_type: ProviderType;
+  cycle_status: CycleStatus;
+  level: "undergraduate" | "postgraduate" | "phd" | "all";
+  deadline: string; // ISO
+  amount: string;
+  application_fee_usd: number;
+  accepts_moi_waiver: boolean;
+  academic_profile_weight: ProfileWeight;
+  banner_image_url: string | null;
+  wow_fact: string | null;
+};
+
+function mapRow(r: DbRow): ViewSch {
+  return {
+    id: r.id,
+    slug: r.slug,
+    name: r.name,
+    provider: r.provider ?? "—",
+    country: r.host_country ?? "—",
+    countryFlag: r.flag_emoji ?? "🎓",
+    description: r.description ?? "",
+    funding_type: (r.funding_type as FundingType) ?? "partial_bursary",
+    provider_type: (r.provider_type as ProviderType) ?? "ngo_foundation",
+    cycle_status: (r.cycle_status as CycleStatus) ?? "active_open",
+    level: (r.degree_level as ViewSch["level"]) ?? "all",
+    deadline: r.deadline ?? "",
+    amount: r.amount_display ?? "Varies",
+    application_fee_usd: r.application_fee_usd ?? 0,
+    accepts_moi_waiver: !!r.accepts_moi_waiver,
+    academic_profile_weight: (r.academic_profile_weight as ProfileWeight) ?? "merit",
+    banner_image_url: r.banner_image_url,
+    wow_fact: r.wow_fact,
+  };
+}
+
+/* ──────────────── Filter primitives ──────────────── */
 
 type BudgetKey = "free" | "5k" | "15k" | "any";
 const BUDGETS: { key: BudgetKey; label: string; sub: string }[] = [
@@ -60,6 +127,14 @@ const BUDGETS: { key: BudgetKey; label: string; sub: string }[] = [
   { key: "any", label: "Any budget", sub: "Show everything" },
 ];
 
+type LevelKey = "all" | "undergraduate" | "postgraduate" | "phd";
+const LEVELS: { key: LevelKey; label: string; sub: string; icon: any }[] = [
+  { key: "undergraduate", label: "Undergraduate", sub: "Bachelor's degree", icon: GraduationCap },
+  { key: "postgraduate", label: "Masters", sub: "MSc / MA / MBA", icon: GraduationCap },
+  { key: "phd", label: "PhD", sub: "Doctoral / research", icon: GraduationCap },
+  { key: "all", label: "All levels", sub: "Open to UG + PG", icon: Sparkles },
+];
+
 const PROFILES: { key: ProfileWeight | "any"; label: string; icon: any }[] = [
   { key: "any", label: "Any profile", icon: Sparkles },
   { key: "merit", label: "High Academic / Merit", icon: GraduationCap },
@@ -67,68 +142,89 @@ const PROFILES: { key: ProfileWeight | "any"; label: string; icon: any }[] = [
   { key: "professional", label: "Work Experience", icon: Briefcase },
 ];
 
+const PROVIDER_TYPES: { key: "all" | ProviderType; label: string }[] = [
+  { key: "all", label: "All sources" },
+  { key: "government", label: "Government" },
+  { key: "university_internal", label: "University" },
+  { key: "ngo_foundation", label: "NGO / Foundation" },
+  { key: "private_corporate", label: "Corporate / Private" },
+];
+
 const COUNTRY_REGION: Record<string, string> = {
   USA: "North America", Canada: "North America",
   UK: "Europe", Germany: "Europe", Finland: "Europe", Norway: "Europe", Italy: "Europe",
-  Netherlands: "Europe", Sweden: "Europe", Switzerland: "Europe", "EU (multi)": "Europe",
-  Japan: "Asia", "South Korea": "Asia", China: "Asia", Singapore: "Asia",
+  Netherlands: "Europe", Sweden: "Europe", Switzerland: "Europe", "EU (multi)": "Europe", France: "Europe",
+  Japan: "Asia", "South Korea": "Asia", China: "Asia", Singapore: "Asia", "Hong Kong": "Asia", India: "Asia", Turkey: "Asia",
   Australia: "Oceania", "New Zealand": "Oceania",
 };
-const REGIONS = ["all", "North America", "Europe", "Asia", "Oceania"] as const;
+const REGIONS = ["all", "North America", "Europe", "Asia", "Oceania", "Various"] as const;
+
+/* ──────────────── Page ──────────────── */
 
 function ScholarshipsHub() {
+  const [level, setLevel] = useState<LevelKey>("undergraduate");
   const [budget, setBudget] = useState<BudgetKey>("free");
   const [profile, setProfile] = useState<ProfileWeight | "any">("any");
+  const [providerType, setProviderType] = useState<"all" | ProviderType>("all");
   const [region, setRegion] = useState<(typeof REGIONS)[number]>("all");
   const [noFee, setNoFee] = useState(false);
   const [moiOnly, setMoiOnly] = useState(false);
   const [q, setQ] = useState("");
 
-  // Slug → banner_image_url map (fetched from DB scholarships table).
-  const bannerQuery = useQuery({
-    queryKey: ["scholarship-banners"],
+  const dbQuery = useQuery({
+    queryKey: ["scholarships-all"],
     queryFn: async () => {
       const { data, error } = await supabase
         .from("scholarships")
-        .select("slug, banner_image_url")
-        .not("banner_image_url", "is", null);
+        .select(
+          "id,slug,name,provider,host_country,flag_emoji,description,funding_type,provider_type,cycle_status,degree_level,deadline,expected_next_open_month,amount_display,annual_value_usd,application_fee_usd,accepts_moi_waiver,academic_profile_weight,banner_image_url,eligible_countries,wow_fact,fully_funded"
+        )
+        .order("deadline", { ascending: true, nullsFirst: false })
+        .limit(500);
       if (error) throw error;
-      const map = new Map<string, string>();
-      for (const r of data ?? []) {
-        if ((r as any).slug && (r as any).banner_image_url) {
-          map.set((r as any).slug, (r as any).banner_image_url);
-        }
-      }
-      return map;
+      return (data as DbRow[]).map(mapRow);
     },
     staleTime: 5 * 60 * 1000,
   });
-  const bannerMap = bannerQuery.data ?? new Map<string, string>();
+
+  const all = dbQuery.data ?? [];
 
   const filtered = useMemo(() => {
-    return ENRICHED_SCHOLARSHIPS.filter((s) => {
+    return all.filter((s) => {
+      if (level !== "all") {
+        if (s.level !== level && s.level !== "all") return false;
+      }
       if (budget === "free" && s.funding_type !== "fully_funded") return false;
       if (budget === "5k" && s.funding_type === "stipend_only") return false;
-      // 15k & any: no restriction beyond default
       if (profile !== "any" && s.academic_profile_weight !== profile) return false;
-      if (region !== "all" && COUNTRY_REGION[s.country] !== region) return false;
+      if (providerType !== "all" && s.provider_type !== providerType) return false;
+      if (region !== "all") {
+        const r = COUNTRY_REGION[s.country] ?? "Various";
+        if (r !== region) return false;
+      }
       if (noFee && s.application_fee_usd > 0) return false;
       if (moiOnly && !s.accepts_moi_waiver) return false;
       if (q) {
         const n = q.toLowerCase();
-        if (!s.name.toLowerCase().includes(n) && !s.country.toLowerCase().includes(n) && !s.provider.toLowerCase().includes(n)) {
-          return false;
-        }
+        if (
+          !s.name.toLowerCase().includes(n) &&
+          !s.country.toLowerCase().includes(n) &&
+          !s.provider.toLowerCase().includes(n)
+        ) return false;
       }
       return true;
     });
-  }, [budget, profile, region, noFee, moiOnly, q]);
+  }, [all, level, budget, profile, providerType, region, noFee, moiOnly, q]);
 
   const active = useMemo(
     () =>
       filtered
         .filter((s) => s.cycle_status === "active_open" || s.cycle_status === "rolling_admissions")
-        .sort((a, b) => +new Date(a.deadline) - +new Date(b.deadline)),
+        .sort((a, b) => {
+          if (!a.deadline) return 1;
+          if (!b.deadline) return -1;
+          return +new Date(a.deadline) - +new Date(b.deadline);
+        }),
     [filtered],
   );
   const prepMode = useMemo(
@@ -137,13 +233,16 @@ function ScholarshipsHub() {
   );
 
   const closingSoon = active.filter((s) => {
+    if (!s.deadline) return false;
     const d = daysLeft(s.deadline);
     return d >= 0 && d <= 30;
   });
 
   const reset = () => {
+    setLevel("undergraduate");
     setBudget("free");
     setProfile("any");
+    setProviderType("all");
     setRegion("all");
     setNoFee(false);
     setMoiOnly(false);
@@ -154,30 +253,57 @@ function ScholarshipsHub() {
     <div className="mx-auto max-w-7xl px-4 py-10">
       {/* Page heading */}
       <div className="mb-6">
+        <div className="mb-2 inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-primary">
+          <Sparkles className="h-3 w-3" /> {all.length} scholarships indexed
+        </div>
         <h1 className="font-heading text-4xl font-extrabold text-foreground md:text-5xl">
           Scholarships
         </h1>
         <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
-          Every international scholarship that matters — filtered by what you can actually pay,
-          and split into what's <em>open today</em> vs what to start <em>preparing now</em>.
+          Every international scholarship that matters — government, university, NGO and regional.
+          Filtered by your degree level and what you can actually pay, split into what's{" "}
+          <em>open today</em> vs what to start <em>preparing now</em>.
         </p>
       </div>
 
-      {/* ─── WTF Scholarships carousel ─── */}
-      <WtfScholarshipsCarousel />
+      {/* Level switcher (primary nav) */}
+      <div className="mb-6 grid grid-cols-2 gap-2 md:grid-cols-4">
+        {LEVELS.map((l) => {
+          const Icon = l.icon;
+          const active = level === l.key;
+          const count = all.filter((s) => l.key === "all" ? true : s.level === l.key || s.level === "all").length;
+          return (
+            <button
+              key={l.key}
+              onClick={() => setLevel(l.key)}
+              className={`flex items-start gap-2 rounded-md border px-3 py-3 text-left transition ${
+                active
+                  ? "border-primary bg-primary text-primary-foreground shadow-sm"
+                  : "border-border bg-white text-foreground hover:border-primary/40"
+              }`}
+            >
+              <Icon className={`mt-0.5 h-4 w-4 shrink-0 ${active ? "text-primary-foreground" : "text-primary"}`} />
+              <div className="min-w-0">
+                <div className="text-sm font-bold leading-tight">{l.label}</div>
+                <div className={`text-[11px] ${active ? "text-primary-foreground/80" : "text-muted-foreground"}`}>
+                  {l.sub} · {count}
+                </div>
+              </div>
+            </button>
+          );
+        })}
+      </div>
 
+      {/* WTF Scholarships carousel */}
+      <WtfScholarshipsCarousel all={all} />
 
-
-      {/* ─── Intent matrix ─── */}
+      {/* Intent matrix */}
       <section className="rounded-md border border-border bg-white p-5 md:p-6">
         <div className="grid gap-6 md:grid-cols-3">
-          {/* Budget switcher */}
           <div>
             <div className="mb-2 flex items-center gap-2">
               <Wallet className="h-4 w-4 text-primary" />
-              <h3 className="font-heading text-sm font-bold uppercase tracking-wide text-foreground">
-                Your budget
-              </h3>
+              <h3 className="font-heading text-sm font-bold uppercase tracking-wide text-foreground">Your budget</h3>
             </div>
             <div className="flex flex-col gap-1.5">
               {BUDGETS.map((b) => (
@@ -197,13 +323,10 @@ function ScholarshipsHub() {
             </div>
           </div>
 
-          {/* Profile selector */}
           <div>
             <div className="mb-2 flex items-center gap-2">
               <Sparkles className="h-4 w-4 text-primary" />
-              <h3 className="font-heading text-sm font-bold uppercase tracking-wide text-foreground">
-                Your profile
-              </h3>
+              <h3 className="font-heading text-sm font-bold uppercase tracking-wide text-foreground">Your profile</h3>
             </div>
             <div className="flex flex-col gap-1.5">
               {PROFILES.map((p) => {
@@ -226,42 +349,25 @@ function ScholarshipsHub() {
             </div>
           </div>
 
-          {/* Hidden wall toggles + region + search */}
           <div className="flex flex-col gap-3">
             <div>
               <div className="mb-2 flex items-center gap-2">
                 <AlertTriangle className="h-4 w-4 text-primary" />
-                <h3 className="font-heading text-sm font-bold uppercase tracking-wide text-foreground">
-                  Hidden-wall toggles
-                </h3>
+                <h3 className="font-heading text-sm font-bold uppercase tracking-wide text-foreground">Hidden-wall toggles</h3>
               </div>
               <div className="flex flex-col gap-1.5">
                 <label className="flex cursor-pointer items-start gap-2 rounded border border-border px-3 py-2 text-sm hover:border-primary/40">
-                  <input
-                    type="checkbox"
-                    checked={noFee}
-                    onChange={(e) => setNoFee(e.target.checked)}
-                    className="mt-0.5 h-4 w-4 accent-primary"
-                  />
+                  <input type="checkbox" checked={noFee} onChange={(e) => setNoFee(e.target.checked)} className="mt-0.5 h-4 w-4 accent-primary" />
                   <span>
                     <span className="font-medium text-foreground">Only $0 application fees</span>
-                    <span className="block text-[11px] text-muted-foreground">
-                      Hide awards that charge to apply
-                    </span>
+                    <span className="block text-[11px] text-muted-foreground">Hide awards that charge to apply</span>
                   </span>
                 </label>
                 <label className="flex cursor-pointer items-start gap-2 rounded border border-border px-3 py-2 text-sm hover:border-primary/40">
-                  <input
-                    type="checkbox"
-                    checked={moiOnly}
-                    onChange={(e) => setMoiOnly(e.target.checked)}
-                    className="mt-0.5 h-4 w-4 accent-primary"
-                  />
+                  <input type="checkbox" checked={moiOnly} onChange={(e) => setMoiOnly(e.target.checked)} className="mt-0.5 h-4 w-4 accent-primary" />
                   <span>
                     <span className="font-medium text-foreground">Accepts MOI (no IELTS)</span>
-                    <span className="block text-[11px] text-muted-foreground">
-                      Medium-of-instruction letter in lieu of IELTS/TOEFL
-                    </span>
+                    <span className="block text-[11px] text-muted-foreground">Medium-of-instruction letter in lieu of IELTS/TOEFL</span>
                   </span>
                 </label>
               </div>
@@ -269,29 +375,33 @@ function ScholarshipsHub() {
 
             <div className="grid grid-cols-2 gap-2">
               <select
+                value={providerType}
+                onChange={(e) => setProviderType(e.target.value as any)}
+                className="h-10 rounded border border-border bg-white px-2 text-sm text-foreground"
+              >
+                {PROVIDER_TYPES.map((p) => (
+                  <option key={p.key} value={p.key}>{p.label}</option>
+                ))}
+              </select>
+              <select
                 value={region}
-                onChange={(e) => setRegion(e.target.value as (typeof REGIONS)[number])}
+                onChange={(e) => setRegion(e.target.value as any)}
                 className="h-10 rounded border border-border bg-white px-2 text-sm text-foreground"
               >
                 {REGIONS.map((r) => (
-                  <option key={r} value={r}>
-                    {r === "all" ? "All regions" : r}
-                  </option>
+                  <option key={r} value={r}>{r === "all" ? "All regions" : r}</option>
                 ))}
               </select>
+            </div>
+
+            <div className="grid grid-cols-[1fr_auto] gap-2">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                <Input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search name, country, provider…" className="h-10 bg-white pl-9" />
+              </div>
               <Button variant="outline" size="sm" onClick={reset} className="h-10">
                 <RotateCcw className="mr-1.5 h-3.5 w-3.5" /> Reset
               </Button>
-            </div>
-
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-              <Input
-                value={q}
-                onChange={(e) => setQ(e.target.value)}
-                placeholder="Search by name, country, or provider…"
-                className="h-10 bg-white pl-9"
-              />
             </div>
           </div>
         </div>
@@ -305,47 +415,56 @@ function ScholarshipsHub() {
             <div className="font-heading text-sm font-bold text-destructive">
               Closing soon: {closingSoon.length} match{closingSoon.length > 1 ? "es" : ""} close within 30 days
             </div>
-            <div className="mt-0.5 text-xs text-foreground/80">
-              Sorted by deadline — apply to the urgent ones first.
-            </div>
+            <div className="mt-0.5 text-xs text-foreground/80">Sorted by deadline — apply to the urgent ones first.</div>
           </div>
         </div>
       )}
 
-      {/* ─── Dual stream ─── */}
-      <section className="mt-10">
-        <SectionHeader
-          icon={<Clock className="h-5 w-5 text-primary" />}
-          title="The Current Window"
-          subtitle="Active and rolling-admission awards, soonest deadline first."
-          count={active.length}
-        />
-        {active.length === 0 ? (
-          <EmptyState reset={reset} />
-        ) : (
-          <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
-            {active.map((s) => (
-              <ScholarshipCard key={s.id} s={s} variant="active" bannerUrl={bannerMap.get(scholarshipSlug(s)) ?? null} />
-            ))}
-          </div>
-        )}
-      </section>
+      {/* Loading */}
+      {dbQuery.isLoading && (
+        <div className="mt-10 flex items-center justify-center gap-3 rounded-md border border-border bg-white p-12 text-sm text-muted-foreground">
+          <Loader2 className="h-4 w-4 animate-spin" /> Loading scholarships…
+        </div>
+      )}
 
-      {prepMode.length > 0 && (
-        <section className="mt-14">
-          <SectionHeader
-            icon={<CalendarClock className="h-5 w-5 text-amber-700" />}
-            title="The Next-Cycle Pipeline"
-            subtitle="Premium fellowships currently closed. Start preparing now so you're not caught off-guard when portals reopen."
-            count={prepMode.length}
-            accent="amber"
-          />
-          <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
-            {prepMode.map((s) => (
-              <ScholarshipCard key={s.id} s={s} variant="prep" bannerUrl={bannerMap.get(scholarshipSlug(s)) ?? null} />
-            ))}
-          </div>
-        </section>
+      {/* Dual stream */}
+      {!dbQuery.isLoading && (
+        <>
+          <section className="mt-10">
+            <SectionHeader
+              icon={<Clock className="h-5 w-5 text-primary" />}
+              title="The Current Window"
+              subtitle="Active and rolling-admission awards, soonest deadline first."
+              count={active.length}
+            />
+            {active.length === 0 ? (
+              <EmptyState reset={reset} />
+            ) : (
+              <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+                {active.map((s) => (
+                  <ScholarshipCard key={s.id} s={s} variant="active" />
+                ))}
+              </div>
+            )}
+          </section>
+
+          {prepMode.length > 0 && (
+            <section className="mt-14">
+              <SectionHeader
+                icon={<CalendarClock className="h-5 w-5 text-amber-700" />}
+                title="The Next-Cycle Pipeline"
+                subtitle="Premium fellowships currently closed. Start preparing now so you're not caught off-guard when portals reopen."
+                count={prepMode.length}
+                accent="amber"
+              />
+              <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+                {prepMode.map((s) => (
+                  <ScholarshipCard key={s.id} s={s} variant="prep" />
+                ))}
+              </div>
+            </section>
+          )}
+        </>
       )}
 
       <LoginNudge text="Save your favorites and track every deadline." />
@@ -353,37 +472,21 @@ function ScholarshipsHub() {
   );
 }
 
+/* ──────────────── Helpers ──────────────── */
+
 function SectionHeader({
-  icon,
-  title,
-  subtitle,
-  count,
-  accent,
-}: {
-  icon: React.ReactNode;
-  title: string;
-  subtitle: string;
-  count: number;
-  accent?: "amber";
-}) {
+  icon, title, subtitle, count, accent,
+}: { icon: React.ReactNode; title: string; subtitle: string; count: number; accent?: "amber" }) {
   return (
     <div className="mb-5 flex items-end justify-between gap-4 border-b border-border pb-3">
       <div className="min-w-0">
         <div className="flex items-center gap-2">
           {icon}
-          <h2
-            className={`font-heading text-2xl font-bold ${
-              accent === "amber" ? "text-amber-900" : "text-foreground"
-            }`}
-          >
-            {title}
-          </h2>
+          <h2 className={`font-heading text-2xl font-bold ${accent === "amber" ? "text-amber-900" : "text-foreground"}`}>{title}</h2>
         </div>
         <p className="mt-1 text-sm text-muted-foreground">{subtitle}</p>
       </div>
-      <div className="shrink-0 rounded-full border border-border bg-white px-3 py-1 text-xs font-semibold text-foreground">
-        {count}
-      </div>
+      <div className="shrink-0 rounded-full border border-border bg-white px-3 py-1 text-xs font-semibold text-foreground">{count}</div>
     </div>
   );
 }
@@ -391,12 +494,8 @@ function SectionHeader({
 function EmptyState({ reset }: { reset: () => void }) {
   return (
     <div className="rounded-md border border-dashed border-border bg-white p-12 text-center">
-      <p className="font-heading text-lg font-bold text-foreground">
-        No scholarships match these exact criteria.
-      </p>
-      <p className="mt-1 text-sm text-muted-foreground">
-        Try broadening your budget or region filters.
-      </p>
+      <p className="font-heading text-lg font-bold text-foreground">No scholarships match these exact criteria.</p>
+      <p className="mt-1 text-sm text-muted-foreground">Try broadening your degree level, budget or region filters.</p>
       <Button onClick={reset} className="mt-5 bg-primary text-primary-foreground hover:bg-primary/90">
         <RotateCcw className="mr-2 h-4 w-4" /> Reset filters
       </Button>
@@ -404,9 +503,7 @@ function EmptyState({ reset }: { reset: () => void }) {
   );
 }
 
-/* ──────────────────── Card ──────────────────── */
-
-function levelBadge(level: EnrichedScholarship["level"]): string {
+function levelBadge(level: ViewSch["level"]): string {
   switch (level) {
     case "undergraduate": return "Bachelor's";
     case "postgraduate": return "Master's";
@@ -416,22 +513,17 @@ function levelBadge(level: EnrichedScholarship["level"]): string {
   }
 }
 
-function ScholarshipCard({
-  s,
-  variant,
-  bannerUrl,
-}: {
-  s: EnrichedScholarship;
-  variant: "active" | "prep";
-  bannerUrl?: string | null;
-}) {
+/* ──────────────── Card ──────────────── */
+
+function ScholarshipCard({ s, variant }: { s: ViewSch; variant: "active" | "prep" }) {
   const { user } = useAuth();
   const [saving, setSaving] = useState(false);
-  const d = daysLeft(s.deadline);
-  const slug = scholarshipSlug(s);
+  const d = s.deadline ? daysLeft(s.deadline) : null;
 
   const countdownCls =
-    d < 0
+    d === null
+      ? "bg-white/15 text-white/80 ring-white/20"
+      : d < 0
       ? "bg-white/15 text-white/80 ring-white/20"
       : d <= 10
       ? "bg-red-500/90 text-white ring-red-300/60"
@@ -459,16 +551,29 @@ function ScholarshipCard({
     else toast.success(`Saved ${s.name}`);
   };
 
+  const banner = s.banner_image_url;
+
   return (
     <Link
       to="/scholarships/$slug"
-      params={{ slug }}
+      params={{ slug: s.slug }}
       className="group relative block h-[360px] overflow-hidden rounded-lg ring-1 ring-border shadow-sm transition-shadow hover:shadow-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
     >
-      {/* Premium topographic background — pure CSS/SVG, no stock photos */}
-      <TopoBackground />
+      {banner ? (
+        <>
+          <img
+            src={banner}
+            alt={s.name}
+            loading="lazy"
+            className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.04]"
+            onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = "none"; }}
+          />
+          <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-black/40 to-black/85" />
+        </>
+      ) : (
+        <TopoBackground />
+      )}
 
-      {/* Top-right level badge */}
       <div className="absolute right-3 top-3 z-10 flex items-center gap-1.5">
         <span className="rounded-full bg-white/15 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-white ring-1 ring-white/30 backdrop-blur">
           {levelBadge(s.level)}
@@ -483,7 +588,6 @@ function ScholarshipCard({
         </button>
       </div>
 
-      {/* Top-left chips */}
       <div className="absolute left-3 top-3 z-10 flex flex-wrap items-center gap-1.5">
         <span className="rounded-full bg-primary/90 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-primary-foreground ring-1 ring-white/20 backdrop-blur">
           {fundingLabel(s.funding_type)}
@@ -495,7 +599,6 @@ function ScholarshipCard({
         )}
       </div>
 
-      {/* Bottom content */}
       <div className="relative z-10 flex h-full flex-col justify-end p-5 !text-white">
         <div className="flex items-center gap-2 text-sm !text-white">
           <span className="text-xl leading-none">{s.countryFlag}</span>
@@ -521,7 +624,9 @@ function ScholarshipCard({
           ) : (
             <span className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[11px] font-bold uppercase tracking-wide ring-1 ${countdownCls}`}>
               <Clock className="h-3 w-3" />
-              {d < 0
+              {d === null
+                ? "Rolling"
+                : d < 0
                 ? "Closed"
                 : d === 0
                 ? "Today"
@@ -535,9 +640,7 @@ function ScholarshipCard({
         <div className="mt-3 flex items-center justify-between text-[11px] text-white/70">
           <span>{s.application_fee_usd > 0 ? `$${s.application_fee_usd} fee` : "Free to apply"}</span>
           {s.accepts_moi_waiver && (
-            <span className="rounded-full bg-emerald-500/20 px-2 py-0.5 font-semibold text-emerald-200 ring-1 ring-emerald-300/40">
-              MOI ok
-            </span>
+            <span className="rounded-full bg-emerald-500/20 px-2 py-0.5 font-semibold text-emerald-200 ring-1 ring-emerald-300/40">MOI ok</span>
           )}
           <span className="inline-flex items-center gap-1 font-semibold text-white group-hover:underline">
             View <ArrowRight className="h-3 w-3 transition-transform group-hover:translate-x-0.5" />
@@ -548,43 +651,41 @@ function ScholarshipCard({
   );
 }
 
-/* ─────────────────── WTF Scholarships Carousel ─────────────────── */
+/* ──────────────── WTF Carousel ──────────────── */
 
-function WtfScholarshipsCarousel() {
-  const wtf = useMemo(() => {
+function WtfScholarshipsCarousel({ all }: { all: ViewSch[] }) {
+  const buckets = useMemo(() => {
     return [
       {
         title: "$0 application fee",
-        items: ENRICHED_SCHOLARSHIPS.filter((s) => s.application_fee_usd === 0 && s.funding_type === "fully_funded").slice(0, 6),
+        items: all.filter((s) => s.application_fee_usd === 0 && s.funding_type === "fully_funded").slice(0, 6),
         emoji: "💸",
         tone: "from-emerald-50 to-white border-emerald-200",
       },
       {
         title: "MOI accepted (skip IELTS)",
-        items: ENRICHED_SCHOLARSHIPS.filter((s) => s.accepts_moi_waiver && s.funding_type === "fully_funded").slice(0, 6),
+        items: all.filter((s) => s.accepts_moi_waiver && s.funding_type === "fully_funded").slice(0, 6),
         emoji: "📝",
         tone: "from-sky-50 to-white border-sky-200",
       },
       {
         title: "Government-backed fully funded",
-        items: ENRICHED_SCHOLARSHIPS.filter((s) => s.provider_type === "government" && s.funding_type === "fully_funded").slice(0, 6),
+        items: all.filter((s) => s.provider_type === "government" && s.funding_type === "fully_funded").slice(0, 6),
         emoji: "🏛️",
         tone: "from-amber-50 to-white border-amber-200",
       },
     ];
-  }, []);
+  }, [all]);
 
   return (
     <section className="mb-8">
       <div className="mb-3 flex items-center gap-2">
         <Sparkles className="h-4 w-4 text-primary" />
-        <h2 className="font-heading text-sm font-bold uppercase tracking-wide text-foreground">
-          WTF scholarships
-        </h2>
+        <h2 className="font-heading text-sm font-bold uppercase tracking-wide text-foreground">WTF scholarships</h2>
         <span className="text-xs text-muted-foreground">— the ones most people don't know exist</span>
       </div>
       <div className="grid gap-4 md:grid-cols-3">
-        {wtf.map((bucket) => (
+        {buckets.map((bucket) => (
           <div key={bucket.title} className={`rounded-md border bg-gradient-to-b p-4 ${bucket.tone}`}>
             <div className="mb-2 flex items-center gap-2">
               <span className="text-lg">{bucket.emoji}</span>
@@ -595,7 +696,7 @@ function WtfScholarshipsCarousel() {
                 <li key={s.id}>
                   <Link
                     to="/scholarships/$slug"
-                    params={{ slug: scholarshipSlug(s) }}
+                    params={{ slug: s.slug }}
                     className="group flex items-start gap-2 text-xs text-foreground/85 hover:text-primary"
                   >
                     <span className="text-sm leading-none">{s.countryFlag}</span>
@@ -604,7 +705,7 @@ function WtfScholarshipsCarousel() {
                 </li>
               ))}
               {bucket.items.length === 0 && (
-                <li className="text-xs text-muted-foreground">Nothing indexed in this bucket yet.</li>
+                <li className="text-xs text-muted-foreground">Nothing in this bucket yet.</li>
               )}
             </ul>
           </div>
@@ -613,6 +714,3 @@ function WtfScholarshipsCarousel() {
     </section>
   );
 }
-
-
-export { ScholarshipCard };
