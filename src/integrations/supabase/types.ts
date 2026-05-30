@@ -274,7 +274,7 @@ export type Database = {
           amount_display: string | null
           annual_value_usd: number | null
           application_fee_usd: number | null
-          application_steps: Json | null
+          application_steps: string[] | null
           avg_gpa_recipients: string | null
           avg_ielts_recipients: string | null
           banner_image_url: string | null
@@ -309,7 +309,7 @@ export type Database = {
           provider_type: string | null
           renewable: boolean | null
           renewal_conditions: string | null
-          required_docs: Json | null
+          required_docs: string[] | null
           required_documents_checklist: string[] | null
           results_announced: string | null
           seats_per_year: number | null
@@ -331,7 +331,7 @@ export type Database = {
           amount_display?: string | null
           annual_value_usd?: number | null
           application_fee_usd?: number | null
-          application_steps?: Json | null
+          application_steps?: string[] | null
           avg_gpa_recipients?: string | null
           avg_ielts_recipients?: string | null
           banner_image_url?: string | null
@@ -366,7 +366,7 @@ export type Database = {
           provider_type?: string | null
           renewable?: boolean | null
           renewal_conditions?: string | null
-          required_docs?: Json | null
+          required_docs?: string[] | null
           required_documents_checklist?: string[] | null
           results_announced?: string | null
           seats_per_year?: number | null
@@ -388,7 +388,7 @@ export type Database = {
           amount_display?: string | null
           annual_value_usd?: number | null
           application_fee_usd?: number | null
-          application_steps?: Json | null
+          application_steps?: string[] | null
           avg_gpa_recipients?: string | null
           avg_ielts_recipients?: string | null
           banner_image_url?: string | null
@@ -423,7 +423,7 @@ export type Database = {
           provider_type?: string | null
           renewable?: boolean | null
           renewal_conditions?: string | null
-          required_docs?: Json | null
+          required_docs?: string[] | null
           required_documents_checklist?: string[] | null
           results_announced?: string | null
           seats_per_year?: number | null
@@ -733,6 +733,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      _jsonb_to_text_array: { Args: { j: Json }; Returns: string[] }
       show_limit: { Args: never; Returns: number }
       show_trgm: { Args: { "": string }; Returns: string[] }
     }
