@@ -147,8 +147,12 @@ function ScholarshipDetailPage() {
   }, [slug, staticS, dbQuery.data, dbQuery.isLoading, hydrating, hydrateFn, queryClient]);
 
   // No data at all → shimmer + rotating status
-  if (!staticS && (dbQuery.isLoading || hydrating || !hasTriedHydrate)) {
+  if (!staticS && (dbQuery.isLoading || hydrating)) {
     if (hydrateErr) return <HydrationError slug={slug} message={hydrateErr} />;
+    return <HydrationShimmer />;
+  }
+
+  if (!staticS && !dbQuery.data && !hasTriedHydrate && !hydrateErr) {
     return <HydrationShimmer />;
   }
 
