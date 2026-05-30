@@ -194,25 +194,20 @@ function UniDetailPage() {
 }
 
 function Hero({ uni }: { uni: any }) {
-  const hasValidImage =
-    uni?.campus_image_url && typeof uni.campus_image_url === "string" && uni.campus_image_url.trim() !== "";
-  const bgImage = hasValidImage
-    ? uni.campus_image_url
-    : COUNTRY_IMAGE_MAP[uni?.country_code as string] ||
-      COUNTRY_IMAGE_MAP[uni?.country as string] ||
-      "https://images.unsplash.com/photo-1541339907198-e08756dedf3f?fm=webp&w=1600&q=80";
-
-  const hasValidLogo =
-    uni?.logo_url && typeof uni.logo_url === "string" && uni.logo_url.trim() !== "";
+  const campusUrl = typeof uni?.campus_image_url === "string" ? uni.campus_image_url.trim() : "";
+  const logoUrl = typeof uni?.logo_url === "string" ? uni.logo_url.trim() : "";
+  const website = uni?.official_url || undefined;
 
   return (
-    <header className="relative w-full h-[400px] flex flex-col justify-end pb-10 px-8 bg-[#020617] overflow-hidden">
-      <img
-        src={bgImage}
-        alt="Campus"
-        className="absolute inset-0 w-full h-full object-cover opacity-50 -z-20"
+    <header className="relative flex h-[400px] w-full flex-col justify-end overflow-hidden bg-slate-950 px-8 pb-10">
+      <SmartCampusImage
+        src={campusUrl || null}
+        name={uni?.name ?? "University"}
+        alt={`${uni?.name ?? "University"} campus`}
+        className="opacity-40 -z-20"
+        loading="eager"
       />
-      <div className="absolute inset-0 bg-gradient-to-t from-[#020617] via-[#020617]/80 to-transparent -z-10" />
+      <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/60 to-transparent -z-10" />
 
       <div className="absolute inset-x-0 top-0 z-10 p-4">
         <Link to="/universities" className="inline-flex items-center gap-1 text-sm text-white/90 hover:text-white drop-shadow">
@@ -222,26 +217,13 @@ function Hero({ uni }: { uni: any }) {
 
       <div className="mx-auto w-full max-w-6xl">
         <div className="flex items-end gap-6 relative z-10">
-          <div className="w-28 h-28 bg-white rounded-2xl shadow-2xl flex items-center justify-center shrink-0 overflow-hidden relative z-10 border-4 border-[#020617]/10">
-            {hasValidLogo ? (
-              <img
-                src={uni.logo_url}
-                alt="Logo"
-                className="w-full h-full object-contain p-3"
-                onError={(e) => {
-                  e.currentTarget.style.display = "none";
-                  const sib = e.currentTarget.nextElementSibling as HTMLElement | null;
-                  if (sib) sib.style.display = "flex";
-                }}
-              />
-            ) : null}
-            <div
-              className="w-full h-full bg-slate-900 items-center justify-center text-5xl font-serif font-bold text-white text-center"
-              style={{ display: hasValidLogo ? "none" : "flex" }}
-            >
-              {uni?.name ? uni.name.charAt(0) : "U"}
-            </div>
-          </div>
+          <SmartLogo
+            name={uni?.name ?? "University"}
+            logoUrl={logoUrl || null}
+            website={website}
+            size={112}
+            className="relative z-10 border-4 border-white/10 bg-white shadow-2xl"
+          />
 
           <div className="min-w-0">
             <h1 className="text-4xl md:text-5xl font-serif font-bold text-white drop-shadow-lg tracking-tight m-0">
