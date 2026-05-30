@@ -24,6 +24,7 @@ import { useAuth } from "@/lib/auth";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { TopoBackground } from "@/components/TopoBackground";
+import { SmartCampusImage } from "@/components/SmartCampusImage";
 import { LoginNudge } from "./universities.index";
 
 export const Route = createFileRoute("/scholarships/")({
@@ -551,7 +552,7 @@ function ScholarshipCard({ s, variant }: { s: ViewSch; variant: "active" | "prep
     else toast.success(`Saved ${s.name}`);
   };
 
-  const banner = s.banner_image_url;
+  const banner = typeof s.banner_image_url === "string" ? s.banner_image_url.trim() : "";
 
   return (
     <Link
@@ -559,20 +560,17 @@ function ScholarshipCard({ s, variant }: { s: ViewSch; variant: "active" | "prep
       params={{ slug: s.slug }}
       className="group relative block h-[360px] overflow-hidden rounded-lg ring-1 ring-border shadow-sm transition-shadow hover:shadow-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
     >
-      {banner ? (
-        <>
-          <img
-            src={banner}
-            alt={s.name}
-            loading="lazy"
-            className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.04]"
-            onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = "none"; }}
-          />
-          <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-black/40 to-black/85" />
-        </>
-      ) : (
+      <div className="absolute inset-0">
         <TopoBackground />
-      )}
+        <SmartCampusImage
+          src={banner || null}
+          name={s.name}
+          alt={`${s.name} scholarship cover`}
+          className="transition-transform duration-700 group-hover:scale-[1.04] opacity-60"
+          noOverlay
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-black/40 to-black/85" />
+      </div>
 
       <div className="absolute right-3 top-3 z-10 flex items-center gap-1.5">
         <span className="rounded-full bg-white/15 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-white ring-1 ring-white/30 backdrop-blur">

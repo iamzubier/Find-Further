@@ -109,6 +109,7 @@ function ScholarshipDetailPage() {
   const staticS = useMemo(() => findScholarshipBySlug(slug), [slug]);
   const queryClient = useQueryClient();
   const hydrateFn = useServerFn(hydrateScholarship);
+  const [hasTriedHydrate, setHasTriedHydrate] = useState(false);
 
   // Pull DB row (if present) — gives us the multi-POV detail when hydrated.
   const dbQuery = useQuery({
@@ -118,9 +119,10 @@ function ScholarshipDetailPage() {
         .from("scholarships")
         .select("*")
         .eq("slug", slug)
-        .maybeSingle();
+        .limit(1);
       if (error) throw error;
-      return (data as DbScholarship | null) ?? null;
+      const row = Array.isArray(data) ? data[0] : data;
+      return (row as DbScholarship | null) ?? null;
     },
   });
 
@@ -128,10 +130,23 @@ function ScholarshipDetailPage() {
   const [hydrating, setHydrating] = useState(false);
   const [hydrateErr, setHydrateErr] = useState<string | null>(null);
   useEffect(() => {
+    console.log("scholarship-detail-state", {
+      slug,
+      isLoading: dbQuery.isLoading,
+      hasData: !!dbQuery.data,
+      hydrating,
+      hasTriedHydrate,
+      hydrateErr,
+      dbError: dbQuery.error ? String(dbQuery.error) : null,
+    });
+  }, [slug, dbQuery.isLoading, dbQuery.data, dbQuery.error, hydrating, hasTriedHydrate, hydrateErr]);
+
+  useEffect(() => {
     if (dbQuery.isLoading) return;
     if (staticS) return;
     if (dbQuery.data?.hydrated_at) return;
     if (hydrating) return;
+    setHasTriedHydrate(true);
     setHydrating(true);
     setHydrateErr(null);
     hydrateFn({ data: { slug } })
@@ -144,9 +159,18 @@ function ScholarshipDetailPage() {
   }, [slug, staticS, dbQuery.data, dbQuery.isLoading, hydrating, hydrateFn, queryClient]);
 
   // No data at all → shimmer + rotating status
-  if (!staticS && !dbQuery.data) {
+  if (!staticS && (dbQuery.isLoading || hydrating)) {
     if (hydrateErr) return <HydrationError slug={slug} message={hydrateErr} />;
     return <HydrationShimmer />;
+  }
+
+  if (!staticS && !dbQuery.data && !hasTriedHydrate && !hydrateErr) {
+    return <HydrationShimmer />;
+  }
+
+  if (!staticS && !dbQuery.data) {
+    if (hydrateErr) return <HydrationError slug={slug} message={hydrateErr} />;
+    return <HydrationError slug={slug} message="This scholarship profile is temporarily unavailable. Please try again in a moment." />;
   }
 
   // Build a unified enriched view: static enrichment, with DB overrides if present.
@@ -392,6 +416,7 @@ function Hero({ v }: { v: View }) {
   const c = useCountdown(v.deadline);
   const d = daysLeft(v.deadline);
   const isPrep = v.cycle_status === "closed_prep_mode";
+  const bannerUrl = typeof v.banner_image_url === "string" ? v.banner_image_url.trim() : "";
 
   const save = async () => {
     if (!user) {
@@ -411,7 +436,16 @@ function Hero({ v }: { v: View }) {
 
   return (
     <div className="relative w-full overflow-hidden border-b border-border" style={{ minHeight: 400 }}>
-      <TopoBackground />
+      <div className="absolute inset-0 z-0">
+        <TopoBackground />
+        <SmartCampusImage
+          src={bannerUrl || null}
+          name={v.name}
+          alt={`${v.name} scholarship cover`}
+          className="opacity-35"
+          loading="eager"
+        />
+      </div>
 
       <div className="relative z-10 mx-auto max-w-6xl px-4 py-10 text-white">
         <Link to="/scholarships" className="inline-flex items-center gap-1 text-sm text-white/80 hover:text-white">
