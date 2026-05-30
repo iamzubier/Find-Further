@@ -36,7 +36,13 @@ export const fixPlaceImagesBatch = createServerFn({ method: "POST" })
     }
 
     const { data: rows, error, count } = await query;
-    if (error) throw new Error(error.message);
+    if (error) {
+      // PostgREST returns 416 "Requested range not satisfiable" when offset >= total.
+      if ((error as any).code === "PGRST103" || /range not satisfiable/i.test(error.message)) {
+        return { total: count ?? 0, batch: 0, offset: data.offset, campusUpdated: 0, logosUpdated: 0, skipped: 0, failed: 0, done: true };
+      }
+      throw new Error(error.message);
+    }
 
     let campusUpdated = 0, logosUpdated = 0, failed = 0, skipped = 0;
 
