@@ -2,6 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { fetchUniversityCampusImage } from "@/lib/image-fetch.server";
+import { fetchUniversityPlaceImagery } from "@/lib/google-places-images.server";
 
 const InputSchema = z.object({
   slug: z.string().min(1).max(120),
@@ -108,6 +109,7 @@ export const hydrateUniversity = createServerFn({ method: "POST" })
 
     let aiJson: any = null;
     let campusImageUrl: string | null = null;
+    let place: { photoUrl: string | null; iconUrl: string | null; websiteUri: string | null; placeId: string | null } = { photoUrl: null, iconUrl: null, websiteUri: null, placeId: null };
     try {
       const res = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
         method: "POST",
@@ -142,15 +144,16 @@ export const hydrateUniversity = createServerFn({ method: "POST" })
       }
       aiJson = JSON.parse(toolCall.function.arguments);
 
-      // Always fetch the real campus photo from Wikipedia (no API key).
-      campusImageUrl = await fetchUniversityCampusImage(name);
+      // Prefer Google Maps Places photo (unique per campus). Fall back to Wikipedia.
+      place = await fetchUniversityPlaceImagery(name, country);
+      campusImageUrl = place.photoUrl ?? (await fetchUniversityCampusImage(name));
     } catch (err) {
       console.error("[hydrate-university] fetch failed", err);
       return { ok: false, error: "Network error contacting AI gateway", slug: data.slug };
     }
 
     // 4. Derive logo via Clearbit using the best-known domain (no API key).
-    const officialUrl: string | null = aiJson.official_url ?? catalogWebsite ?? null;
+    const officialUrl: string | null = aiJson.official_url ?? place.websiteUri ?? catalogWebsite ?? null;
     const domain = (() => {
       const fromWebsite = (() => {
         if (!officialUrl) return null;
