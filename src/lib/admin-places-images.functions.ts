@@ -2,21 +2,8 @@ import { createServerFn } from "@tanstack/react-start";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { z } from "zod";
 import { fetchUniversityPlaceImagery } from "@/lib/google-places-images.server";
-
-function domainFromUrl(url: string | null | undefined): string | null {
-  if (!url) return null;
-  try {
-    const u = new URL(url.startsWith("http") ? url : `https://${url}`);
-    return u.hostname.replace(/^www\./, "");
-  } catch {
-    return null;
-  }
-}
-
-function faviconUrlFromDomain(domain: string | null): string | null {
-  if (!domain) return null;
-  return `https://www.google.com/s2/favicons?domain=${encodeURIComponent(domain)}&sz=256`;
-}
+import { fetchUniversityWikipediaLogo } from "@/lib/wikipedia-logo.server";
+import { isWeakLogoUrl } from "@/lib/logo-url";
 
 const Input = z.object({
   key: z.string().min(1).max(256),
@@ -59,10 +46,9 @@ export const fixPlaceImagesBatch = createServerFn({ method: "POST" })
         update.campus_image_url = imagery.photoUrl;
       }
 
-      if (data.force || !u.logo_url) {
-        const domain = domainFromUrl(imagery.websiteUri ?? u.official_url);
-        const faviconUrl = faviconUrlFromDomain(domain);
-        if (faviconUrl) update.logo_url = faviconUrl;
+      if (data.force || isWeakLogoUrl(u.logo_url)) {
+        const wikiLogo = await fetchUniversityWikipediaLogo(u.name);
+        if (wikiLogo) update.logo_url = wikiLogo;
       }
 
       if (Object.keys(update).length === 0) { skipped++; continue; }
