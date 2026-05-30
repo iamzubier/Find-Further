@@ -1,6 +1,6 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { queryOptions, useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import {
   SCHOLARSHIPS,
@@ -44,42 +44,39 @@ import { useAuth } from "@/lib/auth";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { hydrateScholarship } from "@/lib/hydrate-scholarship.functions";
+import { getScholarshipDetail, type ScholarshipDetailDto } from "@/lib/scholarship-detail.functions";
 import { DocumentTracker } from "@/components/DocumentTracker";
 import { loadEvalSummary } from "@/lib/evaluation-store";
 
 
-type DbScholarship = {
-  id: string;
-  slug: string;
-  name: string;
-  provider: string | null;
-  host_country: string | null;
-  description: string | null;
-  funding_type: string | null;
-  provider_type: string | null;
-  cycle_status: string | null;
-  degree_level: string | null;
-  annual_value_usd: number | null;
-  amount_display: string | null;
-  allowance_breakdown: Record<string, unknown> | null;
-  upfront_costs_covered: Record<string, unknown> | null;
-  hidden_costs_for_student: string | null;
-  hidden_obligations: string | null;
-  application_fee_usd: number | null;
-  accepts_moi_waiver: boolean | null;
-  academic_profile_weight: string | null;
-  deadline: string | null;
-  expected_next_open_month: string | null;
-  official_url: string | null;
-  required_documents_checklist: string[] | null;
-  insider_tips: string[] | null;
-  hydrated_at: string | null;
-  banner_image_url: string | null;
-  avg_gpa_recipients: string | null;
-  avg_ielts_recipients: string | null;
-};
+type DbScholarship = ScholarshipDetailDto;
+
+const detailQuery = (slug: string) => queryOptions({
+  queryKey: ["scholarship-detail", slug],
+  queryFn: () => getScholarshipDetail({ data: { slug } }),
+});
+
+function ScholarshipDetailError({ reset }: { error: Error; reset: () => void }) {
+  const router = useRouter();
+  return (
+    <div className="mx-auto max-w-2xl px-4 py-24 text-center">
+      <h1 className="font-heading text-3xl font-extrabold">Something went wrong</h1>
+      <Button onClick={() => { router.invalidate(); reset(); }} className="mt-6">Try again</Button>
+    </div>
+  );
+}
+
+function ScholarshipDetailNotFound() {
+  return (
+    <div className="mx-auto max-w-2xl px-4 py-24 text-center">
+      <h1 className="font-heading text-3xl font-extrabold">Scholarship not found</h1>
+      <Button asChild className="mt-6"><Link to="/scholarships">Back to scholarships</Link></Button>
+    </div>
+  );
+}
 
 export const Route = createFileRoute("/scholarships/$slug")({
+  loader: ({ params, context }) => context.queryClient.ensureQueryData(detailQuery(params.slug)),
   head: ({ params }) => {
     const s = findScholarshipBySlug(params.slug);
     const name = s?.name ?? "Scholarship";
@@ -95,86 +92,50 @@ export const Route = createFileRoute("/scholarships/$slug")({
       ],
     };
   },
-  errorComponent: ({ reset }) => (
-    <div className="mx-auto max-w-2xl px-4 py-24 text-center">
-      <h1 className="font-heading text-3xl font-extrabold">Something went wrong</h1>
-      <Button onClick={() => reset()} className="mt-6">Try again</Button>
-    </div>
-  ),
+  errorComponent: ScholarshipDetailError,
+  notFoundComponent: ScholarshipDetailNotFound,
   component: ScholarshipDetailPage,
 });
 
 function ScholarshipDetailPage() {
   const { slug } = Route.useParams();
   const staticS = useMemo(() => findScholarshipBySlug(slug), [slug]);
+  const { data } = useSuspenseQuery(detailQuery(slug));
   const queryClient = useQueryClient();
   const hydrateFn = useServerFn(hydrateScholarship);
-  const [hasTriedHydrate, setHasTriedHydrate] = useState(false);
-
-  // Pull DB row (if present) — gives us the multi-POV detail when hydrated.
-  const dbQuery = useQuery({
-    queryKey: ["scholarship-db", slug],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("scholarships")
-        .select("*")
-        .eq("slug", slug)
-        .limit(1);
-      if (error) throw error;
-      const row = Array.isArray(data) ? data[0] : data;
-      return (row as DbScholarship | null) ?? null;
-    },
-  });
+  const db = data as DbScholarship | null;
 
   // Trigger JIT hydration when neither static nor DB has this scholarship
   const [hydrating, setHydrating] = useState(false);
   const [hydrateErr, setHydrateErr] = useState<string | null>(null);
-  useEffect(() => {
-    console.log("scholarship-detail-state", {
-      slug,
-      isLoading: dbQuery.isLoading,
-      hasData: !!dbQuery.data,
-      hydrating,
-      hasTriedHydrate,
-      hydrateErr,
-      dbError: dbQuery.error ? String(dbQuery.error) : null,
-    });
-  }, [slug, dbQuery.isLoading, dbQuery.data, dbQuery.error, hydrating, hasTriedHydrate, hydrateErr]);
 
   useEffect(() => {
-    if (dbQuery.isLoading) return;
     if (staticS) return;
-    if (dbQuery.data?.hydrated_at) return;
+    if (db?.hydrated_at) return;
     if (hydrating) return;
-    setHasTriedHydrate(true);
     setHydrating(true);
     setHydrateErr(null);
     hydrateFn({ data: { slug } })
       .then((r) => {
         if (!r.ok) setHydrateErr(r.error ?? "Hydration failed");
-        return queryClient.invalidateQueries({ queryKey: ["scholarship-db", slug] });
+        return queryClient.invalidateQueries({ queryKey: ["scholarship-detail", slug] });
       })
       .catch((e) => setHydrateErr(String(e?.message ?? e)))
       .finally(() => setHydrating(false));
-  }, [slug, staticS, dbQuery.data, dbQuery.isLoading, hydrating, hydrateFn, queryClient]);
+  }, [slug, staticS, db, hydrating, hydrateFn, queryClient]);
 
-  // No data at all → shimmer + rotating status
-  if (!staticS && (dbQuery.isLoading || hydrating)) {
+  if (!staticS && hydrating) {
     if (hydrateErr) return <HydrationError slug={slug} message={hydrateErr} />;
     return <HydrationShimmer />;
   }
 
-  if (!staticS && !dbQuery.data && !hasTriedHydrate && !hydrateErr) {
-    return <HydrationShimmer />;
-  }
-
-  if (!staticS && !dbQuery.data) {
+  if (!staticS && !db) {
     if (hydrateErr) return <HydrationError slug={slug} message={hydrateErr} />;
     return <HydrationError slug={slug} message="This scholarship profile is temporarily unavailable. Please try again in a moment." />;
   }
 
   // Build a unified enriched view: static enrichment, with DB overrides if present.
-  const view = buildView(staticS, dbQuery.data ?? null);
+  const view = buildView(staticS, db ?? null);
 
   return (
     <div className="pb-24">
