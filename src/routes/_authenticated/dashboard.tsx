@@ -6,8 +6,7 @@ import { Button } from "@/components/ui/button";
 import { UNIVERSITIES, SCHOLARSHIPS, daysLeft } from "@/lib/data";
 import { gpaConversionLine } from "@/lib/gpa";
 import { UniversityCard } from "../universities.index";
-import { ScholarshipCard } from "../scholarships.index";
-import { enrich } from "@/lib/scholarship-enrich";
+import { scholarshipSlug } from "@/lib/data";
 import { matchUniversity } from "@/lib/matching";
 import { ArrowRight, Sparkles, TrendingUp, AlertCircle, Target } from "lucide-react";
 
