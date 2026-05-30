@@ -24,7 +24,7 @@ export const fixPlaceImagesBatch = createServerFn({ method: "POST" })
       .range(data.offset, data.offset + data.limit - 1);
 
     if (!data.force) {
-      query = query.or("logo_url.is.null,campus_image_url.is.null,campus_image_url.ilike.%unsplash%");
+      query = query.or("logo_url.is.null,logo_url.ilike.%clearbit%,logo_url.ilike.%google.com/s2/favicons%,campus_image_url.is.null,campus_image_url.ilike.%unsplash%");
     }
 
     const { data: rows, error, count } = await query;
