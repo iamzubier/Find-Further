@@ -10,9 +10,9 @@
 
   --radius-sm: 4px;
   --radius-md: 6px;
-  --radius-lg: 6px;
-  --radius-xl: 8px;
-  --radius-2xl: 10px;
+  --radius-lg: 8px;
+  --radius-xl: 10px;
+  --radius-2xl: 14px;
 
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -22,12 +22,15 @@
   --color-popover-foreground: var(--popover-foreground);
   --color-primary: var(--primary);
   --color-primary-foreground: var(--primary-foreground);
+  --color-primary-glow: var(--primary-glow);
   --color-secondary: var(--secondary);
   --color-secondary-foreground: var(--secondary-foreground);
   --color-muted: var(--muted);
   --color-muted-foreground: var(--muted-foreground);
   --color-accent: var(--accent);
   --color-accent-foreground: var(--accent-foreground);
+  --color-gold: var(--gold);
+  --color-gold-foreground: var(--gold-foreground);
   --color-destructive: var(--destructive);
   --color-destructive-foreground: var(--destructive-foreground);
   --color-warning: var(--warning);
@@ -36,32 +39,44 @@
   --color-input: var(--input);
   --color-ring: var(--ring);
   --color-ring-offset-background: var(--background);
+
+  --animate-fade-up: fade-up 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
+  --animate-shimmer: shimmer 2.5s linear infinite;
 }
 
-/* Classic academic light theme — ivory, slate, navy */
+/* Rolex-inspired luxury palette — deep emerald, champagne gold, ivory */
 :root {
-  --background: oklch(0.985 0.002 250);     /* #F9FAFB ivory */
-  --foreground: oklch(0.21 0.02 265);       /* #1F2937 slate */
-  --card: oklch(1 0 0);                     /* #FFFFFF */
-  --card-foreground: oklch(0.21 0.02 265);
+  --background: oklch(0.985 0.004 95);           /* warm ivory #FBFAF6 */
+  --foreground: oklch(0.20 0.02 200);            /* charcoal slate */
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.20 0.02 200);
   --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.21 0.02 265);
-  --primary: oklch(0.45 0.21 265);          /* #1D4ED8 academic navy */
-  --primary-foreground: oklch(1 0 0);
-  --secondary: oklch(0.96 0.005 250);       /* #F3F4F6 */
-  --secondary-foreground: oklch(0.21 0.02 265);
-  --muted: oklch(0.96 0.005 250);
-  --muted-foreground: oklch(0.45 0.015 260);
-  --accent: oklch(0.45 0.21 265);
-  --accent-foreground: oklch(1 0 0);
-  --destructive: oklch(0.43 0.18 25);       /* #991B1B crimson */
+  --popover-foreground: oklch(0.20 0.02 200);
+  --primary: oklch(0.38 0.09 160);               /* Rolex deep emerald #00603A */
+  --primary-foreground: oklch(0.985 0.004 95);
+  --primary-glow: oklch(0.52 0.12 160);          /* lifted emerald for gradients */
+  --secondary: oklch(0.965 0.005 95);            /* paper */
+  --secondary-foreground: oklch(0.20 0.02 200);
+  --muted: oklch(0.96 0.005 95);
+  --muted-foreground: oklch(0.46 0.012 200);
+  --accent: oklch(0.74 0.10 85);                 /* champagne gold #C9A86A */
+  --accent-foreground: oklch(0.20 0.02 200);
+  --gold: oklch(0.74 0.10 85);
+  --gold-foreground: oklch(0.20 0.02 200);
+  --destructive: oklch(0.43 0.18 25);
   --destructive-foreground: oklch(1 0 0);
   --warning: oklch(0.72 0.16 70);
   --warning-foreground: oklch(0.18 0.005 280);
-  --border: oklch(0.9 0.005 250);           /* #E5E7EB */
-  --input: oklch(0.93 0.005 250);
-  --ring: oklch(0.45 0.21 265);
-  --radius: 6px;
+  --border: oklch(0.91 0.005 95);
+  --input: oklch(0.93 0.005 95);
+  --ring: oklch(0.38 0.09 160);
+  --radius: 8px;
+
+  --gradient-emerald: linear-gradient(135deg, oklch(0.32 0.08 160) 0%, oklch(0.42 0.10 160) 55%, oklch(0.52 0.12 160) 100%);
+  --gradient-gold: linear-gradient(135deg, oklch(0.68 0.09 80) 0%, oklch(0.80 0.11 85) 100%);
+  --gradient-hero: linear-gradient(135deg, oklch(0.18 0.04 160) 0%, oklch(0.28 0.07 160) 60%, oklch(0.38 0.09 160) 100%);
+  --shadow-luxe: 0 1px 2px rgba(0,0,0,0.04), 0 8px 24px -10px rgba(0, 60, 40, 0.18);
+  --shadow-gold: 0 4px 24px -8px oklch(0.74 0.10 85 / 0.45);
 }
 
 @layer base {
@@ -72,36 +87,98 @@
     color: var(--color-foreground);
     font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
   }
   * { border-color: var(--color-border); }
   h1, h2, h3, h4, h5 {
     font-family: var(--font-heading);
     font-weight: 700;
-    letter-spacing: -0.01em;
-    line-height: 1.15;
+    letter-spacing: -0.018em;
+    line-height: 1.12;
     color: var(--color-foreground);
   }
+  ::selection { background: oklch(0.38 0.09 160 / 0.18); color: var(--color-foreground); }
+}
+
+@keyframes fade-up {
+  0% { opacity: 0; transform: translateY(14px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+@keyframes gold-sweep {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(200%); }
 }
 
 @layer utilities {
   .gradient-text {
-    background: linear-gradient(135deg, var(--color-foreground) 0%, var(--color-primary) 100%);
+    background: var(--gradient-emerald);
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+  }
+  .gold-text {
+    background: var(--gradient-gold);
     -webkit-background-clip: text; background-clip: text; color: transparent;
   }
   .serif-italic { font-family: var(--font-heading); font-style: italic; font-weight: 500; }
   .ink-rule { background: var(--color-border); height: 1px; }
+  .hairline-gold {
+    background: linear-gradient(90deg, transparent, oklch(0.74 0.10 85 / 0.6), transparent);
+    height: 1px;
+  }
   .card-surface {
     background: #ffffff;
     border: 1px solid var(--color-border);
     border-radius: var(--radius-md);
   }
+  .luxe-card {
+    background: #ffffff;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-luxe);
+  }
+  .bg-hero-emerald { background: var(--gradient-hero); }
+  .bg-emerald-grad { background: var(--gradient-emerald); }
+  .bg-gold-grad { background: var(--gradient-gold); }
+  .ring-gold { box-shadow: 0 0 0 1px oklch(0.74 0.10 85 / 0.6); }
+  .text-gold { color: oklch(0.66 0.10 80); }
+
+  /* Animated underline used on nav + inline links */
+  .story-link {
+    position: relative; display: inline-block;
+  }
+  .story-link::after {
+    content: ""; position: absolute; left: 0; bottom: -2px;
+    width: 100%; height: 1.5px;
+    background: var(--gradient-gold);
+    transform: scaleX(0); transform-origin: right;
+    transition: transform 0.35s cubic-bezier(0.65, 0, 0.35, 1);
+  }
+  .story-link:hover::after { transform: scaleX(1); transform-origin: left; }
+
+  .hover-lift { transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.35s ease; }
+  .hover-lift:hover { transform: translateY(-3px); box-shadow: var(--shadow-luxe); }
+
+  .gold-sheen {
+    position: relative; overflow: hidden;
+  }
+  .gold-sheen::after {
+    content: ""; position: absolute; inset: 0;
+    background: linear-gradient(110deg, transparent 35%, oklch(0.74 0.10 85 / 0.25) 50%, transparent 65%);
+    transform: translateX(-100%);
+    transition: transform 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .gold-sheen:hover::after { transform: translateX(100%); }
+
   /* legacy no-ops */
   .glow-green, .text-glow, .accent-glow { box-shadow: none; text-shadow: none; }
   .crest-wall, .crest-wall-dense, .paper-grain { background-color: transparent; background-image: none; }
   .glass { background: #ffffff; border: 1px solid var(--color-border); border-radius: var(--radius-md); }
 }
 
-/* Clean flat cards — solid white, hairline border, subtle hover */
+/* Cards — flat white, hairline border, luxe hover */
 .bg-card {
   background: #ffffff !important;
   border-color: var(--color-border);
@@ -111,13 +188,16 @@
 }
 
 .card-surface, .bg-card, .glass {
-  transition: box-shadow 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+  transition: box-shadow 0.35s ease, border-color 0.3s ease, transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
 }
 a:hover > .card-surface,
 a:hover > .bg-card,
 .card-surface:hover,
 .bg-card:hover,
 .glass:hover {
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-  border-color: #d1d5db;
+  box-shadow: var(--shadow-luxe);
+  border-color: oklch(0.74 0.10 85 / 0.5);
 }
+
+/* Smooth page-level fades */
+main, section { scroll-behavior: smooth; }

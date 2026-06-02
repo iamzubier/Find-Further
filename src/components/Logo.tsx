@@ -2,9 +2,16 @@ import { Link } from "@tanstack/react-router";
 
 export function Logo({ className = "" }: { className?: string; showWord?: boolean }) {
   return (
-    <Link to="/" className={`inline-flex items-baseline ${className}`}>
-      <span className="font-heading text-[1.5rem] font-bold leading-none tracking-tight text-foreground">
-        Beyond<span className="italic font-medium">Border</span>
+    <Link to="/" className={`group inline-flex items-center gap-2.5 ${className}`}>
+      <span
+        aria-hidden
+        className="flex h-8 w-8 items-center justify-center rounded-md bg-emerald-grad text-[11px] font-bold tracking-tight text-white shadow-[0_2px_8px_-2px_rgba(0,60,40,0.4)] transition-transform duration-500 group-hover:rotate-[8deg]"
+        style={{ background: "var(--gradient-emerald)" }}
+      >
+        <span className="gold-text font-heading italic">B</span>
+      </span>
+      <span className="font-heading text-[1.4rem] font-bold leading-none tracking-tight text-foreground">
+        Beyond<span className="italic font-medium gradient-text">Border</span>
       </span>
     </Link>
   );
