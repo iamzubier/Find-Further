@@ -329,34 +329,62 @@ function CatalogBrowser() {
 
 function CatalogCard({ u }: { u: any }) {
   return (
-    <article className="group flex h-full flex-col overflow-hidden rounded-md border border-border bg-white transition-all hover:-translate-y-0.5 hover:shadow-[0_4px_6px_-1px_rgba(0,0,0,0.1)]">
-      <div className="relative h-40 w-full overflow-hidden bg-neutral-100">
-        <SmartCampusImage src={null} name={u.name} noOverlay />
-        <div className="absolute inset-0 bg-gradient-to-b from-black/10 via-transparent to-black/60" aria-hidden />
+    <article className="group relative flex h-full flex-col overflow-hidden rounded-xl border border-border bg-white transition-all duration-500 hover:-translate-y-1 hover:border-[oklch(0.74_0.10_85_/_0.6)] hover:shadow-[0_20px_40px_-20px_rgba(0,60,40,0.25)]">
+      {/* Top emerald banner */}
+      <div className="relative h-40 w-full overflow-hidden" style={{ background: "var(--gradient-hero)" }}>
+        <div
+          aria-hidden
+          className="absolute inset-0 opacity-30"
+          style={{ background: "radial-gradient(ellipse 70% 70% at 30% 20%, oklch(0.74 0.10 85 / 0.35), transparent 60%)" }}
+        />
+        {/* gold sheen on hover */}
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-0 translate-x-[-100%] transition-transform duration-1000 group-hover:translate-x-[100%]"
+          style={{ background: "linear-gradient(110deg, transparent 40%, oklch(0.74 0.10 85 / 0.22) 50%, transparent 60%)" }}
+        />
         {u.qs_rank && (
-          <span className="absolute right-3 top-3 rounded bg-white px-2 py-0.5 text-xs font-bold text-foreground ring-1 ring-border">
+          <span
+            className="absolute right-3 top-3 rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-foreground"
+            style={{ background: "var(--gradient-gold)", boxShadow: "0 2px 8px -2px oklch(0.74 0.10 85 / 0.6)" }}
+          >
             QS #{u.qs_rank}
           </span>
         )}
         <div className="absolute bottom-3 left-3">
-          <SmartLogo name={u.name} website={u.website} size={48} className="ring-2 ring-white" />
+          <SmartLogo name={u.name} website={u.website} size={52} className="ring-2 ring-white shadow-xl" />
+        </div>
+        <div className="absolute bottom-3 right-3 text-[10px] font-semibold uppercase tracking-[0.18em] text-white/70">
+          {u.country}
         </div>
       </div>
       <div className="flex flex-1 flex-col p-5">
-        <h3 className="font-heading text-base font-bold leading-snug text-foreground line-clamp-2">{u.name}</h3>
+        <h3 className="font-heading text-base font-bold leading-snug text-foreground line-clamp-2 transition-colors group-hover:text-primary">{u.name}</h3>
         <div className="mt-1 text-xs text-muted-foreground">
           {u.state_province ? `${u.state_province}, ` : ""}{u.country}
         </div>
         {u.has_curated_data && (
-          <span className="mt-3 inline-flex w-fit items-center rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-semibold text-primary ring-1 ring-primary/30">
-            <Sparkles className="mr-0.5 inline h-2.5 w-2.5" /> Curated
+          <span
+            className="mt-3 inline-flex w-fit items-center rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider"
+            style={{
+              background: "linear-gradient(135deg, oklch(0.74 0.10 85 / 0.15), oklch(0.74 0.10 85 / 0.05))",
+              color: "oklch(0.45 0.08 80)",
+              boxShadow: "inset 0 0 0 1px oklch(0.74 0.10 85 / 0.4)",
+            }}
+          >
+            <Sparkles className="mr-1 inline h-2.5 w-2.5" /> Curated
           </span>
         )}
         <div className="mt-auto flex items-center justify-between gap-2 pt-4">
           {u.slug ? (
-            <Button asChild size="sm" className="h-8 bg-primary text-primary-foreground hover:bg-primary/90">
+            <Button
+              asChild
+              size="sm"
+              className="h-8 text-primary-foreground transition-all hover:shadow-[0_4px_14px_-4px_rgba(0,60,40,0.5)]"
+              style={{ background: "var(--gradient-emerald)" }}
+            >
               <Link to="/universities/$slug" params={{ slug: u.slug }}>
-                View Details <ArrowRight className="ml-1 h-3.5 w-3.5" />
+                View Details <ArrowRight className="ml-1 h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
               </Link>
             </Button>
           ) : (
@@ -367,7 +395,7 @@ function CatalogCard({ u }: { u: any }) {
               href={u.website}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-xs text-muted-foreground hover:text-primary hover:underline"
+              className="text-xs text-muted-foreground transition-colors hover:text-primary story-link"
             >
               Site ↗
             </a>
