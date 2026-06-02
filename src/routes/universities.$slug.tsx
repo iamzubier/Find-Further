@@ -197,50 +197,86 @@ function Hero({ uni }: { uni: any }) {
   const website = uni?.official_url || undefined;
 
   return (
-    <header className="relative flex h-[400px] w-full flex-col justify-end overflow-hidden bg-slate-950 px-8 pb-10">
+    <header
+      className="relative flex h-[440px] w-full flex-col justify-end overflow-hidden px-8 pb-12"
+      style={{ background: "var(--gradient-hero)" }}
+    >
       <div className="absolute inset-0 z-0">
         <SmartCampusImage
           src={campusUrl || null}
           name={uni?.name ?? "University"}
           alt={`${uni?.name ?? "University"} campus`}
-          className="opacity-40"
+          className="opacity-35 scale-105 transition-transform duration-[8s] ease-out hover:scale-110"
           loading="eager"
         />
       </div>
-      <div className="absolute inset-0 z-10 bg-gradient-to-t from-slate-950 via-slate-950/60 to-transparent" />
+      {/* Emerald-tinted gradient + gold radial accent */}
+      <div
+        className="absolute inset-0 z-10"
+        style={{
+          background:
+            "linear-gradient(180deg, oklch(0.18 0.04 160 / 0.3) 0%, oklch(0.18 0.04 160 / 0.6) 60%, oklch(0.14 0.03 160) 100%)",
+        }}
+      />
+      <div
+        aria-hidden
+        className="absolute inset-0 z-10 opacity-40"
+        style={{ background: "radial-gradient(ellipse 50% 50% at 80% 10%, oklch(0.74 0.10 85 / 0.4), transparent 70%)" }}
+      />
+      {/* gold hairline at bottom */}
+      <div className="absolute bottom-0 left-0 right-0 z-20 hairline-gold" />
 
-      <div className="absolute inset-x-0 top-0 z-20 p-4">
-        <Link to="/universities" className="inline-flex items-center gap-1 text-sm text-white/90 hover:text-white drop-shadow">
-          <ArrowLeft className="h-4 w-4" /> All universities
+      <div className="absolute inset-x-0 top-0 z-20 mx-auto max-w-6xl p-5">
+        <Link
+          to="/universities"
+          className="inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-white/5 px-3 py-1.5 text-xs font-medium uppercase tracking-wider text-white/85 backdrop-blur-md transition-all hover:border-[oklch(0.74_0.10_85_/_0.5)] hover:text-white"
+        >
+          <ArrowLeft className="h-3.5 w-3.5" /> All universities
         </Link>
       </div>
 
-      <div className="relative z-20 mx-auto w-full max-w-6xl">
+      <div className="relative z-20 mx-auto w-full max-w-6xl animate-fade-in">
         <div className="flex items-end gap-6">
-          <SmartLogo
-            name={uni?.name ?? "University"}
-            logoUrl={logoUrl || null}
-            website={website}
-            size={112}
-            className="relative z-10 border-4 border-white/10 bg-white shadow-2xl"
-          />
+          <div className="relative">
+            <div
+              aria-hidden
+              className="absolute -inset-1 rounded-2xl opacity-70 blur-md"
+              style={{ background: "var(--gradient-gold)" }}
+            />
+            <SmartLogo
+              name={uni?.name ?? "University"}
+              logoUrl={logoUrl || null}
+              website={website}
+              size={112}
+              className="relative z-10 border-2 border-[oklch(0.74_0.10_85_/_0.7)] bg-white shadow-2xl"
+            />
+          </div>
 
-          <div className="min-w-0">
-            <h1 className="text-4xl md:text-5xl font-serif font-bold text-white drop-shadow-lg tracking-tight m-0">
+          <div className="min-w-0 flex-1">
+            <div className="mb-2 flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.25em] text-[oklch(0.80_0.11_85)]">
+              <span className="h-px w-6" style={{ background: "var(--gradient-gold)" }} />
+              Institutional Profile
+            </div>
+            <h1 className="font-heading text-4xl md:text-5xl font-bold text-white drop-shadow-lg tracking-tight m-0 leading-[1.05]">
               {uni.name}
             </h1>
-            <div className="mt-2 flex flex-wrap items-center gap-3 text-lg text-slate-200">
+            <div className="mt-3 flex flex-wrap items-center gap-3 text-sm text-white/85">
               {uni.country_flag && <span className="text-xl">{uni.country_flag}</span>}
               <span className="inline-flex items-center gap-1.5">
-                <MapPin className="h-4 w-4" />
+                <MapPin className="h-4 w-4 text-[oklch(0.80_0.11_85)]" />
                 {uni.city ? `${uni.city}, ` : ""}{uni.country}
               </span>
               {uni.qs_rank && (
-                <span className="rounded-full bg-primary px-3 py-0.5 text-sm font-bold text-primary-foreground">
-                  QS #{uni.qs_rank}
+                <span
+                  className="rounded-full px-3 py-1 text-xs font-bold uppercase tracking-wider text-foreground"
+                  style={{ background: "var(--gradient-gold)", boxShadow: "0 4px 16px -4px oklch(0.74 0.10 85 / 0.6)" }}
+                >
+                  QS World #{uni.qs_rank}
                 </span>
               )}
-              {uni.founded_year && <span className="text-sm text-slate-300">Founded {uni.founded_year}</span>}
+              {uni.founded_year && (
+                <span className="font-heading italic text-white/70">Est. {uni.founded_year}</span>
+              )}
             </div>
           </div>
         </div>
