@@ -248,8 +248,7 @@ function Hero({ uni }: { uni: any }) {
               logoUrl={logoUrl || null}
               website={website}
               size={112}
-              className="relative z-10 border-2 bg-white shadow-2xl"
-              style={{ borderColor: "oklch(0.74 0.10 85 / 0.7)" }}
+              className="relative z-10 border-2 border-[oklch(0.74_0.10_85_/_0.7)] bg-white shadow-2xl"
             />
           </div>
 
