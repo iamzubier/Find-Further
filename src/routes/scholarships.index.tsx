@@ -401,6 +401,27 @@ function ScholarshipsHub() {
                     <span className="block text-[11px] text-muted-foreground">Medium-of-instruction letter in lieu of IELTS/TOEFL</span>
                   </span>
                 </label>
+                <label className="flex cursor-pointer items-start gap-2 rounded border border-border px-3 py-2 text-sm hover:border-primary/40">
+                  <input type="checkbox" checked={satOnly} onChange={(e) => setSatOnly(e.target.checked)} className="mt-0.5 h-4 w-4 accent-primary" />
+                  <span>
+                    <span className="font-medium text-foreground">SAT-based merit awards only</span>
+                    <span className="block text-[11px] text-muted-foreground">Show only scholarships with a published SAT cutoff</span>
+                  </span>
+                </label>
+                <div className="rounded border border-border px-3 py-2">
+                  <label className="block text-[11px] font-medium text-foreground">Your SAT score (optional)</label>
+                  <input
+                    type="number"
+                    inputMode="numeric"
+                    min={400}
+                    max={1600}
+                    placeholder="e.g. 1450"
+                    value={userSat}
+                    onChange={(e) => setUserSat(e.target.value)}
+                    className="mt-1 h-8 w-full rounded border border-border bg-white px-2 text-sm text-foreground"
+                  />
+                  <div className="mt-1 text-[10px] text-muted-foreground">Hides awards whose minimum SAT exceeds your score.</div>
+                </div>
               </div>
             </div>
 
