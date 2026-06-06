@@ -68,6 +68,9 @@ type DbRow = {
   application_fee_usd: number | null;
   accepts_moi_waiver: boolean | null;
   academic_profile_weight: string | null;
+  awarding_basis: string | null;
+  min_sat_score: number | null;
+  min_act_score: number | null;
   banner_image_url: string | null;
   eligible_countries: string[] | null;
   wow_fact: string | null;
@@ -88,9 +91,13 @@ type ViewSch = {
   level: "undergraduate" | "postgraduate" | "phd" | "all";
   deadline: string; // ISO
   amount: string;
+  annual_value_usd: number | null;
   application_fee_usd: number;
   accepts_moi_waiver: boolean;
   academic_profile_weight: ProfileWeight;
+  awarding_basis: "merit" | "portfolio" | "professional" | null;
+  min_sat_score: number | null;
+  min_act_score: number | null;
   banner_image_url: string | null;
   wow_fact: string | null;
 };
@@ -110,9 +117,13 @@ function mapRow(r: DbRow): ViewSch {
     level: (r.degree_level as ViewSch["level"]) ?? "all",
     deadline: r.deadline ?? "",
     amount: r.amount_display ?? "Varies",
+    annual_value_usd: r.annual_value_usd,
     application_fee_usd: r.application_fee_usd ?? 0,
     accepts_moi_waiver: !!r.accepts_moi_waiver,
     academic_profile_weight: (r.academic_profile_weight as ProfileWeight) ?? "merit",
+    awarding_basis: (r.awarding_basis as ViewSch["awarding_basis"]) ?? null,
+    min_sat_score: r.min_sat_score ?? null,
+    min_act_score: r.min_act_score ?? null,
     banner_image_url: r.banner_image_url,
     wow_fact: r.wow_fact,
   };
