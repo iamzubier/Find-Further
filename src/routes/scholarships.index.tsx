@@ -275,6 +275,8 @@ function ScholarshipsHub() {
     setRegion("all");
     setNoFee(false);
     setMoiOnly(false);
+    setSatOnly(false);
+    setUserSat("");
     setQ("");
   };
 
