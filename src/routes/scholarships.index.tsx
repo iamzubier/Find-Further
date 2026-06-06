@@ -661,6 +661,13 @@ function ScholarshipCard({ s, variant }: { s: ViewSch; variant: "active" | "prep
         </h3>
         <div className="mt-1 truncate text-xs !text-white/80">{s.provider}</div>
 
+        {s.min_sat_score != null && (
+          <div className="mt-2 inline-flex items-center gap-1.5 self-start rounded-full bg-sky-500/20 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-sky-100 ring-1 ring-sky-300/40 backdrop-blur w-fit">
+            🎯 SAT ≥ {s.min_sat_score}
+            {s.min_act_score ? <span className="text-sky-200/70">· ACT {s.min_act_score}+</span> : null}
+          </div>
+        )}
+
         <div className="mt-4 flex items-center justify-between gap-2 border-t border-white/15 pt-3">
           <div className="min-w-0">
             <div className="text-[10px] uppercase tracking-wide text-white/55">Value</div>
