@@ -277,6 +277,7 @@ export type Database = {
           application_steps: string[] | null
           avg_gpa_recipients: string | null
           avg_ielts_recipients: string | null
+          awarding_basis: string | null
           banner_image_url: string | null
           bond_requirement: string | null
           competitiveness: string | null
@@ -300,6 +301,8 @@ export type Database = {
           hydrated_at: string | null
           id: string
           insider_tips: Json | null
+          min_act_score: number | null
+          min_sat_score: number | null
           monthly_stipend_usd: number | null
           name: string
           next_cycle: string | null
@@ -334,6 +337,7 @@ export type Database = {
           application_steps?: string[] | null
           avg_gpa_recipients?: string | null
           avg_ielts_recipients?: string | null
+          awarding_basis?: string | null
           banner_image_url?: string | null
           bond_requirement?: string | null
           competitiveness?: string | null
@@ -357,6 +361,8 @@ export type Database = {
           hydrated_at?: string | null
           id?: string
           insider_tips?: Json | null
+          min_act_score?: number | null
+          min_sat_score?: number | null
           monthly_stipend_usd?: number | null
           name: string
           next_cycle?: string | null
@@ -391,6 +397,7 @@ export type Database = {
           application_steps?: string[] | null
           avg_gpa_recipients?: string | null
           avg_ielts_recipients?: string | null
+          awarding_basis?: string | null
           banner_image_url?: string | null
           bond_requirement?: string | null
           competitiveness?: string | null
@@ -414,6 +421,8 @@ export type Database = {
           hydrated_at?: string | null
           id?: string
           insider_tips?: Json | null
+          min_act_score?: number | null
+          min_sat_score?: number | null
           monthly_stipend_usd?: number | null
           name?: string
           next_cycle?: string | null
