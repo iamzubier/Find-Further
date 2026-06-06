@@ -203,14 +203,26 @@ function ScholarshipsHub() {
 
   const all = dbQuery.data ?? [];
 
+  const satNum = Number(userSat);
+  const hasUserSat = Number.isFinite(satNum) && satNum >= 400 && satNum <= 1600;
+
   const filtered = useMemo(() => {
     return all.filter((s) => {
       if (level !== "all") {
         if (s.level !== level && s.level !== "all") return false;
       }
+      // Budget filter: use real funding type AND tuition cap
       if (budget === "free" && s.funding_type !== "fully_funded") return false;
-      if (budget === "5k" && s.funding_type === "stipend_only") return false;
-      if (profile !== "any" && s.academic_profile_weight !== profile) return false;
+      if (budget === "5k") {
+        // Out-of-pocket = sticker tuition minus award. Anything fully funded or under ~$5k tuition stays.
+        const tuition = s.annual_value_usd ?? 0;
+        if (s.funding_type !== "fully_funded" && s.funding_type !== "tuition_waiver" && tuition < 4000) return false;
+      }
+      if (budget === "15k") {
+        if (s.funding_type === "stipend_only") return false;
+      }
+      // Profile filter — use the proper enum column, fall back gracefully
+      if (profile !== "any" && s.awarding_basis && s.awarding_basis !== profile) return false;
       if (providerType !== "all" && s.provider_type !== providerType) return false;
       if (region !== "all") {
         const r = COUNTRY_REGION[s.country] ?? "Various";
@@ -218,6 +230,9 @@ function ScholarshipsHub() {
       }
       if (noFee && s.application_fee_usd > 0) return false;
       if (moiOnly && !s.accepts_moi_waiver) return false;
+      // SAT filtering
+      if (satOnly && s.min_sat_score == null) return false;
+      if (hasUserSat && s.min_sat_score != null && s.min_sat_score > satNum) return false;
       if (q) {
         const n = q.toLowerCase();
         if (
@@ -228,7 +243,7 @@ function ScholarshipsHub() {
       }
       return true;
     });
-  }, [all, level, budget, profile, providerType, region, noFee, moiOnly, q]);
+  }, [all, level, budget, profile, providerType, region, noFee, moiOnly, satOnly, hasUserSat, satNum, q]);
 
   const active = useMemo(
     () =>
