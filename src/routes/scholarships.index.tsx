@@ -68,6 +68,9 @@ type DbRow = {
   application_fee_usd: number | null;
   accepts_moi_waiver: boolean | null;
   academic_profile_weight: string | null;
+  awarding_basis: string | null;
+  min_sat_score: number | null;
+  min_act_score: number | null;
   banner_image_url: string | null;
   eligible_countries: string[] | null;
   wow_fact: string | null;
@@ -88,9 +91,13 @@ type ViewSch = {
   level: "undergraduate" | "postgraduate" | "phd" | "all";
   deadline: string; // ISO
   amount: string;
+  annual_value_usd: number | null;
   application_fee_usd: number;
   accepts_moi_waiver: boolean;
   academic_profile_weight: ProfileWeight;
+  awarding_basis: "merit" | "portfolio" | "professional" | null;
+  min_sat_score: number | null;
+  min_act_score: number | null;
   banner_image_url: string | null;
   wow_fact: string | null;
 };
@@ -110,9 +117,13 @@ function mapRow(r: DbRow): ViewSch {
     level: (r.degree_level as ViewSch["level"]) ?? "all",
     deadline: r.deadline ?? "",
     amount: r.amount_display ?? "Varies",
+    annual_value_usd: r.annual_value_usd,
     application_fee_usd: r.application_fee_usd ?? 0,
     accepts_moi_waiver: !!r.accepts_moi_waiver,
     academic_profile_weight: (r.academic_profile_weight as ProfileWeight) ?? "merit",
+    awarding_basis: (r.awarding_basis as ViewSch["awarding_basis"]) ?? null,
+    min_sat_score: r.min_sat_score ?? null,
+    min_act_score: r.min_act_score ?? null,
     banner_image_url: r.banner_image_url,
     wow_fact: r.wow_fact,
   };
@@ -170,15 +181,17 @@ function ScholarshipsHub() {
   const [region, setRegion] = useState<(typeof REGIONS)[number]>("all");
   const [noFee, setNoFee] = useState(false);
   const [moiOnly, setMoiOnly] = useState(false);
+  const [satOnly, setSatOnly] = useState(false);
+  const [userSat, setUserSat] = useState<string>("");
   const [q, setQ] = useState("");
 
   const dbQuery = useQuery({
-    queryKey: ["scholarships-all"],
+    queryKey: ["scholarships-all-v2"],
     queryFn: async () => {
       const { data, error } = await supabase
         .from("scholarships")
         .select(
-          "id,slug,name,provider,host_country,flag_emoji,description,funding_type,provider_type,cycle_status,degree_level,deadline,expected_next_open_month,amount_display,annual_value_usd,application_fee_usd,accepts_moi_waiver,academic_profile_weight,banner_image_url,eligible_countries,wow_fact,fully_funded"
+          "id,slug,name,provider,host_country,flag_emoji,description,funding_type,provider_type,cycle_status,degree_level,deadline,expected_next_open_month,amount_display,annual_value_usd,application_fee_usd,accepts_moi_waiver,academic_profile_weight,awarding_basis,min_sat_score,min_act_score,banner_image_url,eligible_countries,wow_fact,fully_funded"
         )
         .order("deadline", { ascending: true, nullsFirst: false })
         .limit(500);
@@ -190,14 +203,26 @@ function ScholarshipsHub() {
 
   const all = dbQuery.data ?? [];
 
+  const satNum = Number(userSat);
+  const hasUserSat = Number.isFinite(satNum) && satNum >= 400 && satNum <= 1600;
+
   const filtered = useMemo(() => {
     return all.filter((s) => {
       if (level !== "all") {
         if (s.level !== level && s.level !== "all") return false;
       }
+      // Budget filter: use real funding type AND tuition cap
       if (budget === "free" && s.funding_type !== "fully_funded") return false;
-      if (budget === "5k" && s.funding_type === "stipend_only") return false;
-      if (profile !== "any" && s.academic_profile_weight !== profile) return false;
+      if (budget === "5k") {
+        // Out-of-pocket = sticker tuition minus award. Anything fully funded or under ~$5k tuition stays.
+        const tuition = s.annual_value_usd ?? 0;
+        if (s.funding_type !== "fully_funded" && s.funding_type !== "tuition_waiver" && tuition < 4000) return false;
+      }
+      if (budget === "15k") {
+        if (s.funding_type === "stipend_only") return false;
+      }
+      // Profile filter — use the proper enum column, fall back gracefully
+      if (profile !== "any" && s.awarding_basis && s.awarding_basis !== profile) return false;
       if (providerType !== "all" && s.provider_type !== providerType) return false;
       if (region !== "all") {
         const r = COUNTRY_REGION[s.country] ?? "Various";
@@ -205,6 +230,9 @@ function ScholarshipsHub() {
       }
       if (noFee && s.application_fee_usd > 0) return false;
       if (moiOnly && !s.accepts_moi_waiver) return false;
+      // SAT filtering
+      if (satOnly && s.min_sat_score == null) return false;
+      if (hasUserSat && s.min_sat_score != null && s.min_sat_score > satNum) return false;
       if (q) {
         const n = q.toLowerCase();
         if (
@@ -215,7 +243,7 @@ function ScholarshipsHub() {
       }
       return true;
     });
-  }, [all, level, budget, profile, providerType, region, noFee, moiOnly, q]);
+  }, [all, level, budget, profile, providerType, region, noFee, moiOnly, satOnly, hasUserSat, satNum, q]);
 
   const active = useMemo(
     () =>
@@ -247,6 +275,8 @@ function ScholarshipsHub() {
     setRegion("all");
     setNoFee(false);
     setMoiOnly(false);
+    setSatOnly(false);
+    setUserSat("");
     setQ("");
   };
 
@@ -371,6 +401,27 @@ function ScholarshipsHub() {
                     <span className="block text-[11px] text-muted-foreground">Medium-of-instruction letter in lieu of IELTS/TOEFL</span>
                   </span>
                 </label>
+                <label className="flex cursor-pointer items-start gap-2 rounded border border-border px-3 py-2 text-sm hover:border-primary/40">
+                  <input type="checkbox" checked={satOnly} onChange={(e) => setSatOnly(e.target.checked)} className="mt-0.5 h-4 w-4 accent-primary" />
+                  <span>
+                    <span className="font-medium text-foreground">SAT-based merit awards only</span>
+                    <span className="block text-[11px] text-muted-foreground">Show only scholarships with a published SAT cutoff</span>
+                  </span>
+                </label>
+                <div className="rounded border border-border px-3 py-2">
+                  <label className="block text-[11px] font-medium text-foreground">Your SAT score (optional)</label>
+                  <input
+                    type="number"
+                    inputMode="numeric"
+                    min={400}
+                    max={1600}
+                    placeholder="e.g. 1450"
+                    value={userSat}
+                    onChange={(e) => setUserSat(e.target.value)}
+                    className="mt-1 h-8 w-full rounded border border-border bg-white px-2 text-sm text-foreground"
+                  />
+                  <div className="mt-1 text-[10px] text-muted-foreground">Hides awards whose minimum SAT exceeds your score.</div>
+                </div>
               </div>
             </div>
 
@@ -609,6 +660,13 @@ function ScholarshipCard({ s, variant }: { s: ViewSch; variant: "active" | "prep
           {s.name}
         </h3>
         <div className="mt-1 truncate text-xs !text-white/80">{s.provider}</div>
+
+        {s.min_sat_score != null && (
+          <div className="mt-2 inline-flex items-center gap-1.5 self-start rounded-full bg-sky-500/20 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-sky-100 ring-1 ring-sky-300/40 backdrop-blur w-fit">
+            🎯 SAT ≥ {s.min_sat_score}
+            {s.min_act_score ? <span className="text-sky-200/70">· ACT {s.min_act_score}+</span> : null}
+          </div>
+        )}
 
         <div className="mt-4 flex items-center justify-between gap-2 border-t border-white/15 pt-3">
           <div className="min-w-0">
