@@ -181,6 +181,8 @@ function ScholarshipsHub() {
   const [region, setRegion] = useState<(typeof REGIONS)[number]>("all");
   const [noFee, setNoFee] = useState(false);
   const [moiOnly, setMoiOnly] = useState(false);
+  const [satOnly, setSatOnly] = useState(false);
+  const [userSat, setUserSat] = useState<string>("");
   const [q, setQ] = useState("");
 
   const dbQuery = useQuery({
