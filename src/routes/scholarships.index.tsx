@@ -184,12 +184,12 @@ function ScholarshipsHub() {
   const [q, setQ] = useState("");
 
   const dbQuery = useQuery({
-    queryKey: ["scholarships-all"],
+    queryKey: ["scholarships-all-v2"],
     queryFn: async () => {
       const { data, error } = await supabase
         .from("scholarships")
         .select(
-          "id,slug,name,provider,host_country,flag_emoji,description,funding_type,provider_type,cycle_status,degree_level,deadline,expected_next_open_month,amount_display,annual_value_usd,application_fee_usd,accepts_moi_waiver,academic_profile_weight,banner_image_url,eligible_countries,wow_fact,fully_funded"
+          "id,slug,name,provider,host_country,flag_emoji,description,funding_type,provider_type,cycle_status,degree_level,deadline,expected_next_open_month,amount_display,annual_value_usd,application_fee_usd,accepts_moi_waiver,academic_profile_weight,awarding_basis,min_sat_score,min_act_score,banner_image_url,eligible_countries,wow_fact,fully_funded"
         )
         .order("deadline", { ascending: true, nullsFirst: false })
         .limit(500);
