@@ -311,35 +311,32 @@ function ScholarshipsHub() {
         <div className="hairline-gold absolute inset-x-0 top-0" />
 
         <div className="relative mx-auto max-w-7xl px-4 pt-16 pb-12 md:pt-24 md:pb-16 lg:px-6">
-          <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/[0.04] px-3.5 py-1.5 text-[10px] font-bold uppercase tracking-[0.22em] text-white/80 backdrop-blur">
-            <span className="h-1.5 w-1.5 rounded-full bg-gold" />
-            The Atlas of Funded Education
+          <div className="mb-8 flex items-center gap-3 text-[10px] font-bold uppercase tracking-[0.28em] text-white/60">
+            <span className="h-px w-10 bg-gold/60" />
+            Vol. {new Date().getFullYear()} — Atlas
+            <span className="h-px w-10 bg-gold/60" />
           </div>
 
-          <h1 className="font-heading text-5xl font-extrabold leading-[1.02] tracking-tight text-white md:text-7xl">
-            Scholarships,{" "}
-            <span className="serif-italic gold-text font-medium">handpicked</span>
-            <br className="hidden md:block" /> for the relentlessly ambitious.
+          <h1 className="font-heading text-6xl font-extrabold leading-[0.95] tracking-tight text-white md:text-[7.5rem]">
+            <span className="serif-italic gold-text font-medium">Funded.</span>
           </h1>
+          <div className="mt-4 font-heading text-2xl font-light tracking-tight text-white/80 md:text-3xl">
+            Everywhere worth going.
+          </div>
 
-          <p className="mt-6 max-w-2xl text-base leading-relaxed text-white/70 md:text-lg">
-            Every international award worth chasing — government, university, NGO — distilled into one
-            quiet, well-lit room. <span className="serif-italic text-white/85">No fees. No commissions. No noise.</span>
-          </p>
-
-          {/* KPI strip */}
-          <div className="mt-10 grid max-w-3xl grid-cols-2 gap-px overflow-hidden rounded-md border border-white/10 bg-white/5 sm:grid-cols-4">
+          {/* KPI strip — bigger, breathier, the headline does the talking */}
+          <div className="mt-12 grid max-w-4xl grid-cols-2 gap-px overflow-hidden rounded-md border border-white/10 bg-white/5 sm:grid-cols-4">
             {[
-              { v: all.length, l: "Indexed" },
+              { v: all.length, l: "Awards" },
               { v: fullyFundedCount, l: "Fully funded" },
               { v: noFeeCount, l: "$0 to apply" },
               { v: countriesCount, l: "Countries" },
             ].map((k) => (
-              <div key={k.l} className="bg-[oklch(0.18_0.04_160_/_0.6)] px-5 py-4 backdrop-blur">
-                <div className="font-heading text-2xl font-bold text-white md:text-3xl">
+              <div key={k.l} className="bg-[oklch(0.18_0.04_160_/_0.6)] px-6 py-6 backdrop-blur">
+                <div className="font-heading text-4xl font-bold tabular-nums text-white md:text-5xl">
                   {k.v}
                 </div>
-                <div className="mt-0.5 text-[10px] font-semibold uppercase tracking-[0.18em] text-gold/80">
+                <div className="mt-1.5 text-[10px] font-semibold uppercase tracking-[0.22em] text-gold/80">
                   {k.l}
                 </div>
               </div>
@@ -348,10 +345,8 @@ function ScholarshipsHub() {
 
           {/* Level switcher — luxury pill tabs */}
           <div className="mt-10">
-            <div className="mb-3 text-[10px] font-bold uppercase tracking-[0.22em] text-white/50">
-              Choose your chapter
-            </div>
             <div className="inline-flex flex-wrap gap-1.5 rounded-full border border-white/10 bg-black/20 p-1.5 backdrop-blur-xl">
+
               {LEVELS.map((l) => {
                 const Icon = l.icon;
                 const isActive = level === l.key;
