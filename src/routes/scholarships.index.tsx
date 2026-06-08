@@ -280,50 +280,111 @@ function ScholarshipsHub() {
     setQ("");
   };
 
-  return (
-    <div className="mx-auto max-w-7xl px-4 py-10">
-      {/* Page heading */}
-      <div className="mb-6">
-        <div className="mb-2 inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-primary">
-          <Sparkles className="h-3 w-3" /> {all.length} scholarships indexed
-        </div>
-        <h1 className="font-heading text-4xl font-extrabold text-foreground md:text-5xl">
-          Scholarships
-        </h1>
-        <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
-          Every international scholarship that matters — government, university, NGO and regional.
-          Filtered by your degree level and what you can actually pay, split into what's{" "}
-          <em>open today</em> vs what to start <em>preparing now</em>.
-        </p>
-      </div>
+  const fullyFundedCount = all.filter((s) => s.funding_type === "fully_funded").length;
+  const noFeeCount = all.filter((s) => s.application_fee_usd === 0).length;
+  const countriesCount = new Set(all.map((s) => s.country).filter((c) => c && c !== "—")).size;
 
-      {/* Level switcher (primary nav) */}
-      <div className="mb-6 grid grid-cols-2 gap-2 md:grid-cols-4">
-        {LEVELS.map((l) => {
-          const Icon = l.icon;
-          const active = level === l.key;
-          const count = all.filter((s) => l.key === "all" ? true : s.level === l.key || s.level === "all").length;
-          return (
-            <button
-              key={l.key}
-              onClick={() => setLevel(l.key)}
-              className={`flex items-start gap-2 rounded-md border px-3 py-3 text-left transition ${
-                active
-                  ? "border-primary bg-primary text-primary-foreground shadow-sm"
-                  : "border-border bg-white text-foreground hover:border-primary/40"
-              }`}
-            >
-              <Icon className={`mt-0.5 h-4 w-4 shrink-0 ${active ? "text-primary-foreground" : "text-primary"}`} />
-              <div className="min-w-0">
-                <div className="text-sm font-bold leading-tight">{l.label}</div>
-                <div className={`text-[11px] ${active ? "text-primary-foreground/80" : "text-muted-foreground"}`}>
-                  {l.sub} · {count}
+  return (
+    <div>
+      {/* ─── Cinematic Hero ─── */}
+      <section
+        className="relative overflow-hidden"
+        style={{ background: "var(--gradient-hero)" }}
+      >
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-0 opacity-70"
+          style={{
+            background:
+              "radial-gradient(ellipse 70% 60% at 80% 0%, oklch(0.74 0.10 85 / 0.22), transparent 65%), radial-gradient(ellipse 60% 50% at 10% 100%, oklch(0.52 0.12 160 / 0.35), transparent 60%)",
+          }}
+        />
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-0 opacity-[0.06]"
+          style={{
+            backgroundImage:
+              "linear-gradient(oklch(0.74 0.10 85) 1px, transparent 1px), linear-gradient(90deg, oklch(0.74 0.10 85) 1px, transparent 1px)",
+            backgroundSize: "56px 56px",
+          }}
+        />
+        <div className="hairline-gold absolute inset-x-0 top-0" />
+
+        <div className="relative mx-auto max-w-7xl px-4 pt-16 pb-12 md:pt-24 md:pb-16 lg:px-6">
+          <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/[0.04] px-3.5 py-1.5 text-[10px] font-bold uppercase tracking-[0.22em] text-white/80 backdrop-blur">
+            <span className="h-1.5 w-1.5 rounded-full bg-gold" />
+            The Atlas of Funded Education
+          </div>
+
+          <h1 className="font-heading text-5xl font-extrabold leading-[1.02] tracking-tight text-white md:text-7xl">
+            Scholarships,{" "}
+            <span className="serif-italic gold-text font-medium">handpicked</span>
+            <br className="hidden md:block" /> for the relentlessly ambitious.
+          </h1>
+
+          <p className="mt-6 max-w-2xl text-base leading-relaxed text-white/70 md:text-lg">
+            Every international award worth chasing — government, university, NGO — distilled into one
+            quiet, well-lit room. <span className="serif-italic text-white/85">No fees. No commissions. No noise.</span>
+          </p>
+
+          {/* KPI strip */}
+          <div className="mt-10 grid max-w-3xl grid-cols-2 gap-px overflow-hidden rounded-md border border-white/10 bg-white/5 sm:grid-cols-4">
+            {[
+              { v: all.length, l: "Indexed" },
+              { v: fullyFundedCount, l: "Fully funded" },
+              { v: noFeeCount, l: "$0 to apply" },
+              { v: countriesCount, l: "Countries" },
+            ].map((k) => (
+              <div key={k.l} className="bg-[oklch(0.18_0.04_160_/_0.6)] px-5 py-4 backdrop-blur">
+                <div className="font-heading text-2xl font-bold text-white md:text-3xl">
+                  {k.v}
+                </div>
+                <div className="mt-0.5 text-[10px] font-semibold uppercase tracking-[0.18em] text-gold/80">
+                  {k.l}
                 </div>
               </div>
-            </button>
-          );
-        })}
-      </div>
+            ))}
+          </div>
+
+          {/* Level switcher — luxury pill tabs */}
+          <div className="mt-10">
+            <div className="mb-3 text-[10px] font-bold uppercase tracking-[0.22em] text-white/50">
+              Choose your chapter
+            </div>
+            <div className="inline-flex flex-wrap gap-1.5 rounded-full border border-white/10 bg-black/20 p-1.5 backdrop-blur-xl">
+              {LEVELS.map((l) => {
+                const Icon = l.icon;
+                const isActive = level === l.key;
+                const count = all.filter((s) => l.key === "all" ? true : s.level === l.key || s.level === "all").length;
+                return (
+                  <button
+                    key={l.key}
+                    onClick={() => setLevel(l.key)}
+                    className={`group relative inline-flex items-center gap-2 rounded-full px-4 py-2.5 text-[13px] font-semibold transition-all duration-500 ${
+                      isActive
+                        ? "text-emerald-950 shadow-[0_4px_18px_-4px_oklch(0.74_0.10_85_/_0.55)]"
+                        : "text-white/75 hover:text-white"
+                    }`}
+                    style={isActive ? { background: "var(--gradient-gold)" } : undefined}
+                  >
+                    <Icon className="h-3.5 w-3.5" />
+                    <span>{l.label}</span>
+                    <span className={`rounded-full px-1.5 py-0.5 text-[10px] font-bold tabular-nums ${
+                      isActive ? "bg-emerald-950/15 text-emerald-950" : "bg-white/10 text-white/60"
+                    }`}>
+                      {count}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+        <div className="hairline-gold absolute inset-x-0 bottom-0" />
+      </section>
+
+      <div className="mx-auto max-w-7xl px-4 py-10 lg:px-6">
+
 
       {/* WTF Scholarships carousel */}
       <WtfScholarshipsCarousel all={all} />
