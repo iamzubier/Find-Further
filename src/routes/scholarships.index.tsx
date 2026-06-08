@@ -581,9 +581,11 @@ function ScholarshipsHub() {
       )}
 
       <LoginNudge text="Save your favorites and track every deadline." />
+      </div>
     </div>
   );
 }
+
 
 /* ──────────────── Helpers ──────────────── */
 
