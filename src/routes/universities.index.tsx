@@ -17,6 +17,7 @@ import { useCompare } from "@/lib/compare-store";
 import { toast } from "sonner";
 import { SmartLogo } from "@/components/SmartLogo";
 import { SmartCampusImage } from "@/components/SmartCampusImage";
+import { useWikiImage } from "@/lib/use-wiki-image";
 
 
 const SearchSchema = z.object({
