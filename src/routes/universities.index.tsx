@@ -277,8 +277,8 @@ function CatalogBrowser() {
       const key = r.country || "Other";
       const enriched = {
         ...r,
-        campus_image_url: imgMap[r.slug]?.campus_image_url ?? null,
-        logo_url: imgMap[r.slug]?.logo_url ?? null,
+        campus_image_url: r.slug ? imgMap[r.slug]?.campus_image_url ?? null : null,
+        logo_url: r.slug ? imgMap[r.slug]?.logo_url ?? null : null,
       };
       if (!map.has(key)) map.set(key, []);
       map.get(key)!.push(enriched);
