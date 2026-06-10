@@ -243,16 +243,48 @@ function CatalogBrowser() {
   const total = listQuery.data?.count ?? 0;
   const pages = Math.max(1, Math.ceil(total / PAGE_SIZE));
 
+  const slugs = useMemo(
+    () => (listQuery.data?.rows ?? []).map((r: any) => r.slug).filter(Boolean) as string[],
+    [listQuery.data],
+  );
+
+  const imagesQuery = useQuery({
+    queryKey: ["catalog-images", slugs.join(",")],
+    enabled: slugs.length > 0,
+    staleTime: 5 * 60 * 1000,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("universities_detail")
+        .select("slug, campus_image_url, logo_url")
+        .in("slug", slugs);
+      if (error) throw error;
+      const map: Record<string, { campus_image_url: string | null; logo_url: string | null }> = {};
+      for (const r of data ?? []) {
+        map[(r as any).slug] = {
+          campus_image_url: (r as any).campus_image_url ?? null,
+          logo_url: (r as any).logo_url ?? null,
+        };
+      }
+      return map;
+    },
+  });
+
   const grouped = useMemo(() => {
     const rows = listQuery.data?.rows ?? [];
+    const imgMap = imagesQuery.data ?? {};
     const map = new Map<string, any[]>();
     for (const r of rows) {
       const key = r.country || "Other";
+      const enriched = {
+        ...r,
+        campus_image_url: imgMap[r.slug]?.campus_image_url ?? null,
+        logo_url: imgMap[r.slug]?.logo_url ?? null,
+      };
       if (!map.has(key)) map.set(key, []);
-      map.get(key)!.push(r);
+      map.get(key)!.push(enriched);
     }
     return Array.from(map.entries());
-  }, [listQuery.data]);
+  }, [listQuery.data, imagesQuery.data]);
 
   return (
     <>
