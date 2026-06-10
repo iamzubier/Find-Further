@@ -243,16 +243,48 @@ function CatalogBrowser() {
   const total = listQuery.data?.count ?? 0;
   const pages = Math.max(1, Math.ceil(total / PAGE_SIZE));
 
+  const slugs = useMemo(
+    () => (listQuery.data?.rows ?? []).map((r: any) => r.slug).filter(Boolean) as string[],
+    [listQuery.data],
+  );
+
+  const imagesQuery = useQuery({
+    queryKey: ["catalog-images", slugs.join(",")],
+    enabled: slugs.length > 0,
+    staleTime: 5 * 60 * 1000,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("universities_detail")
+        .select("slug, campus_image_url, logo_url")
+        .in("slug", slugs);
+      if (error) throw error;
+      const map: Record<string, { campus_image_url: string | null; logo_url: string | null }> = {};
+      for (const r of data ?? []) {
+        map[(r as any).slug] = {
+          campus_image_url: (r as any).campus_image_url ?? null,
+          logo_url: (r as any).logo_url ?? null,
+        };
+      }
+      return map;
+    },
+  });
+
   const grouped = useMemo(() => {
     const rows = listQuery.data?.rows ?? [];
+    const imgMap = imagesQuery.data ?? {};
     const map = new Map<string, any[]>();
     for (const r of rows) {
       const key = r.country || "Other";
+      const enriched = {
+        ...r,
+        campus_image_url: r.slug ? imgMap[r.slug]?.campus_image_url ?? null : null,
+        logo_url: r.slug ? imgMap[r.slug]?.logo_url ?? null : null,
+      };
       if (!map.has(key)) map.set(key, []);
-      map.get(key)!.push(r);
+      map.get(key)!.push(enriched);
     }
     return Array.from(map.entries());
-  }, [listQuery.data]);
+  }, [listQuery.data, imagesQuery.data]);
 
   return (
     <>
@@ -330,12 +362,14 @@ function CatalogBrowser() {
 function CatalogCard({ u }: { u: any }) {
   return (
     <article className="group relative flex h-full flex-col overflow-hidden rounded-xl border border-border bg-white transition-all duration-500 hover:-translate-y-1 hover:border-[oklch(0.74_0.10_85_/_0.6)] hover:shadow-[0_20px_40px_-20px_rgba(0,60,40,0.25)]">
-      {/* Top emerald banner */}
+      {/* Top campus image banner */}
       <div className="relative h-40 w-full overflow-hidden" style={{ background: "var(--gradient-hero)" }}>
+        <SmartCampusImage src={u.campus_image_url} name={u.name} noOverlay />
+        {/* dark gradient for text legibility */}
         <div
           aria-hidden
-          className="absolute inset-0 opacity-30"
-          style={{ background: "radial-gradient(ellipse 70% 70% at 30% 20%, oklch(0.74 0.10 85 / 0.35), transparent 60%)" }}
+          className="pointer-events-none absolute inset-0"
+          style={{ background: "linear-gradient(180deg, rgba(0,0,0,0.05) 0%, rgba(0,0,0,0.35) 65%, rgba(0,0,0,0.6) 100%)" }}
         />
         {/* gold sheen on hover */}
         <div
@@ -352,9 +386,9 @@ function CatalogCard({ u }: { u: any }) {
           </span>
         )}
         <div className="absolute bottom-3 left-3">
-          <SmartLogo name={u.name} website={u.website} size={52} className="ring-2 ring-white shadow-xl" />
+          <SmartLogo name={u.name} logoUrl={u.logo_url} website={u.website} size={52} className="ring-2 ring-white shadow-xl" />
         </div>
-        <div className="absolute bottom-3 right-3 text-[10px] font-semibold uppercase tracking-[0.18em] text-white/70">
+        <div className="absolute bottom-3 right-3 text-[10px] font-semibold uppercase tracking-[0.18em] text-white/90 drop-shadow">
           {u.country}
         </div>
       </div>
