@@ -360,11 +360,14 @@ function CatalogBrowser() {
 }
 
 function CatalogCard({ u }: { u: any }) {
+  // If the DB has no campus image, fall back to a live Wikipedia thumbnail.
+  const wiki = useWikiImage(u.name, !u.campus_image_url);
+  const imageSrc = u.campus_image_url || wiki.data || null;
   return (
     <article className="group relative flex h-full flex-col overflow-hidden rounded-xl border border-border bg-white transition-all duration-500 hover:-translate-y-1 hover:border-[oklch(0.74_0.10_85_/_0.6)] hover:shadow-[0_20px_40px_-20px_rgba(0,60,40,0.25)]">
       {/* Top campus image banner */}
       <div className="relative h-40 w-full overflow-hidden" style={{ background: "var(--gradient-hero)" }}>
-        <SmartCampusImage src={u.campus_image_url} name={u.name} noOverlay />
+        <SmartCampusImage src={imageSrc} name={u.name} noOverlay />
         {/* dark gradient for text legibility */}
         <div
           aria-hidden
