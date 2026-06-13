@@ -259,6 +259,11 @@ function FeatureTrio() {
 
   return (
     <section className="relative mx-auto max-w-7xl px-4 py-28 lg:px-8">
+      {/* giant ghost serif number behind the heading */}
+      <div aria-hidden className="ghost-numeral pointer-events-none absolute -top-6 right-4 select-none text-[14rem] leading-none opacity-60">
+        III
+      </div>
+
       <div className="mb-12 flex items-end justify-between gap-6">
         <div>
           <div className="text-[10px] uppercase tracking-[0.28em] text-muted-foreground">The Field Guide</div>
@@ -270,23 +275,41 @@ function FeatureTrio() {
       </div>
 
       <div className="grid gap-6 md:grid-cols-3">
-        {items.map(({ icon: Icon, kicker, title, body, cta, to, image }) => (
+        {items.map(({ icon: Icon, kicker, title, body, cta, to, image }, idx) => (
           <Link
             key={title}
             to={to}
-            className="group relative isolate flex min-h-[460px] flex-col overflow-hidden rounded-2xl text-white shadow-[0_20px_50px_-20px_rgba(0,60,40,0.4)] transition-all duration-500 hover:-translate-y-1 hover:shadow-[0_30px_60px_-20px_rgba(0,60,40,0.55)]"
+            className="group relative isolate flex min-h-[480px] flex-col overflow-hidden rounded-2xl text-white shadow-[0_20px_50px_-20px_rgba(0,60,40,0.4)] transition-all duration-500 hover:-translate-y-2 hover:shadow-[0_40px_80px_-20px_rgba(0,60,40,0.6)] reveal-up"
+            style={{ animationDelay: `${idx * 0.12}s` }}
           >
             <img src={image} alt="" loading="lazy" className="absolute inset-0 h-full w-full object-cover transition-transform duration-1000 group-hover:scale-110" />
-            <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-black/60 to-black/95" />
+            <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-black/55 to-black/95" />
+            {/* gold sweep on hover */}
             <div
               aria-hidden
-              className="absolute inset-x-0 bottom-0 h-1 opacity-80"
+              className="absolute inset-0 -translate-x-full transition-transform duration-1000 group-hover:translate-x-full"
+              style={{ background: "linear-gradient(110deg, transparent 40%, oklch(0.74 0.10 85 / 0.22) 50%, transparent 60%)" }}
+            />
+            {/* corner ornaments */}
+            <span aria-hidden className="absolute left-4 top-4 h-4 w-4 border-l border-t border-gold/70" />
+            <span aria-hidden className="absolute right-4 top-4 h-4 w-4 border-r border-t border-gold/70" />
+            <span aria-hidden className="absolute left-4 bottom-4 h-4 w-4 border-l border-b border-gold/70" />
+            <span aria-hidden className="absolute right-4 bottom-4 h-4 w-4 border-r border-b border-gold/70" />
+            <div
+              aria-hidden
+              className="absolute inset-x-0 bottom-0 h-[2px] opacity-90"
               style={{ background: "var(--gradient-gold)" }}
             />
+            {/* roman numeral watermark */}
+            <div aria-hidden className="ghost-numeral pointer-events-none absolute -bottom-4 -right-2 select-none text-[8rem] opacity-30">
+              {["I","II","III"][idx]}
+            </div>
             <div className="relative z-[1] flex h-full flex-col p-7">
-              <div className="flex items-center justify-between text-[10px] uppercase tracking-[0.28em] text-white/75">
+              <div className="flex items-center justify-between text-[10px] uppercase tracking-[0.28em] text-white/80">
                 <span>{kicker}</span>
-                <Icon className="h-4 w-4 text-gold" />
+                <span className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-gold/60 bg-black/30 backdrop-blur transition-transform duration-500 group-hover:rotate-12">
+                  <Icon className="h-4 w-4 text-gold" />
+                </span>
               </div>
               <h3 className="mt-auto pt-12 font-heading text-3xl font-bold tracking-tight">{title}</h3>
               <p className="mt-3 text-sm leading-relaxed text-white/85">{body}</p>
