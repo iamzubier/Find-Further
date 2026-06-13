@@ -211,11 +211,16 @@ function CountriesMarquee() {
     "🇪🇸 Spain", "🇩🇰 Denmark", "🇸🇬 Singapore", "🇭🇺 Hungary", "🇦🇹 Austria",
   ];
   return (
-    <section className="border-y border-border bg-foreground py-5 text-background">
-      <div className="flex items-center gap-4 overflow-hidden">
+    <section className="relative border-y border-border bg-foreground py-5 text-background overflow-hidden">
+      <div
+        aria-hidden
+        className="absolute inset-0 opacity-40"
+        style={{ background: "radial-gradient(800px 80px at 50% 50%, oklch(0.74 0.10 85 / 0.18), transparent 70%)" }}
+      />
+      <div className="relative flex items-center gap-4 overflow-hidden">
         <span className="shrink-0 pl-6 text-[10px] uppercase tracking-[0.32em] text-background/60">Atlas covers</span>
         <div className="hairline-gold w-12 shrink-0 opacity-60" />
-        <div className="relative flex-1 overflow-hidden">
+        <div className="relative flex-1 overflow-hidden mask-fade-x">
           <div className="flex animate-[marquee_38s_linear_infinite] gap-10 whitespace-nowrap text-sm tracking-wide text-background/85">
             {[...items, ...items].map((c, i) => (
               <span key={i} className="inline-flex items-center gap-2">
