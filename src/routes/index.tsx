@@ -52,19 +52,39 @@ function Hero() {
     <section className="relative isolate overflow-hidden">
       {/* layered backdrop */}
       <div className="absolute inset-0 -z-10">
-        <img src={heroLibrary} alt="" className="absolute inset-0 h-full w-full object-cover" />
+        <img src={heroLibrary} alt="" className="absolute inset-0 h-full w-full object-cover scale-105" />
         <div
           className="absolute inset-0"
           style={{
             background:
-              "linear-gradient(120deg, oklch(0.16 0.05 160 / 0.92) 0%, oklch(0.22 0.07 160 / 0.82) 45%, oklch(0.18 0.05 160 / 0.78) 100%)",
+              "linear-gradient(120deg, oklch(0.12 0.04 160 / 0.94) 0%, oklch(0.18 0.06 160 / 0.86) 45%, oklch(0.14 0.04 160 / 0.84) 100%)",
           }}
         />
+        {/* drifting emerald + gold orbs */}
         <div
-          className="absolute inset-0 opacity-40"
+          aria-hidden
+          className="absolute -left-32 top-10 h-[420px] w-[420px] rounded-full opacity-50 blur-3xl orb-drift"
+          style={{ background: "radial-gradient(circle, oklch(0.52 0.12 160 / 0.55), transparent 70%)" }}
+        />
+        <div
+          aria-hidden
+          className="absolute -right-24 top-40 h-[520px] w-[520px] rounded-full opacity-55 blur-3xl orb-drift"
+          style={{ background: "radial-gradient(circle, oklch(0.74 0.10 85 / 0.45), transparent 70%)", animationDelay: "-6s" }}
+        />
+        {/* conic gold light rays */}
+        <div aria-hidden className="absolute inset-0 light-rays" />
+        {/* film grain */}
+        <div aria-hidden className="absolute inset-0 grain-overlay pointer-events-none" />
+        {/* faint topographic grid */}
+        <div
+          aria-hidden
+          className="absolute inset-0 opacity-[0.07]"
           style={{
-            background:
-              "radial-gradient(900px 500px at 80% 20%, oklch(0.74 0.10 85 / 0.35), transparent 60%), radial-gradient(700px 500px at 10% 90%, oklch(0.52 0.12 160 / 0.4), transparent 70%)",
+            backgroundImage:
+              "linear-gradient(to right, white 1px, transparent 1px), linear-gradient(to bottom, white 1px, transparent 1px)",
+            backgroundSize: "64px 64px",
+            maskImage: "radial-gradient(ellipse at center, black 30%, transparent 80%)",
+            WebkitMaskImage: "radial-gradient(ellipse at center, black 30%, transparent 80%)",
           }}
         />
       </div>
@@ -72,16 +92,23 @@ function Hero() {
       <div className="mx-auto max-w-7xl px-4 pt-20 pb-28 lg:px-8 lg:pt-28 lg:pb-36">
         <div className="grid items-center gap-12 lg:grid-cols-[1.15fr_1fr]">
           {/* left — editorial copy */}
-          <div className="text-white">
+          <div className="text-white reveal-up">
             <div className="inline-flex items-center gap-3 rounded-full border border-white/15 bg-white/5 px-4 py-1.5 text-[10px] uppercase tracking-[0.28em] text-white/85 backdrop-blur">
-              <span className="h-1.5 w-1.5 rounded-full bg-gold-grad" />
+              <span className="h-1.5 w-1.5 rounded-full bg-gold-grad animate-pulse" />
               Est. MMXXVI · Volume II · {new Date().toLocaleDateString("en-US", { month: "long" })}
             </div>
 
             <h1 className="mt-8 font-heading text-[3.4rem] font-bold leading-[0.98] tracking-tight text-white md:text-[5.5rem]">
               The atlas for
               <br />
-              <span className="gold-text italic font-medium">ambitious</span>{" "}
+              <span className="relative inline-block">
+                <span className="gold-text italic font-medium">ambitious</span>
+                <span
+                  aria-hidden
+                  className="absolute -bottom-2 left-0 h-[3px] w-full origin-left"
+                  style={{ background: "var(--gradient-gold)", transform: "scaleX(0.7)" }}
+                />
+              </span>{" "}
               <span className="text-white/95">students.</span>
             </h1>
 
@@ -100,19 +127,30 @@ function Hero() {
           </div>
 
           {/* right — search card */}
-          <div className="relative">
+          <div className="relative reveal-up" style={{ animationDelay: "0.15s" }}>
+            {/* slowly rotating gold ring behind the card */}
+            <div
+              aria-hidden
+              className="pointer-events-none absolute -inset-10 spin-slow opacity-40"
+              style={{
+                background:
+                  "conic-gradient(from 0deg, transparent 0deg, oklch(0.74 0.10 85 / 0.55) 60deg, transparent 130deg, transparent 240deg, oklch(0.74 0.10 85 / 0.4) 300deg, transparent 360deg)",
+                borderRadius: "9999px",
+                filter: "blur(28px)",
+              }}
+            />
             <div
               aria-hidden
               className="absolute -inset-1 rounded-2xl opacity-60 blur-2xl"
               style={{ background: "var(--gradient-gold)" }}
             />
-            <div className="relative rounded-2xl border border-white/15 bg-white/95 p-6 shadow-2xl backdrop-blur-xl md:p-7">
+            <div className="relative corner-orn rounded-2xl border border-white/15 bg-white/95 p-6 shadow-2xl backdrop-blur-xl md:p-7">
               <div className="mb-5 flex items-center justify-between">
                 <div>
                   <div className="text-[10px] uppercase tracking-[0.28em] text-muted-foreground">Begin your journey</div>
                   <h3 className="mt-1 font-heading text-xl font-bold tracking-tight">Find your match</h3>
                 </div>
-                <div className="hairline-gold w-16" />
+                <div className="hairline-shimmer w-16" />
               </div>
 
               <div className="space-y-2.5">
@@ -150,9 +188,16 @@ function Hero() {
             </div>
           </div>
         </div>
+
+        {/* scroll cue */}
+        <div className="mt-16 flex justify-center">
+          <div className="flex h-9 w-5 items-start justify-center rounded-full border border-white/25 p-1">
+            <span className="h-2 w-px animate-bounce bg-white/70" />
+          </div>
+        </div>
       </div>
 
-      <div className="hairline-gold" />
+      <div className="hairline-shimmer" />
     </section>
   );
 }
