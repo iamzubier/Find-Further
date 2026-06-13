@@ -495,19 +495,35 @@ function Stats() {
         className="relative overflow-hidden rounded-2xl border border-border p-10 md:p-14"
         style={{ background: "var(--gradient-hero)" }}
       >
+        {/* drifting gold orbs */}
         <div
           aria-hidden
-          className="absolute inset-0 opacity-50"
+          className="absolute -right-32 -top-32 h-[460px] w-[460px] rounded-full opacity-50 blur-3xl orb-drift"
+          style={{ background: "radial-gradient(circle, oklch(0.74 0.10 85 / 0.5), transparent 70%)" }}
+        />
+        <div
+          aria-hidden
+          className="absolute -left-24 -bottom-24 h-[380px] w-[380px] rounded-full opacity-40 blur-3xl orb-drift"
+          style={{ background: "radial-gradient(circle, oklch(0.52 0.12 160 / 0.55), transparent 70%)", animationDelay: "-7s" }}
+        />
+        <div aria-hidden className="absolute inset-0 grain-overlay pointer-events-none" />
+        {/* hairline grid */}
+        <div
+          aria-hidden
+          className="absolute inset-0 opacity-[0.08]"
           style={{
-            background:
-              "radial-gradient(500px 300px at 90% 0%, oklch(0.74 0.10 85 / 0.4), transparent 70%)",
+            backgroundImage:
+              "linear-gradient(to right, white 1px, transparent 1px), linear-gradient(to bottom, white 1px, transparent 1px)",
+            backgroundSize: "80px 80px",
           }}
         />
-        <div className="relative grid gap-8 md:grid-cols-4">
+
+        <div className="relative grid gap-10 md:grid-cols-4">
           {stats.map((s, i) => (
-            <div key={s.label} className={`text-white ${i > 0 ? "md:border-l md:border-white/10 md:pl-8" : ""}`}>
+            <div key={s.label} className={`text-white relative ${i > 0 ? "md:border-l md:border-white/10 md:pl-8" : ""}`}>
               <div className="gold-text font-heading text-5xl font-extrabold tracking-tight md:text-6xl">{s.num}</div>
               <div className="mt-2 text-xs uppercase tracking-[0.22em] text-white/70">{s.label}</div>
+              <div className="mt-4 h-px w-12 bg-gold/60" />
             </div>
           ))}
         </div>
@@ -520,12 +536,22 @@ function Stats() {
 function CtaStrip() {
   return (
     <section className="mx-auto max-w-7xl px-4 pb-24 lg:px-8">
-      <div className="luxe-card relative overflow-hidden p-10 md:p-14">
+      <div className="luxe-card corner-orn relative overflow-hidden p-10 md:p-14">
+        {/* ghost serif numeral */}
+        <div aria-hidden className="ghost-numeral pointer-events-none absolute -bottom-10 right-6 select-none text-[16rem] opacity-50">
+          ∞
+        </div>
         <div
           aria-hidden
-          className="absolute -right-20 -top-20 h-64 w-64 rounded-full opacity-20"
+          className="absolute -right-20 -top-20 h-64 w-64 rounded-full opacity-25 blur-2xl orb-drift"
           style={{ background: "var(--gradient-gold)" }}
         />
+        <div
+          aria-hidden
+          className="absolute -left-16 -bottom-16 h-56 w-56 rounded-full opacity-20 blur-3xl orb-drift"
+          style={{ background: "var(--gradient-emerald)", animationDelay: "-5s" }}
+        />
+        <div className="hairline-shimmer absolute inset-x-10 top-6" />
         <div className="relative flex flex-col items-start justify-between gap-6 md:flex-row md:items-center">
           <div className="max-w-xl">
             <div className="text-[10px] uppercase tracking-[0.28em] text-gold">The final page</div>
@@ -538,7 +564,7 @@ function CtaStrip() {
           </div>
           <Button
             asChild size="lg"
-            className="gold-sheen text-primary-foreground"
+            className="gold-sheen text-primary-foreground shadow-[0_10px_30px_-10px_rgba(0,60,40,0.55)] transition-transform hover:scale-[1.03]"
             style={{ background: "var(--gradient-emerald)" }}
           >
             <Link to="/auth" search={{ tab: "signup" }}>
@@ -546,7 +572,7 @@ function CtaStrip() {
             </Link>
           </Button>
         </div>
-        <p className="mt-8 border-t border-border pt-5 text-center text-xs text-muted-foreground">
+        <p className="relative mt-8 border-t border-border pt-5 text-center text-xs text-muted-foreground">
           {UNIVERSITIES.length} sample universities · {SCHOLARSHIPS.length} live scholarships · updated {new Date().toLocaleDateString("en-US", { month: "long", year: "numeric" })}
         </p>
       </div>
