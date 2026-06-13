@@ -52,19 +52,39 @@ function Hero() {
     <section className="relative isolate overflow-hidden">
       {/* layered backdrop */}
       <div className="absolute inset-0 -z-10">
-        <img src={heroLibrary} alt="" className="absolute inset-0 h-full w-full object-cover" />
+        <img src={heroLibrary} alt="" className="absolute inset-0 h-full w-full object-cover scale-105" />
         <div
           className="absolute inset-0"
           style={{
             background:
-              "linear-gradient(120deg, oklch(0.16 0.05 160 / 0.92) 0%, oklch(0.22 0.07 160 / 0.82) 45%, oklch(0.18 0.05 160 / 0.78) 100%)",
+              "linear-gradient(120deg, oklch(0.12 0.04 160 / 0.94) 0%, oklch(0.18 0.06 160 / 0.86) 45%, oklch(0.14 0.04 160 / 0.84) 100%)",
           }}
         />
+        {/* drifting emerald + gold orbs */}
         <div
-          className="absolute inset-0 opacity-40"
+          aria-hidden
+          className="absolute -left-32 top-10 h-[420px] w-[420px] rounded-full opacity-50 blur-3xl orb-drift"
+          style={{ background: "radial-gradient(circle, oklch(0.52 0.12 160 / 0.55), transparent 70%)" }}
+        />
+        <div
+          aria-hidden
+          className="absolute -right-24 top-40 h-[520px] w-[520px] rounded-full opacity-55 blur-3xl orb-drift"
+          style={{ background: "radial-gradient(circle, oklch(0.74 0.10 85 / 0.45), transparent 70%)", animationDelay: "-6s" }}
+        />
+        {/* conic gold light rays */}
+        <div aria-hidden className="absolute inset-0 light-rays" />
+        {/* film grain */}
+        <div aria-hidden className="absolute inset-0 grain-overlay pointer-events-none" />
+        {/* faint topographic grid */}
+        <div
+          aria-hidden
+          className="absolute inset-0 opacity-[0.07]"
           style={{
-            background:
-              "radial-gradient(900px 500px at 80% 20%, oklch(0.74 0.10 85 / 0.35), transparent 60%), radial-gradient(700px 500px at 10% 90%, oklch(0.52 0.12 160 / 0.4), transparent 70%)",
+            backgroundImage:
+              "linear-gradient(to right, white 1px, transparent 1px), linear-gradient(to bottom, white 1px, transparent 1px)",
+            backgroundSize: "64px 64px",
+            maskImage: "radial-gradient(ellipse at center, black 30%, transparent 80%)",
+            WebkitMaskImage: "radial-gradient(ellipse at center, black 30%, transparent 80%)",
           }}
         />
       </div>
@@ -72,16 +92,23 @@ function Hero() {
       <div className="mx-auto max-w-7xl px-4 pt-20 pb-28 lg:px-8 lg:pt-28 lg:pb-36">
         <div className="grid items-center gap-12 lg:grid-cols-[1.15fr_1fr]">
           {/* left — editorial copy */}
-          <div className="text-white">
+          <div className="text-white reveal-up">
             <div className="inline-flex items-center gap-3 rounded-full border border-white/15 bg-white/5 px-4 py-1.5 text-[10px] uppercase tracking-[0.28em] text-white/85 backdrop-blur">
-              <span className="h-1.5 w-1.5 rounded-full bg-gold-grad" />
+              <span className="h-1.5 w-1.5 rounded-full bg-gold-grad animate-pulse" />
               Est. MMXXVI · Volume II · {new Date().toLocaleDateString("en-US", { month: "long" })}
             </div>
 
             <h1 className="mt-8 font-heading text-[3.4rem] font-bold leading-[0.98] tracking-tight text-white md:text-[5.5rem]">
               The atlas for
               <br />
-              <span className="gold-text italic font-medium">ambitious</span>{" "}
+              <span className="relative inline-block">
+                <span className="gold-text italic font-medium">ambitious</span>
+                <span
+                  aria-hidden
+                  className="absolute -bottom-2 left-0 h-[3px] w-full origin-left"
+                  style={{ background: "var(--gradient-gold)", transform: "scaleX(0.7)" }}
+                />
+              </span>{" "}
               <span className="text-white/95">students.</span>
             </h1>
 
@@ -100,19 +127,30 @@ function Hero() {
           </div>
 
           {/* right — search card */}
-          <div className="relative">
+          <div className="relative reveal-up" style={{ animationDelay: "0.15s" }}>
+            {/* slowly rotating gold ring behind the card */}
+            <div
+              aria-hidden
+              className="pointer-events-none absolute -inset-10 spin-slow opacity-40"
+              style={{
+                background:
+                  "conic-gradient(from 0deg, transparent 0deg, oklch(0.74 0.10 85 / 0.55) 60deg, transparent 130deg, transparent 240deg, oklch(0.74 0.10 85 / 0.4) 300deg, transparent 360deg)",
+                borderRadius: "9999px",
+                filter: "blur(28px)",
+              }}
+            />
             <div
               aria-hidden
               className="absolute -inset-1 rounded-2xl opacity-60 blur-2xl"
               style={{ background: "var(--gradient-gold)" }}
             />
-            <div className="relative rounded-2xl border border-white/15 bg-white/95 p-6 shadow-2xl backdrop-blur-xl md:p-7">
+            <div className="relative corner-orn rounded-2xl border border-white/15 bg-white/95 p-6 shadow-2xl backdrop-blur-xl md:p-7">
               <div className="mb-5 flex items-center justify-between">
                 <div>
                   <div className="text-[10px] uppercase tracking-[0.28em] text-muted-foreground">Begin your journey</div>
                   <h3 className="mt-1 font-heading text-xl font-bold tracking-tight">Find your match</h3>
                 </div>
-                <div className="hairline-gold w-16" />
+                <div className="hairline-shimmer w-16" />
               </div>
 
               <div className="space-y-2.5">
@@ -150,9 +188,16 @@ function Hero() {
             </div>
           </div>
         </div>
+
+        {/* scroll cue */}
+        <div className="mt-16 flex justify-center">
+          <div className="flex h-9 w-5 items-start justify-center rounded-full border border-white/25 p-1">
+            <span className="h-2 w-px animate-bounce bg-white/70" />
+          </div>
+        </div>
       </div>
 
-      <div className="hairline-gold" />
+      <div className="hairline-shimmer" />
     </section>
   );
 }
@@ -166,11 +211,16 @@ function CountriesMarquee() {
     "🇪🇸 Spain", "🇩🇰 Denmark", "🇸🇬 Singapore", "🇭🇺 Hungary", "🇦🇹 Austria",
   ];
   return (
-    <section className="border-y border-border bg-foreground py-5 text-background">
-      <div className="flex items-center gap-4 overflow-hidden">
+    <section className="relative border-y border-border bg-foreground py-5 text-background overflow-hidden">
+      <div
+        aria-hidden
+        className="absolute inset-0 opacity-40"
+        style={{ background: "radial-gradient(800px 80px at 50% 50%, oklch(0.74 0.10 85 / 0.18), transparent 70%)" }}
+      />
+      <div className="relative flex items-center gap-4 overflow-hidden">
         <span className="shrink-0 pl-6 text-[10px] uppercase tracking-[0.32em] text-background/60">Atlas covers</span>
         <div className="hairline-gold w-12 shrink-0 opacity-60" />
-        <div className="relative flex-1 overflow-hidden">
+        <div className="relative flex-1 overflow-hidden mask-fade-x">
           <div className="flex animate-[marquee_38s_linear_infinite] gap-10 whitespace-nowrap text-sm tracking-wide text-background/85">
             {[...items, ...items].map((c, i) => (
               <span key={i} className="inline-flex items-center gap-2">
@@ -209,6 +259,11 @@ function FeatureTrio() {
 
   return (
     <section className="relative mx-auto max-w-7xl px-4 py-28 lg:px-8">
+      {/* giant ghost serif number behind the heading */}
+      <div aria-hidden className="ghost-numeral pointer-events-none absolute -top-6 right-4 select-none text-[14rem] leading-none opacity-60">
+        III
+      </div>
+
       <div className="mb-12 flex items-end justify-between gap-6">
         <div>
           <div className="text-[10px] uppercase tracking-[0.28em] text-muted-foreground">The Field Guide</div>
@@ -220,23 +275,41 @@ function FeatureTrio() {
       </div>
 
       <div className="grid gap-6 md:grid-cols-3">
-        {items.map(({ icon: Icon, kicker, title, body, cta, to, image }) => (
+        {items.map(({ icon: Icon, kicker, title, body, cta, to, image }, idx) => (
           <Link
             key={title}
             to={to}
-            className="group relative isolate flex min-h-[460px] flex-col overflow-hidden rounded-2xl text-white shadow-[0_20px_50px_-20px_rgba(0,60,40,0.4)] transition-all duration-500 hover:-translate-y-1 hover:shadow-[0_30px_60px_-20px_rgba(0,60,40,0.55)]"
+            className="group relative isolate flex min-h-[480px] flex-col overflow-hidden rounded-2xl text-white shadow-[0_20px_50px_-20px_rgba(0,60,40,0.4)] transition-all duration-500 hover:-translate-y-2 hover:shadow-[0_40px_80px_-20px_rgba(0,60,40,0.6)] reveal-up"
+            style={{ animationDelay: `${idx * 0.12}s` }}
           >
             <img src={image} alt="" loading="lazy" className="absolute inset-0 h-full w-full object-cover transition-transform duration-1000 group-hover:scale-110" />
-            <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-black/60 to-black/95" />
+            <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-black/55 to-black/95" />
+            {/* gold sweep on hover */}
             <div
               aria-hidden
-              className="absolute inset-x-0 bottom-0 h-1 opacity-80"
+              className="absolute inset-0 -translate-x-full transition-transform duration-1000 group-hover:translate-x-full"
+              style={{ background: "linear-gradient(110deg, transparent 40%, oklch(0.74 0.10 85 / 0.22) 50%, transparent 60%)" }}
+            />
+            {/* corner ornaments */}
+            <span aria-hidden className="absolute left-4 top-4 h-4 w-4 border-l border-t border-gold/70" />
+            <span aria-hidden className="absolute right-4 top-4 h-4 w-4 border-r border-t border-gold/70" />
+            <span aria-hidden className="absolute left-4 bottom-4 h-4 w-4 border-l border-b border-gold/70" />
+            <span aria-hidden className="absolute right-4 bottom-4 h-4 w-4 border-r border-b border-gold/70" />
+            <div
+              aria-hidden
+              className="absolute inset-x-0 bottom-0 h-[2px] opacity-90"
               style={{ background: "var(--gradient-gold)" }}
             />
+            {/* roman numeral watermark */}
+            <div aria-hidden className="ghost-numeral pointer-events-none absolute -bottom-4 -right-2 select-none text-[8rem] opacity-30">
+              {["I","II","III"][idx]}
+            </div>
             <div className="relative z-[1] flex h-full flex-col p-7">
-              <div className="flex items-center justify-between text-[10px] uppercase tracking-[0.28em] text-white/75">
+              <div className="flex items-center justify-between text-[10px] uppercase tracking-[0.28em] text-white/80">
                 <span>{kicker}</span>
-                <Icon className="h-4 w-4 text-gold" />
+                <span className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-gold/60 bg-black/30 backdrop-blur transition-transform duration-500 group-hover:rotate-12">
+                  <Icon className="h-4 w-4 text-gold" />
+                </span>
               </div>
               <h3 className="mt-auto pt-12 font-heading text-3xl font-bold tracking-tight">{title}</h3>
               <p className="mt-3 text-sm leading-relaxed text-white/85">{body}</p>
@@ -422,19 +495,35 @@ function Stats() {
         className="relative overflow-hidden rounded-2xl border border-border p-10 md:p-14"
         style={{ background: "var(--gradient-hero)" }}
       >
+        {/* drifting gold orbs */}
         <div
           aria-hidden
-          className="absolute inset-0 opacity-50"
+          className="absolute -right-32 -top-32 h-[460px] w-[460px] rounded-full opacity-50 blur-3xl orb-drift"
+          style={{ background: "radial-gradient(circle, oklch(0.74 0.10 85 / 0.5), transparent 70%)" }}
+        />
+        <div
+          aria-hidden
+          className="absolute -left-24 -bottom-24 h-[380px] w-[380px] rounded-full opacity-40 blur-3xl orb-drift"
+          style={{ background: "radial-gradient(circle, oklch(0.52 0.12 160 / 0.55), transparent 70%)", animationDelay: "-7s" }}
+        />
+        <div aria-hidden className="absolute inset-0 grain-overlay pointer-events-none" />
+        {/* hairline grid */}
+        <div
+          aria-hidden
+          className="absolute inset-0 opacity-[0.08]"
           style={{
-            background:
-              "radial-gradient(500px 300px at 90% 0%, oklch(0.74 0.10 85 / 0.4), transparent 70%)",
+            backgroundImage:
+              "linear-gradient(to right, white 1px, transparent 1px), linear-gradient(to bottom, white 1px, transparent 1px)",
+            backgroundSize: "80px 80px",
           }}
         />
-        <div className="relative grid gap-8 md:grid-cols-4">
+
+        <div className="relative grid gap-10 md:grid-cols-4">
           {stats.map((s, i) => (
-            <div key={s.label} className={`text-white ${i > 0 ? "md:border-l md:border-white/10 md:pl-8" : ""}`}>
+            <div key={s.label} className={`text-white relative ${i > 0 ? "md:border-l md:border-white/10 md:pl-8" : ""}`}>
               <div className="gold-text font-heading text-5xl font-extrabold tracking-tight md:text-6xl">{s.num}</div>
               <div className="mt-2 text-xs uppercase tracking-[0.22em] text-white/70">{s.label}</div>
+              <div className="mt-4 h-px w-12 bg-gold/60" />
             </div>
           ))}
         </div>
@@ -447,12 +536,22 @@ function Stats() {
 function CtaStrip() {
   return (
     <section className="mx-auto max-w-7xl px-4 pb-24 lg:px-8">
-      <div className="luxe-card relative overflow-hidden p-10 md:p-14">
+      <div className="luxe-card corner-orn relative overflow-hidden p-10 md:p-14">
+        {/* ghost serif numeral */}
+        <div aria-hidden className="ghost-numeral pointer-events-none absolute -bottom-10 right-6 select-none text-[16rem] opacity-50">
+          ∞
+        </div>
         <div
           aria-hidden
-          className="absolute -right-20 -top-20 h-64 w-64 rounded-full opacity-20"
+          className="absolute -right-20 -top-20 h-64 w-64 rounded-full opacity-25 blur-2xl orb-drift"
           style={{ background: "var(--gradient-gold)" }}
         />
+        <div
+          aria-hidden
+          className="absolute -left-16 -bottom-16 h-56 w-56 rounded-full opacity-20 blur-3xl orb-drift"
+          style={{ background: "var(--gradient-emerald)", animationDelay: "-5s" }}
+        />
+        <div className="hairline-shimmer absolute inset-x-10 top-6" />
         <div className="relative flex flex-col items-start justify-between gap-6 md:flex-row md:items-center">
           <div className="max-w-xl">
             <div className="text-[10px] uppercase tracking-[0.28em] text-gold">The final page</div>
@@ -465,7 +564,7 @@ function CtaStrip() {
           </div>
           <Button
             asChild size="lg"
-            className="gold-sheen text-primary-foreground"
+            className="gold-sheen text-primary-foreground shadow-[0_10px_30px_-10px_rgba(0,60,40,0.55)] transition-transform hover:scale-[1.03]"
             style={{ background: "var(--gradient-emerald)" }}
           >
             <Link to="/auth" search={{ tab: "signup" }}>
@@ -473,7 +572,7 @@ function CtaStrip() {
             </Link>
           </Button>
         </div>
-        <p className="mt-8 border-t border-border pt-5 text-center text-xs text-muted-foreground">
+        <p className="relative mt-8 border-t border-border pt-5 text-center text-xs text-muted-foreground">
           {UNIVERSITIES.length} sample universities · {SCHOLARSHIPS.length} live scholarships · updated {new Date().toLocaleDateString("en-US", { month: "long", year: "numeric" })}
         </p>
       </div>
