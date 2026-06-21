@@ -39,6 +39,7 @@ import {
   AlertCircle,
 } from "lucide-react";
 import { SmartCampusImage } from "@/components/SmartCampusImage";
+import { useWikiImage } from "@/lib/use-wiki-image";
 import { TopoBackground } from "@/components/TopoBackground";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/integrations/supabase/client";
@@ -384,6 +385,10 @@ function Hero({ v }: { v: View }) {
   const d = daysLeft(v.deadline);
   const isPrep = v.cycle_status === "closed_prep_mode";
   const bannerUrl = typeof v.banner_image_url === "string" ? v.banner_image_url.trim() : "";
+  const providerName = v.provider && v.provider !== "—" ? v.provider : "";
+  const wikiByProvider = useWikiImage(providerName, !bannerUrl && !!providerName);
+  const wikiByName = useWikiImage(v.name, !bannerUrl && !providerName);
+  const heroSrc = bannerUrl || wikiByProvider.data || wikiByName.data || null;
 
   const save = async () => {
     if (!user) {
@@ -406,7 +411,7 @@ function Hero({ v }: { v: View }) {
       <div className="absolute inset-0 z-0">
         <TopoBackground />
         <SmartCampusImage
-          src={bannerUrl || null}
+          src={heroSrc}
           name={v.name}
           alt={`${v.name} scholarship cover`}
           className="opacity-35"
