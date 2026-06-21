@@ -411,7 +411,7 @@ function Hero({ v }: { v: View }) {
       <div className="absolute inset-0 z-0">
         <TopoBackground />
         <SmartCampusImage
-          src={bannerUrl || null}
+          src={heroSrc}
           name={v.name}
           alt={`${v.name} scholarship cover`}
           className="opacity-35"
