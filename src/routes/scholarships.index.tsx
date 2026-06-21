@@ -25,6 +25,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { TopoBackground } from "@/components/TopoBackground";
 import { SmartCampusImage } from "@/components/SmartCampusImage";
+import { useWikiImage } from "@/lib/use-wiki-image";
 import { LoginNudge } from "./universities.index";
 
 export const Route = createFileRoute("/scholarships/")({
@@ -662,6 +663,9 @@ function ScholarshipCard({ s, variant }: { s: ViewSch; variant: "active" | "prep
   };
 
   const banner = typeof s.banner_image_url === "string" ? s.banner_image_url.trim() : "";
+  const wikiByName = useWikiImage(s.name, !banner);
+  const wikiByProvider = useWikiImage(s.provider, !banner && !wikiByName.data && !wikiByName.isLoading && !!s.provider && s.provider !== "—");
+  const imageSrc = banner || wikiByName.data || wikiByProvider.data || null;
 
   return (
     <Link
@@ -672,7 +676,7 @@ function ScholarshipCard({ s, variant }: { s: ViewSch; variant: "active" | "prep
       <div className="absolute inset-0">
         <TopoBackground />
         <SmartCampusImage
-          src={banner || null}
+          src={imageSrc}
           name={s.name}
           alt={`${s.name} scholarship cover`}
           className="transition-transform duration-700 group-hover:scale-[1.04] opacity-60"
