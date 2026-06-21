@@ -663,9 +663,10 @@ function ScholarshipCard({ s, variant }: { s: ViewSch; variant: "active" | "prep
   };
 
   const banner = typeof s.banner_image_url === "string" ? s.banner_image_url.trim() : "";
-  const wikiByName = useWikiImage(s.name, !banner);
-  const wikiByProvider = useWikiImage(s.provider, !banner && !wikiByName.data && !wikiByName.isLoading && !!s.provider && s.provider !== "—");
-  const imageSrc = banner || wikiByName.data || wikiByProvider.data || null;
+  const provider = s.provider && s.provider !== "—" ? s.provider : "";
+  const wikiByProvider = useWikiImage(provider, !banner && !!provider);
+  const wikiByName = useWikiImage(s.name, !banner && !provider);
+  const imageSrc = banner || wikiByProvider.data || wikiByName.data || null;
 
   return (
     <Link

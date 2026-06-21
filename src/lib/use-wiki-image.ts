@@ -5,9 +5,9 @@ import { useQuery } from "@tanstack/react-query";
  * Uses the public REST API (CORS enabled, no key required).
  * Returns null if no page / no image is available.
  */
-const INSTITUTION_HINT = /\b(university|college|institute|academy|polytechnic|school|conservatory)\b/i;
-const BAD_CONTEXT_HINT = /\b(attack|war|bombing|shooting|massacre|accident|province|district|governor|politician)\b/i;
-const BAD_IMAGE_HINT = /\b(logo|seal|crest|coat(?:_|\s|%20)?of(?:_|\s|%20)?arms|emblem|flag|wordmark)\b/i;
+const INSTITUTION_HINT = /\b(university|college|institute|academy|polytechnic|school|conservatory|foundation|trust|scholarship|fellowship|programme|program|ministry|council|commission|corporation)\b/i;
+const BAD_CONTEXT_HINT = /\b(attack|war|bombing|shooting|massacre|accident|province|district|governor|politician|election|murder|assassination|terrorist|riot)\b/i;
+const BAD_IMAGE_HINT = /\b(logo|seal|crest|coat(?:_|\s|%20)?of(?:_|\s|%20)?arms|emblem|flag|wordmark|portrait|headshot|signature|gage[_\s]skidmore|official[_\s]photo|white[_\s]?house)\b/i;
 
 function normalizeName(name: string): string {
   return name
