@@ -663,6 +663,9 @@ function ScholarshipCard({ s, variant }: { s: ViewSch; variant: "active" | "prep
   };
 
   const banner = typeof s.banner_image_url === "string" ? s.banner_image_url.trim() : "";
+  const wikiByName = useWikiImage(s.name, !banner);
+  const wikiByProvider = useWikiImage(s.provider, !banner && !wikiByName.data && !wikiByName.isLoading && !!s.provider && s.provider !== "—");
+  const imageSrc = banner || wikiByName.data || wikiByProvider.data || null;
 
   return (
     <Link
