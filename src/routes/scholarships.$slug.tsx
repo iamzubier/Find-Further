@@ -385,6 +385,10 @@ function Hero({ v }: { v: View }) {
   const d = daysLeft(v.deadline);
   const isPrep = v.cycle_status === "closed_prep_mode";
   const bannerUrl = typeof v.banner_image_url === "string" ? v.banner_image_url.trim() : "";
+  const providerName = v.provider && v.provider !== "—" ? v.provider : "";
+  const wikiByProvider = useWikiImage(providerName, !bannerUrl && !!providerName);
+  const wikiByName = useWikiImage(v.name, !bannerUrl && !providerName);
+  const heroSrc = bannerUrl || wikiByProvider.data || wikiByName.data || null;
 
   const save = async () => {
     if (!user) {
