@@ -676,7 +676,7 @@ function ScholarshipCard({ s, variant }: { s: ViewSch; variant: "active" | "prep
       <div className="absolute inset-0">
         <TopoBackground />
         <SmartCampusImage
-          src={banner || null}
+          src={imageSrc}
           name={s.name}
           alt={`${s.name} scholarship cover`}
           className="transition-transform duration-700 group-hover:scale-[1.04] opacity-60"
