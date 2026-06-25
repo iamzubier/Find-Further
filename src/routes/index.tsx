@@ -51,16 +51,19 @@ function Hero() {
       <div className="mx-auto max-w-7xl px-4 lg:px-8">
         <div className="grid grid-cols-1 gap-4 md:grid-cols-12 md:auto-rows-[minmax(180px,auto)]">
 
-          {/* Brand & Hero — Deep Emerald */}
-          <div className="md:col-span-8 md:row-span-2 relative overflow-hidden border-b-4 border-gold p-8 md:p-12 flex flex-col justify-between text-[#f5f0e0]" style={{ background: "oklch(0.32 0.07 162)" }}>
+          {/* Brand & Hero — Deep Emerald with library backdrop */}
+          <div className="md:col-span-8 md:row-span-2 relative overflow-hidden border-b-4 border-gold p-8 md:p-12 flex flex-col justify-between text-[#f5f0e0] min-h-[460px]">
+            <img src={heroLibrary} alt="" className="absolute inset-0 h-full w-full object-cover" />
+            <div aria-hidden className="absolute inset-0" style={{ background: "linear-gradient(120deg, oklch(0.28 0.07 162 / 0.92) 0%, oklch(0.32 0.07 162 / 0.82) 50%, oklch(0.20 0.05 162 / 0.88) 100%)" }} />
+            <div aria-hidden className="absolute inset-0 grain-overlay pointer-events-none" />
             <div className="relative z-10">
               <span className="font-heading italic text-gold text-lg md:text-xl mb-3 block">BeyondBorder</span>
-              <h1 className="font-heading text-4xl md:text-6xl lg:text-7xl leading-[1.05] max-w-2xl text-[#f5f0e0]">
+              <h1 className="font-heading text-4xl md:text-6xl lg:text-7xl leading-[1.05] max-w-2xl text-[#f5f0e0] drop-shadow-[0_2px_24px_rgba(0,0,0,0.4)]">
                 The Global <em className="not-italic" style={{ fontStyle: "italic" }}>Academic</em> Archive.
               </h1>
             </div>
             <div className="relative z-10 mt-10">
-              <p className="max-w-md leading-relaxed text-[#f5f0e0]/80 text-base md:text-lg">
+              <p className="max-w-md leading-relaxed text-[#f5f0e0]/85 text-base md:text-lg">
                 A curated registry of premier universities and prestigious scholarship opportunities — for the modern scholar applying abroad.
               </p>
               <div className="mt-7 flex flex-wrap gap-3">
@@ -72,9 +75,9 @@ function Hero() {
                 </Button>
               </div>
             </div>
-            {/* decorative compass */}
-            <div aria-hidden className="absolute -bottom-20 -right-20 opacity-10 pointer-events-none">
-              <svg width="420" height="420" viewBox="0 0 100 100" fill="none" stroke="currentColor" strokeWidth="0.4">
+            {/* corner compass */}
+            <div aria-hidden className="absolute -bottom-16 -right-16 opacity-20 pointer-events-none z-[1]">
+              <svg width="320" height="320" viewBox="0 0 100 100" fill="none" stroke="currentColor" strokeWidth="0.4">
                 <circle cx="50" cy="50" r="45" />
                 <circle cx="50" cy="50" r="35" />
                 <circle cx="50" cy="50" r="25" />
