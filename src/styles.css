@@ -5,8 +5,8 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
-  --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, sans-serif;
-  --font-heading: "Playfair Display", "Lora", ui-serif, Georgia, "Times New Roman", serif;
+  --font-sans: "IBM Plex Sans", ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-heading: "Libre Baskerville", ui-serif, Georgia, "Times New Roman", serif;
 
   --radius-sm: 4px;
   --radius-md: 6px;
@@ -46,31 +46,31 @@
 
 /* Rolex-inspired luxury palette — deep emerald, champagne gold, ivory */
 :root {
-  --background: oklch(0.961 0 0);                /* Porcelain White #F4F4F4 */
-  --foreground: oklch(0.18 0 0);                 /* near Midnight Black */
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.18 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.18 0 0);
-  --primary: oklch(0.41 0.10 162);               /* Rolex Green #006039 */
-  --primary-foreground: oklch(0.961 0 0);
-  --primary-glow: oklch(0.52 0.11 162);
-  --secondary: oklch(0.30 0.07 162);             /* Deep Forest #003B24 */
-  --secondary-foreground: oklch(0.961 0 0);
-  --muted: oklch(0.94 0 0);
-  --muted-foreground: oklch(0.45 0 0);
-  --accent: oklch(0.60 0.11 75);                 /* Antique Gold #A37E2C */
-  --accent-foreground: oklch(0.961 0 0);
-  --gold: oklch(0.60 0.11 75);                   /* Antique Gold */
-  --gold-foreground: oklch(0.10 0 0);
+  --background: oklch(0.962 0.020 95);           /* Parchment cream #f5f0e0 */
+  --foreground: oklch(0.32 0.07 162);            /* Deep Emerald #064e3b */
+  --card: oklch(0.995 0.004 95);                 /* Near-white parchment */
+  --card-foreground: oklch(0.32 0.07 162);
+  --popover: oklch(0.995 0.004 95);
+  --popover-foreground: oklch(0.32 0.07 162);
+  --primary: oklch(0.32 0.07 162);               /* Deep Emerald #064e3b */
+  --primary-foreground: oklch(0.962 0.020 95);
+  --primary-glow: oklch(0.50 0.11 162);          /* Emerald glow #0d7a5f */
+  --secondary: oklch(0.92 0.025 95);             /* Soft parchment */
+  --secondary-foreground: oklch(0.32 0.07 162);
+  --muted: oklch(0.92 0.018 95);
+  --muted-foreground: oklch(0.48 0.04 162);
+  --accent: oklch(0.74 0.12 85);                 /* Antique Gold #c9a84c */
+  --accent-foreground: oklch(0.32 0.07 162);
+  --gold: oklch(0.74 0.12 85);                   /* Antique Gold #c9a84c */
+  --gold-foreground: oklch(0.32 0.07 162);
   --destructive: oklch(0.43 0.18 25);
   --destructive-foreground: oklch(1 0 0);
   --warning: oklch(0.72 0.16 70);
   --warning-foreground: oklch(0.18 0 0);
-  --border: oklch(0.88 0 0);
-  --input: oklch(0.92 0 0);
-  --ring: oklch(0.41 0.10 162);
-  --radius: 8px;
+  --border: oklch(0.74 0.12 85 / 0.30);          /* Gold hairline */
+  --input: oklch(0.88 0.02 95);
+  --ring: oklch(0.32 0.07 162);
+  --radius: 4px;
 
   --gradient-emerald: linear-gradient(135deg, oklch(0.30 0.07 162) 0%, oklch(0.41 0.10 162) 55%, oklch(0.52 0.11 162) 100%);
   --gradient-gold: linear-gradient(135deg, oklch(0.52 0.10 75) 0%, oklch(0.64 0.11 75) 100%);
