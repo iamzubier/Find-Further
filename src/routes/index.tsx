@@ -93,7 +93,7 @@ function Hero() {
               {featuredSch.map((s, i) => (
                 <Link key={s.id} to="/scholarships" className="group block">
                   <span className="text-gold text-[11px] font-bold font-heading tracking-wider mb-1 block">
-                    {String(i + 1).padStart(2, "0")} / {s.provider?.toUpperCase() || s.countryFlag}
+                    {String(i + 1).padStart(2, "0")} / {(s.country || s.countryFlag).toUpperCase()}
                   </span>
                   <h4 className="font-heading text-lg leading-snug text-foreground group-hover:text-primary-glow transition-colors">{s.name}</h4>
                   <p className="text-sm text-muted-foreground mt-1.5 line-clamp-2">{s.description}</p>
@@ -147,7 +147,7 @@ function Hero() {
               <label className="text-[10px] uppercase tracking-[0.2em] text-gold font-bold block mb-3">Spotlight Institution</label>
               <h3 className="font-heading text-2xl md:text-3xl mb-3 text-foreground">{UNIVERSITIES[0]?.name ?? "Sorbonne Université"}</h3>
               <p className="text-muted-foreground text-sm font-heading italic">
-                {UNIVERSITIES[0]?.city ?? "Paris"}, {UNIVERSITIES[0]?.country ?? "France"} — Heritage Member
+                {UNIVERSITIES[0]?.country ?? "France"} — Heritage Member · QS #{UNIVERSITIES[0]?.qsRank ?? "—"}
               </p>
               <Link to="/universities" className="mt-5 inline-flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.2em] text-foreground border-b border-foreground pb-1 hover:text-gold hover:border-gold transition-colors">
                 Explore Dossier <ArrowRight className="h-3 w-3" />
