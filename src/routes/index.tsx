@@ -144,29 +144,32 @@ function Hero() {
             <div className="mt-4 h-px w-10 bg-gold/60" />
           </div>
 
-          {/* Spotlight Institution */}
-          <div className="md:col-span-8 bg-card border border-gold/30 p-8 md:p-10 flex items-center justify-between group">
-            <div className="max-w-md">
+          {/* Spotlight Institution — with campus photo */}
+          <div className="md:col-span-8 relative overflow-hidden border border-gold/30 group min-h-[260px] flex">
+            <div className="relative w-1/2 overflow-hidden hidden md:block">
+              <img src={UNIVERSITIES[0]?.campusImageUrl ?? exploreImg} alt={UNIVERSITIES[0]?.name ?? ""} className="absolute inset-0 h-full w-full object-cover transition-transform duration-1000 group-hover:scale-105" />
+              <div aria-hidden className="absolute inset-0 bg-gradient-to-r from-transparent to-[oklch(0.995_0.004_95)]" />
+            </div>
+            <div className="flex-1 bg-card p-8 md:p-10 flex flex-col justify-center">
               <label className="text-[10px] uppercase tracking-[0.2em] text-gold font-bold block mb-3">Spotlight Institution</label>
               <h3 className="font-heading text-2xl md:text-3xl mb-3 text-foreground">{UNIVERSITIES[0]?.name ?? "Sorbonne Université"}</h3>
               <p className="text-muted-foreground text-sm font-heading italic">
                 {UNIVERSITIES[0]?.country ?? "France"} — Heritage Member · QS #{UNIVERSITIES[0]?.qsRank ?? "—"}
               </p>
-              <Link to="/universities" className="mt-5 inline-flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.2em] text-foreground border-b border-foreground pb-1 hover:text-gold hover:border-gold transition-colors">
+              <Link to="/universities" className="mt-5 inline-flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.2em] text-foreground border-b border-foreground pb-1 hover:text-gold hover:border-gold transition-colors self-start">
                 Explore Dossier <ArrowRight className="h-3 w-3" />
               </Link>
             </div>
-            <div className="hidden md:flex h-32 w-32 rounded-full border border-gold items-center justify-center p-4 grayscale group-hover:grayscale-0 transition-all duration-700">
-              <div className="text-5xl font-heading text-gold italic">Σ</div>
-            </div>
           </div>
 
-          {/* Closing maxim */}
-          <div className="md:col-span-4 p-8 flex flex-col justify-center border-l-4 border-gold text-[#f5f0e0]" style={{ background: "oklch(0.32 0.07 162)" }}>
-            <p className="font-heading italic text-base md:text-lg leading-snug text-[#f5f0e0]">
+          {/* Closing maxim — lamp backdrop */}
+          <div className="md:col-span-4 relative overflow-hidden p-8 flex flex-col justify-center border-l-4 border-gold text-[#f5f0e0] min-h-[260px]">
+            <img src={tipsImg} alt="" className="absolute inset-0 h-full w-full object-cover" />
+            <div aria-hidden className="absolute inset-0" style={{ background: "linear-gradient(135deg, oklch(0.32 0.07 162 / 0.94) 0%, oklch(0.20 0.05 162 / 0.92) 100%)" }} />
+            <p className="relative font-heading italic text-base md:text-lg leading-snug text-[#f5f0e0]">
               "The beautiful thing about learning is that no one can take it away from you."
             </p>
-            <span className="text-gold text-[10px] uppercase tracking-[0.2em] mt-4 font-bold">— The Atlas Codex</span>
+            <span className="relative text-gold text-[10px] uppercase tracking-[0.2em] mt-4 font-bold">— The Atlas Codex</span>
           </div>
 
         </div>
