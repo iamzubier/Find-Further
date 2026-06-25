@@ -39,165 +39,148 @@ function HomePage() {
   );
 }
 
-/* ─────────────────────────── HERO ─────────────────────────── */
+/* ─────────────────────────── HERO (Bento Archive Registry) ─────────────────────────── */
 function Hero() {
-  const [country, setCountry] = useState<string>("");
-  const [program, setProgram] = useState<string>("");
-  const [budget, setBudget] = useState<string>("");
   const countFn = useServerFn(getUniversityCount);
   const { data: countData } = useQuery({ queryKey: ["uni-count"], queryFn: () => countFn(), staleTime: 60_000 });
   const countLabel = countData?.count ? `${countData.count.toLocaleString()}+` : "10,000+";
+  const featuredSch = SCHOLARSHIPS.slice(0, 3);
 
   return (
-    <section className="relative isolate overflow-hidden">
-      {/* layered backdrop */}
-      <div className="absolute inset-0 -z-10">
-        <img src={heroLibrary} alt="" className="absolute inset-0 h-full w-full object-cover scale-105" />
-        <div
-          className="absolute inset-0"
-          style={{
-            background:
-              "linear-gradient(120deg, oklch(0.12 0.04 160 / 0.94) 0%, oklch(0.18 0.06 160 / 0.86) 45%, oklch(0.14 0.04 160 / 0.84) 100%)",
-          }}
-        />
-        {/* drifting emerald + gold orbs */}
-        <div
-          aria-hidden
-          className="absolute -left-32 top-10 h-[420px] w-[420px] rounded-full opacity-50 blur-3xl orb-drift"
-          style={{ background: "radial-gradient(circle, oklch(0.52 0.12 160 / 0.55), transparent 70%)" }}
-        />
-        <div
-          aria-hidden
-          className="absolute -right-24 top-40 h-[520px] w-[520px] rounded-full opacity-55 blur-3xl orb-drift"
-          style={{ background: "radial-gradient(circle, oklch(0.74 0.10 85 / 0.45), transparent 70%)", animationDelay: "-6s" }}
-        />
-        {/* conic gold light rays */}
-        <div aria-hidden className="absolute inset-0 light-rays" />
-        {/* film grain */}
-        <div aria-hidden className="absolute inset-0 grain-overlay pointer-events-none" />
-        {/* faint topographic grid */}
-        <div
-          aria-hidden
-          className="absolute inset-0 opacity-[0.07]"
-          style={{
-            backgroundImage:
-              "linear-gradient(to right, white 1px, transparent 1px), linear-gradient(to bottom, white 1px, transparent 1px)",
-            backgroundSize: "64px 64px",
-            maskImage: "radial-gradient(ellipse at center, black 30%, transparent 80%)",
-            WebkitMaskImage: "radial-gradient(ellipse at center, black 30%, transparent 80%)",
-          }}
-        />
-      </div>
+    <section className="relative bg-[oklch(0.962_0.020_95)] py-10 lg:py-16">
+      <div className="mx-auto max-w-7xl px-4 lg:px-8">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-12 md:auto-rows-[minmax(180px,auto)]">
 
-      <div className="mx-auto max-w-7xl px-4 pt-20 pb-28 lg:px-8 lg:pt-28 lg:pb-36">
-        <div className="grid items-center gap-12 lg:grid-cols-[1.15fr_1fr]">
-          {/* left — editorial copy */}
-          <div className="text-white reveal-up">
-            <div className="inline-flex items-center gap-3 rounded-full border border-white/15 bg-white/5 px-4 py-1.5 text-[10px] uppercase tracking-[0.28em] text-white/85 backdrop-blur">
-              <span className="h-1.5 w-1.5 rounded-full bg-gold-grad animate-pulse" />
-              Est. MMXXVI · Volume II · {new Date().toLocaleDateString("en-US", { month: "long" })}
+          {/* Brand & Hero — Deep Emerald */}
+          <div className="md:col-span-8 md:row-span-2 relative overflow-hidden border-b-4 border-gold p-8 md:p-12 flex flex-col justify-between text-[#f5f0e0]" style={{ background: "oklch(0.32 0.07 162)" }}>
+            <div className="relative z-10">
+              <span className="font-heading italic text-gold text-lg md:text-xl mb-3 block">BeyondBorder</span>
+              <h1 className="font-heading text-4xl md:text-6xl lg:text-7xl leading-[1.05] max-w-2xl text-[#f5f0e0]">
+                The Global <em className="not-italic" style={{ fontStyle: "italic" }}>Academic</em> Archive.
+              </h1>
             </div>
-
-            <h1 className="mt-8 font-heading text-[3.4rem] font-bold leading-[0.98] tracking-tight text-white md:text-[5.5rem]">
-              The atlas for
-              <br />
-              <span className="relative inline-block">
-                <span className="gold-text italic font-medium">ambitious</span>
-                <span
-                  aria-hidden
-                  className="absolute -bottom-2 left-0 h-[3px] w-full origin-left"
-                  style={{ background: "var(--gradient-gold)", transform: "scaleX(0.7)" }}
-                />
-              </span>{" "}
-              <span className="text-white/95">students.</span>
-            </h1>
-
-            <p className="mt-7 max-w-xl text-lg leading-relaxed text-white/80">
-              {countLabel} universities. Live scholarships. An AI advisor named{" "}
-              <em className="serif-italic text-white">Aria</em>. One honest, beautifully kept atlas — for students applying to the world's best.
-            </p>
-
-            <div className="mt-10 flex flex-wrap items-center gap-x-8 gap-y-3 text-[11px] uppercase tracking-[0.24em] text-white/70">
-              <span className="inline-flex items-center gap-2"><Globe2 className="h-3.5 w-3.5 text-gold" /> 120+ Countries</span>
-              <span className="h-3 w-px bg-white/20" />
-              <span className="inline-flex items-center gap-2"><Award className="h-3.5 w-3.5 text-gold" /> 180+ Scholarships</span>
-              <span className="h-3 w-px bg-white/20" />
-              <span className="inline-flex items-center gap-2"><GraduationCap className="h-3.5 w-3.5 text-gold" /> Trusted by 12k students</span>
-            </div>
-          </div>
-
-          {/* right — search card */}
-          <div className="relative reveal-up" style={{ animationDelay: "0.15s" }}>
-            {/* slowly rotating gold ring behind the card */}
-            <div
-              aria-hidden
-              className="pointer-events-none absolute -inset-10 spin-slow opacity-40"
-              style={{
-                background:
-                  "conic-gradient(from 0deg, transparent 0deg, oklch(0.74 0.10 85 / 0.55) 60deg, transparent 130deg, transparent 240deg, oklch(0.74 0.10 85 / 0.4) 300deg, transparent 360deg)",
-                borderRadius: "9999px",
-                filter: "blur(28px)",
-              }}
-            />
-            <div
-              aria-hidden
-              className="absolute -inset-1 rounded-2xl opacity-60 blur-2xl"
-              style={{ background: "var(--gradient-gold)" }}
-            />
-            <div className="relative corner-orn rounded-2xl border border-white/15 bg-white/95 p-6 shadow-2xl backdrop-blur-xl md:p-7">
-              <div className="mb-5 flex items-center justify-between">
-                <div>
-                  <div className="text-[10px] uppercase tracking-[0.28em] text-muted-foreground">Begin your journey</div>
-                  <h3 className="mt-1 font-heading text-xl font-bold tracking-tight">Find your match</h3>
-                </div>
-                <div className="hairline-shimmer w-16" />
-              </div>
-
-              <div className="space-y-2.5">
-                <Select value={country} onValueChange={setCountry}>
-                  <SelectTrigger className="h-12 bg-secondary/60"><SelectValue placeholder="Destination country" /></SelectTrigger>
-                  <SelectContent>{COUNTRIES.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}</SelectContent>
-                </Select>
-                <Select value={program} onValueChange={setProgram}>
-                  <SelectTrigger className="h-12 bg-secondary/60"><SelectValue placeholder="Field of study" /></SelectTrigger>
-                  <SelectContent>{PROGRAMS.map(p => <SelectItem key={p} value={p}>{p}</SelectItem>)}</SelectContent>
-                </Select>
-                <Select value={budget} onValueChange={setBudget}>
-                  <SelectTrigger className="h-12 bg-secondary/60"><SelectValue placeholder="Yearly budget" /></SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="0-2k">$0 – $2,000 / yr</SelectItem>
-                    <SelectItem value="2-10k">$2,000 – $10,000 / yr</SelectItem>
-                    <SelectItem value="10-25k">$10,000 – $25,000 / yr</SelectItem>
-                    <SelectItem value="25k+">$25,000+ / yr</SelectItem>
-                  </SelectContent>
-                </Select>
-
-                <Button
-                  asChild
-                  className="gold-sheen mt-2 h-12 w-full text-[13px] font-semibold text-primary-foreground"
-                  style={{ background: "var(--gradient-emerald)" }}
-                >
-                  <Link to="/universities" search={{ country: country || undefined, program: program || undefined }}>
-                    <Search className="mr-2 h-4 w-4" /> Search the atlas
-                  </Link>
+            <div className="relative z-10 mt-10">
+              <p className="max-w-md leading-relaxed text-[#f5f0e0]/80 text-base md:text-lg">
+                A curated registry of premier universities and prestigious scholarship opportunities — for the modern scholar applying abroad.
+              </p>
+              <div className="mt-7 flex flex-wrap gap-3">
+                <Button asChild className="rounded-none bg-gold px-7 py-6 font-semibold uppercase tracking-[0.2em] text-xs hover:bg-[#f5f0e0]" style={{ color: "oklch(0.32 0.07 162)" }}>
+                  <Link to="/universities">Begin Inquiry</Link>
                 </Button>
-                <p className="pt-1 text-center text-[11px] text-muted-foreground">
-                  Or <Link to="/ask-ai" className="story-link font-medium text-primary">ask Aria</Link> to recommend universities for you
-                </p>
+                <Button asChild variant="outline" className="rounded-none border-gold bg-transparent px-7 py-6 font-semibold uppercase tracking-[0.2em] text-xs text-gold hover:bg-gold hover:text-[oklch(0.32_0.07_162)]">
+                  <Link to="/scholarships">View Catalog</Link>
+                </Button>
               </div>
             </div>
+            {/* decorative compass */}
+            <div aria-hidden className="absolute -bottom-20 -right-20 opacity-10 pointer-events-none">
+              <svg width="420" height="420" viewBox="0 0 100 100" fill="none" stroke="currentColor" strokeWidth="0.4">
+                <circle cx="50" cy="50" r="45" />
+                <circle cx="50" cy="50" r="35" />
+                <circle cx="50" cy="50" r="25" />
+                <path d="M50 5 L50 95 M5 50 L95 50 M22 22 L78 78 M78 22 L22 78" />
+              </svg>
+            </div>
           </div>
+
+          {/* Registry — vertical list */}
+          <div className="md:col-span-4 md:row-span-3 bg-card p-7 md:p-8 border border-gold/30 flex flex-col">
+            <div className="border-b border-gold pb-4 mb-6 flex justify-between items-end">
+              <h3 className="font-heading text-2xl text-foreground">Registry</h3>
+              <span className="text-[10px] uppercase tracking-[0.18em] text-gold font-semibold">Active Grants</span>
+            </div>
+            <div className="space-y-7 flex-1">
+              {featuredSch.map((s, i) => (
+                <Link key={s.id} to="/scholarships" className="group block">
+                  <span className="text-gold text-[11px] font-bold font-heading tracking-wider mb-1 block">
+                    {String(i + 1).padStart(2, "0")} / {s.provider?.toUpperCase() || s.countryFlag}
+                  </span>
+                  <h4 className="font-heading text-lg leading-snug text-foreground group-hover:text-primary-glow transition-colors">{s.name}</h4>
+                  <p className="text-sm text-muted-foreground mt-1.5 line-clamp-2">{s.description}</p>
+                </Link>
+              ))}
+            </div>
+            <Link to="/scholarships" className="mt-7 text-[11px] font-bold uppercase tracking-[0.2em] text-foreground border-b border-foreground self-start py-1 hover:text-gold hover:border-gold transition-colors inline-flex items-center gap-2">
+              View All Archives <ArrowRight className="h-3 w-3" />
+            </Link>
+          </div>
+
+          {/* Search — Emerald glow */}
+          <div className="md:col-span-5 p-7 md:p-8 flex flex-col justify-center text-[#f5f0e0]" style={{ background: "oklch(0.50 0.11 162)" }}>
+            <label className="text-[10px] uppercase tracking-[0.22em] mb-4 text-gold font-bold">Discovery Tool</label>
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                const v = (e.currentTarget.elements.namedItem("q") as HTMLInputElement)?.value;
+                if (v) window.location.href = `/universities?q=${encodeURIComponent(v)}`;
+              }}
+              className="relative"
+            >
+              <input
+                name="q"
+                type="text"
+                placeholder="Search regions, disciplines, institutions..."
+                className="w-full bg-transparent border-b border-gold py-4 pr-10 focus:outline-none placeholder:text-[#f5f0e0]/45 font-heading italic text-lg md:text-xl text-[#f5f0e0]"
+              />
+              <button type="submit" className="absolute right-0 top-1/2 -translate-y-1/2 text-gold hover:text-[#f5f0e0] transition-colors">
+                <Search className="h-6 w-6" />
+              </button>
+            </form>
+            <div className="mt-4 flex flex-wrap gap-2 text-[10px] uppercase tracking-[0.18em] text-[#f5f0e0]/70">
+              <Link to="/universities" search={{ country: "United Kingdom" }} className="border border-gold/40 px-2.5 py-1 hover:bg-gold hover:text-foreground transition-colors">UK</Link>
+              <Link to="/universities" search={{ country: "Germany" }} className="border border-gold/40 px-2.5 py-1 hover:bg-gold hover:text-foreground transition-colors">Germany</Link>
+              <Link to="/universities" search={{ country: "United States" }} className="border border-gold/40 px-2.5 py-1 hover:bg-gold hover:text-foreground transition-colors">USA</Link>
+              <Link to="/ask-ai" className="border border-gold/40 px-2.5 py-1 hover:bg-gold hover:text-foreground transition-colors">Ask Aria</Link>
+            </div>
+          </div>
+
+          {/* Stat — Institutions */}
+          <div className="md:col-span-3 bg-card border border-gold/30 p-7 flex flex-col justify-center items-center text-center">
+            <span className="text-4xl md:text-5xl font-heading text-primary">{countLabel}</span>
+            <span className="text-[10px] uppercase tracking-[0.2em] mt-3 text-gold font-bold">Institutions Cataloged</span>
+            <div className="mt-4 h-px w-10 bg-gold/60" />
+          </div>
+
+          {/* Spotlight Institution */}
+          <div className="md:col-span-8 bg-card border border-gold/30 p-8 md:p-10 flex items-center justify-between group">
+            <div className="max-w-md">
+              <label className="text-[10px] uppercase tracking-[0.2em] text-gold font-bold block mb-3">Spotlight Institution</label>
+              <h3 className="font-heading text-2xl md:text-3xl mb-3 text-foreground">{UNIVERSITIES[0]?.name ?? "Sorbonne Université"}</h3>
+              <p className="text-muted-foreground text-sm font-heading italic">
+                {UNIVERSITIES[0]?.city ?? "Paris"}, {UNIVERSITIES[0]?.country ?? "France"} — Heritage Member
+              </p>
+              <Link to="/universities" className="mt-5 inline-flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.2em] text-foreground border-b border-foreground pb-1 hover:text-gold hover:border-gold transition-colors">
+                Explore Dossier <ArrowRight className="h-3 w-3" />
+              </Link>
+            </div>
+            <div className="hidden md:flex h-32 w-32 rounded-full border border-gold items-center justify-center p-4 grayscale group-hover:grayscale-0 transition-all duration-700">
+              <div className="text-5xl font-heading text-gold italic">Σ</div>
+            </div>
+          </div>
+
+          {/* Closing maxim */}
+          <div className="md:col-span-4 p-8 flex flex-col justify-center border-l-4 border-gold text-[#f5f0e0]" style={{ background: "oklch(0.32 0.07 162)" }}>
+            <p className="font-heading italic text-base md:text-lg leading-snug text-[#f5f0e0]">
+              "The beautiful thing about learning is that no one can take it away from you."
+            </p>
+            <span className="text-gold text-[10px] uppercase tracking-[0.2em] mt-4 font-bold">— The Atlas Codex</span>
+          </div>
+
         </div>
 
-        {/* scroll cue */}
-        <div className="mt-16 flex justify-center">
-          <div className="flex h-9 w-5 items-start justify-center rounded-full border border-white/25 p-1">
-            <span className="h-2 w-px animate-bounce bg-white/70" />
+        {/* Lower nav strip */}
+        <div className="mt-6 flex flex-col md:flex-row items-center justify-between py-4 border-t border-gold/30 gap-3">
+          <span className="text-[10px] uppercase tracking-[0.24em] font-bold text-foreground/60">
+            Official Registry • Est. MMXXVI • Vol. II
+          </span>
+          <div className="flex gap-7 text-[10px] uppercase tracking-[0.24em] font-bold">
+            <Link to="/universities" className="hover:text-gold transition-colors">Universities</Link>
+            <Link to="/scholarships" className="hover:text-gold transition-colors">Scholarships</Link>
+            <Link to="/compare" className="hover:text-gold transition-colors">Compare</Link>
+            <Link to="/ask-ai" className="hover:text-gold transition-colors">Aria</Link>
           </div>
         </div>
       </div>
-
-      <div className="hairline-shimmer" />
     </section>
   );
 }
