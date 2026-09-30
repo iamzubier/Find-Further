@@ -9,37 +9,28 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as IndexRouteImport } from './routes/index'
-import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
-import { Route as AuthRouteImport } from './routes/auth'
-import { Route as CompareRouteImport } from './routes/compare'
 import { Route as EvaluateRouteImport } from './routes/evaluate'
-import { Route as AuthenticatedAskAiRouteImport } from './routes/_authenticated/ask-ai'
-import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
-import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
-import { Route as AuthenticatedShortlistRouteImport } from './routes/_authenticated/shortlist'
-import { Route as AdminImageBackfillRouteImport } from './routes/admin.image-backfill'
-import { Route as AdminImportRouteImport } from './routes/admin.import'
-import { Route as AdminSeedScholarshipsRouteImport } from './routes/admin.seed-scholarships'
-import { Route as ScholarshipsIndexRouteImport } from './routes/scholarships.index'
-import { Route as ScholarshipsSlugRouteImport } from './routes/scholarships.$slug'
+import { Route as CompareRouteImport } from './routes/compare'
+import { Route as AuthRouteImport } from './routes/auth'
+import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
+import { Route as IndexRouteImport } from './routes/index'
 import { Route as UniversitiesIndexRouteImport } from './routes/universities.index'
+import { Route as ScholarshipsIndexRouteImport } from './routes/scholarships.index'
 import { Route as UniversitiesSlugRouteImport } from './routes/universities.$slug'
+import { Route as ScholarshipsSlugRouteImport } from './routes/scholarships.$slug'
+import { Route as AdminSeedScholarshipsRouteImport } from './routes/admin.seed-scholarships'
+import { Route as AdminImportRouteImport } from './routes/admin.import'
+import { Route as AdminImageBackfillRouteImport } from './routes/admin.image-backfill'
+import { Route as AuthenticatedShortlistRouteImport } from './routes/_authenticated/shortlist'
+import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
+import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
+import { Route as AuthenticatedAskAiRouteImport } from './routes/_authenticated/ask-ai'
 import { Route as ApiPublicRefreshDataRouteImport } from './routes/api/public/refresh-data'
 import { Route as AuthenticatedEvaluateResultsIdRouteImport } from './routes/_authenticated/evaluate.results.$id'
 
-const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AuthenticatedRoute = AuthenticatedRouteImport.update({
-  id: '/_authenticated',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AuthRoute = AuthRouteImport.update({
-  id: '/auth',
-  path: '/auth',
+const EvaluateRoute = EvaluateRouteImport.update({
+  id: '/evaluate',
+  path: '/evaluate',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CompareRoute = CompareRouteImport.update({
@@ -47,54 +38,18 @@ const CompareRoute = CompareRouteImport.update({
   path: '/compare',
   getParentRoute: () => rootRouteImport,
 } as any)
-const EvaluateRoute = EvaluateRouteImport.update({
-  id: '/evaluate',
-  path: '/evaluate',
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AuthenticatedAskAiRoute = AuthenticatedAskAiRouteImport.update({
-  id: '/ask-ai',
-  path: '/ask-ai',
-  getParentRoute: () => AuthenticatedRoute,
-} as any)
-const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
-  id: '/dashboard',
-  path: '/dashboard',
-  getParentRoute: () => AuthenticatedRoute,
-} as any)
-const AuthenticatedProfileRoute = AuthenticatedProfileRouteImport.update({
-  id: '/profile',
-  path: '/profile',
-  getParentRoute: () => AuthenticatedRoute,
-} as any)
-const AuthenticatedShortlistRoute = AuthenticatedShortlistRouteImport.update({
-  id: '/shortlist',
-  path: '/shortlist',
-  getParentRoute: () => AuthenticatedRoute,
-} as any)
-const AdminImageBackfillRoute = AdminImageBackfillRouteImport.update({
-  id: '/admin/image-backfill',
-  path: '/admin/image-backfill',
+const AuthenticatedRoute = AuthenticatedRouteImport.update({
+  id: '/_authenticated',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AdminImportRoute = AdminImportRouteImport.update({
-  id: '/admin/import',
-  path: '/admin/import',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AdminSeedScholarshipsRoute = AdminSeedScholarshipsRouteImport.update({
-  id: '/admin/seed-scholarships',
-  path: '/admin/seed-scholarships',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ScholarshipsIndexRoute = ScholarshipsIndexRouteImport.update({
-  id: '/scholarships/',
-  path: '/scholarships/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ScholarshipsSlugRoute = ScholarshipsSlugRouteImport.update({
-  id: '/scholarships/$slug',
-  path: '/scholarships/$slug',
+const IndexRoute = IndexRouteImport.update({
+  id: '/',
+  path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const UniversitiesIndexRoute = UniversitiesIndexRouteImport.update({
@@ -102,10 +57,55 @@ const UniversitiesIndexRoute = UniversitiesIndexRouteImport.update({
   path: '/universities/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ScholarshipsIndexRoute = ScholarshipsIndexRouteImport.update({
+  id: '/scholarships/',
+  path: '/scholarships/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const UniversitiesSlugRoute = UniversitiesSlugRouteImport.update({
   id: '/universities/$slug',
   path: '/universities/$slug',
   getParentRoute: () => rootRouteImport,
+} as any)
+const ScholarshipsSlugRoute = ScholarshipsSlugRouteImport.update({
+  id: '/scholarships/$slug',
+  path: '/scholarships/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminSeedScholarshipsRoute = AdminSeedScholarshipsRouteImport.update({
+  id: '/admin/seed-scholarships',
+  path: '/admin/seed-scholarships',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminImportRoute = AdminImportRouteImport.update({
+  id: '/admin/import',
+  path: '/admin/import',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminImageBackfillRoute = AdminImageBackfillRouteImport.update({
+  id: '/admin/image-backfill',
+  path: '/admin/image-backfill',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedShortlistRoute = AuthenticatedShortlistRouteImport.update({
+  id: '/shortlist',
+  path: '/shortlist',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedProfileRoute = AuthenticatedProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedAskAiRoute = AuthenticatedAskAiRouteImport.update({
+  id: '/ask-ai',
+  path: '/ask-ai',
+  getParentRoute: () => AuthenticatedRoute,
 } as any)
 const ApiPublicRefreshDataRoute = ApiPublicRefreshDataRouteImport.update({
   id: '/api/public/refresh-data',
@@ -257,25 +257,11 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/_authenticated': {
-      id: '/_authenticated'
-      path: ''
-      fullPath: '/'
-      preLoaderRoute: typeof AuthenticatedRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/auth': {
-      id: '/auth'
-      path: '/auth'
-      fullPath: '/auth'
-      preLoaderRoute: typeof AuthRouteImport
+    '/evaluate': {
+      id: '/evaluate'
+      path: '/evaluate'
+      fullPath: '/evaluate'
+      preLoaderRoute: typeof EvaluateRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/compare': {
@@ -285,74 +271,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CompareRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/evaluate': {
-      id: '/evaluate'
-      path: '/evaluate'
-      fullPath: '/evaluate'
-      preLoaderRoute: typeof EvaluateRouteImport
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/_authenticated/ask-ai': {
-      id: '/_authenticated/ask-ai'
-      path: '/ask-ai'
-      fullPath: '/ask-ai'
-      preLoaderRoute: typeof AuthenticatedAskAiRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/dashboard': {
-      id: '/_authenticated/dashboard'
-      path: '/dashboard'
-      fullPath: '/dashboard'
-      preLoaderRoute: typeof AuthenticatedDashboardRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/profile': {
-      id: '/_authenticated/profile'
-      path: '/profile'
-      fullPath: '/profile'
-      preLoaderRoute: typeof AuthenticatedProfileRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/shortlist': {
-      id: '/_authenticated/shortlist'
-      path: '/shortlist'
-      fullPath: '/shortlist'
-      preLoaderRoute: typeof AuthenticatedShortlistRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/admin/image-backfill': {
-      id: '/admin/image-backfill'
-      path: '/admin/image-backfill'
-      fullPath: '/admin/image-backfill'
-      preLoaderRoute: typeof AdminImageBackfillRouteImport
+    '/_authenticated': {
+      id: '/_authenticated'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthenticatedRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/admin/import': {
-      id: '/admin/import'
-      path: '/admin/import'
-      fullPath: '/admin/import'
-      preLoaderRoute: typeof AdminImportRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/admin/seed-scholarships': {
-      id: '/admin/seed-scholarships'
-      path: '/admin/seed-scholarships'
-      fullPath: '/admin/seed-scholarships'
-      preLoaderRoute: typeof AdminSeedScholarshipsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/scholarships/': {
-      id: '/scholarships/'
-      path: '/scholarships'
-      fullPath: '/scholarships/'
-      preLoaderRoute: typeof ScholarshipsIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/scholarships/$slug': {
-      id: '/scholarships/$slug'
-      path: '/scholarships/$slug'
-      fullPath: '/scholarships/$slug'
-      preLoaderRoute: typeof ScholarshipsSlugRouteImport
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/universities/': {
@@ -362,12 +299,75 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof UniversitiesIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/scholarships/': {
+      id: '/scholarships/'
+      path: '/scholarships'
+      fullPath: '/scholarships/'
+      preLoaderRoute: typeof ScholarshipsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/universities/$slug': {
       id: '/universities/$slug'
       path: '/universities/$slug'
       fullPath: '/universities/$slug'
       preLoaderRoute: typeof UniversitiesSlugRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/scholarships/$slug': {
+      id: '/scholarships/$slug'
+      path: '/scholarships/$slug'
+      fullPath: '/scholarships/$slug'
+      preLoaderRoute: typeof ScholarshipsSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/seed-scholarships': {
+      id: '/admin/seed-scholarships'
+      path: '/admin/seed-scholarships'
+      fullPath: '/admin/seed-scholarships'
+      preLoaderRoute: typeof AdminSeedScholarshipsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/import': {
+      id: '/admin/import'
+      path: '/admin/import'
+      fullPath: '/admin/import'
+      preLoaderRoute: typeof AdminImportRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/image-backfill': {
+      id: '/admin/image-backfill'
+      path: '/admin/image-backfill'
+      fullPath: '/admin/image-backfill'
+      preLoaderRoute: typeof AdminImageBackfillRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/shortlist': {
+      id: '/_authenticated/shortlist'
+      path: '/shortlist'
+      fullPath: '/shortlist'
+      preLoaderRoute: typeof AuthenticatedShortlistRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/profile': {
+      id: '/_authenticated/profile'
+      path: '/profile'
+      fullPath: '/profile'
+      preLoaderRoute: typeof AuthenticatedProfileRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/dashboard': {
+      id: '/_authenticated/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof AuthenticatedDashboardRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/ask-ai': {
+      id: '/_authenticated/ask-ai'
+      path: '/ask-ai'
+      fullPath: '/ask-ai'
+      preLoaderRoute: typeof AuthenticatedAskAiRouteImport
+      parentRoute: typeof AuthenticatedRoute
     }
     '/api/public/refresh-data': {
       id: '/api/public/refresh-data'
