@@ -25,6 +25,7 @@ import { Route as AuthenticatedShortlistRouteImport } from './routes/_authentica
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedAskAiRouteImport } from './routes/_authenticated/ask-ai'
+import { Route as ApiPublicRefreshDataRouteImport } from './routes/api/public/refresh-data'
 import { Route as AuthenticatedEvaluateResultsIdRouteImport } from './routes/_authenticated/evaluate.results.$id'
 
 const EvaluateRoute = EvaluateRouteImport.update({
@@ -106,6 +107,11 @@ const AuthenticatedAskAiRoute = AuthenticatedAskAiRouteImport.update({
   path: '/ask-ai',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const ApiPublicRefreshDataRoute = ApiPublicRefreshDataRouteImport.update({
+  id: '/api/public/refresh-data',
+  path: '/api/public/refresh-data',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedEvaluateResultsIdRoute =
   AuthenticatedEvaluateResultsIdRouteImport.update({
     id: '/evaluate/results/$id',
@@ -129,6 +135,7 @@ export interface FileRoutesByFullPath {
   '/universities/$slug': typeof UniversitiesSlugRoute
   '/scholarships/': typeof ScholarshipsIndexRoute
   '/universities/': typeof UniversitiesIndexRoute
+  '/api/public/refresh-data': typeof ApiPublicRefreshDataRoute
   '/evaluate/results/$id': typeof AuthenticatedEvaluateResultsIdRoute
 }
 export interface FileRoutesByTo {
@@ -147,6 +154,7 @@ export interface FileRoutesByTo {
   '/universities/$slug': typeof UniversitiesSlugRoute
   '/scholarships': typeof ScholarshipsIndexRoute
   '/universities': typeof UniversitiesIndexRoute
+  '/api/public/refresh-data': typeof ApiPublicRefreshDataRoute
   '/evaluate/results/$id': typeof AuthenticatedEvaluateResultsIdRoute
 }
 export interface FileRoutesById {
@@ -167,6 +175,7 @@ export interface FileRoutesById {
   '/universities/$slug': typeof UniversitiesSlugRoute
   '/scholarships/': typeof ScholarshipsIndexRoute
   '/universities/': typeof UniversitiesIndexRoute
+  '/api/public/refresh-data': typeof ApiPublicRefreshDataRoute
   '/_authenticated/evaluate/results/$id': typeof AuthenticatedEvaluateResultsIdRoute
 }
 export interface FileRouteTypes {
@@ -187,6 +196,7 @@ export interface FileRouteTypes {
     | '/universities/$slug'
     | '/scholarships/'
     | '/universities/'
+    | '/api/public/refresh-data'
     | '/evaluate/results/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -205,6 +215,7 @@ export interface FileRouteTypes {
     | '/universities/$slug'
     | '/scholarships'
     | '/universities'
+    | '/api/public/refresh-data'
     | '/evaluate/results/$id'
   id:
     | '__root__'
@@ -224,6 +235,7 @@ export interface FileRouteTypes {
     | '/universities/$slug'
     | '/scholarships/'
     | '/universities/'
+    | '/api/public/refresh-data'
     | '/_authenticated/evaluate/results/$id'
   fileRoutesById: FileRoutesById
 }
@@ -240,6 +252,7 @@ export interface RootRouteChildren {
   UniversitiesSlugRoute: typeof UniversitiesSlugRoute
   ScholarshipsIndexRoute: typeof ScholarshipsIndexRoute
   UniversitiesIndexRoute: typeof UniversitiesIndexRoute
+  ApiPublicRefreshDataRoute: typeof ApiPublicRefreshDataRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -356,6 +369,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAskAiRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/api/public/refresh-data': {
+      id: '/api/public/refresh-data'
+      path: '/api/public/refresh-data'
+      fullPath: '/api/public/refresh-data'
+      preLoaderRoute: typeof ApiPublicRefreshDataRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated/evaluate/results/$id': {
       id: '/_authenticated/evaluate/results/$id'
       path: '/evaluate/results/$id'
@@ -399,6 +419,7 @@ const rootRouteChildren: RootRouteChildren = {
   UniversitiesSlugRoute: UniversitiesSlugRoute,
   ScholarshipsIndexRoute: ScholarshipsIndexRoute,
   UniversitiesIndexRoute: UniversitiesIndexRoute,
+  ApiPublicRefreshDataRoute: ApiPublicRefreshDataRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

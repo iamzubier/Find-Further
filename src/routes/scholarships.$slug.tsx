@@ -1,4 +1,4 @@
-import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
+import { createFileRoute, Link, useRouter, type ErrorRouteComponent } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { queryOptions, useQuery, useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
@@ -93,7 +93,7 @@ export const Route = createFileRoute("/scholarships/$slug")({
       ],
     };
   },
-  errorComponent: ScholarshipDetailError,
+  errorComponent: ScholarshipDetailError as unknown as ErrorRouteComponent,
   notFoundComponent: ScholarshipDetailNotFound,
   component: ScholarshipDetailPage,
 });
