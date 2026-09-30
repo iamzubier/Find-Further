@@ -93,7 +93,7 @@ export const Route = createFileRoute("/scholarships/$slug")({
       ],
     };
   },
-  errorComponent: ScholarshipDetailError,
+  errorComponent: ScholarshipDetailError as unknown as ErrorRouteComponent,
   notFoundComponent: ScholarshipDetailNotFound,
   component: ScholarshipDetailPage,
 });
