@@ -10,13 +10,22 @@ export const Route = createFileRoute("/api/public/refresh-data")({
   server: {
     handlers: {
       POST: async ({ request }) => {
-        const secret = process.env["ADMIN_SECRET"];
         const key = request.headers.get("x-refresh-key") ?? "";
-        if (!secret || key !== secret) {
+        const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+
+        // Accept either the admin secret or the rotating cron key stored in the DB
+        const adminSecret = process.env["ADMIN_SECRET"];
+        const { data: cronRow } = await supabaseAdmin
+          .schema("private")
+          .from("cron_config")
+          .select("value")
+          .eq("key", "refresh_key")
+          .maybeSingle();
+        const cronKey = (cronRow as { value?: string } | null)?.value;
+        const ok = (adminSecret && key === adminSecret) || (cronKey && key === cronKey);
+        if (!ok) {
           return new Response("Unauthorized", { status: 401 });
         }
-
-        const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
         const now = new Date();
         const results: Record<string, number> = { deadlines_rolled: 0, marked_stale: 0, status_flipped: 0 };
 
