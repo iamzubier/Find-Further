@@ -7,6 +7,9 @@ import { appendFile, mkdir, writeFile } from "node:fs/promises";
 
 // Wikimedia asks scripts to identify themselves
 const UA = "FindFurtherLogoScript/1.0 (https://github.com/iamzubier)";
+const HIPOLABS_URL = "https://universities.hipolabs.com/search";
+const HIPOLABS_FALLBACK_URL =
+  "https://raw.githubusercontent.com/Hipo/university-domains-list/master/world_universities_and_domains.json";
 
 type Uni = { name: string; country: string; domains?: string[]; web_pages?: string[] };
 type WdRow = {
@@ -71,7 +74,14 @@ const toCsv = (rows: string[][]) => rows.map((r) => r.map(esc).join(",")).join("
 
 async function main() {
   console.log("Loading universities from Hipolabs...");
-  const unis = await getJson<Uni[]>("https://universities.hipolabs.com/search");
+  let unis: Uni[];
+  try {
+    unis = await getJson<Uni[]>(HIPOLABS_URL);
+  } catch (err) {
+    console.warn("Hipolabs API unavailable, retrying with GitHub mirror dataset...");
+    console.warn(err);
+    unis = await getJson<Uni[]>(HIPOLABS_FALLBACK_URL);
+  }
   console.log(`  ${unis.length} universities`);
 
   console.log("Loading logos from Wikidata...");
