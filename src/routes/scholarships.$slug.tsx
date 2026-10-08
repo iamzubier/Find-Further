@@ -39,7 +39,7 @@ import {
   AlertCircle,
 } from "lucide-react";
 import { SmartCampusImage } from "@/components/SmartCampusImage";
-import { useWikiImage } from "@/lib/use-wiki-image";
+import { useCampusPhoto } from "@/lib/use-campus-photo";
 import { TopoBackground } from "@/components/TopoBackground";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/integrations/supabase/client";
@@ -386,9 +386,8 @@ function Hero({ v }: { v: View }) {
   const isPrep = v.cycle_status === "closed_prep_mode";
   const bannerUrl = typeof v.banner_image_url === "string" ? v.banner_image_url.trim() : "";
   const providerName = v.provider && v.provider !== "—" ? v.provider : "";
-  const wikiByProvider = useWikiImage(providerName, !bannerUrl && !!providerName);
-  const wikiByName = useWikiImage(v.name, !bannerUrl && !providerName);
-  const heroSrc = bannerUrl || wikiByProvider.data || wikiByName.data || null;
+ const photo = useCampusPhoto({ provider: providerName, country: v.country, enabled: !bannerUrl });
+const heroSrc = bannerUrl || photo.data?.url || null;
 
   const save = async () => {
     if (!user) {
@@ -414,12 +413,19 @@ function Hero({ v }: { v: View }) {
           src={heroSrc}
           name={v.name}
           alt={`${v.name} scholarship cover`}
-          className="opacity-35"
+          className="opacity-60"
           loading="eager"
         />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/35 to-black/20" />
       </div>
 
       <div className="relative z-10 mx-auto max-w-6xl px-4 py-10 text-white">
+        {!bannerUrl && photo.data && (
+  <a href={photo.data.pageUrl} target="_blank" rel="noopener noreferrer"
+     className="absolute bottom-2 right-3 max-w-[70%] truncate text-[10px] text-white/60 hover:text-white">
+    Photo: {photo.data.credit}
+  </a>
+)}
         <Link to="/scholarships" className="inline-flex items-center gap-1 text-sm text-white/80 hover:text-white">
           <ArrowLeft className="h-4 w-4" /> All scholarships
         </Link>
