@@ -6,7 +6,7 @@ async function fetchOgImage(url: string): Promise<string | null> {
   try {
     const r = await fetch(url, {
       headers: {
-        "User-Agent": "Mozilla/5.0 (compatible; BeyondBorderBot/1.0)",
+        "User-Agent": "Mozilla/5.0 (compatible; FindFurtherBot/1.0)",
         Accept: "text/html,application/xhtml+xml",
       },
       redirect: "follow",

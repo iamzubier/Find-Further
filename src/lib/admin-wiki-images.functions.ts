@@ -6,7 +6,7 @@ async function wikiThumb(name: string): Promise<string | null> {
   const title = encodeURIComponent(name.replace(/\s+/g, "_"));
   try {
     const r = await fetch(`https://en.wikipedia.org/api/rest_v1/page/summary/${title}`, {
-      headers: { "User-Agent": "BeyondBorder/1.0 (admin import)" },
+      headers: { "User-Agent": "FindFurther/1.0 (admin import)" },
     });
     if (!r.ok) return null;
     const j: any = await r.json();

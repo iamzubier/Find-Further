@@ -17,7 +17,7 @@ type WikidataEntityResponse = {
 };
 
 function withUserAgent() {
-  return { "User-Agent": "BeyondBorder/1.0 (logo resolver)" };
+  return { "User-Agent": "FindFurther/1.0 (logo resolver)" };
 }
 
 function filePathUrl(fileName: string): string {

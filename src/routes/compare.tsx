@@ -9,7 +9,7 @@ import { SmartCampusImage } from "@/components/SmartCampusImage";
 
 export const Route = createFileRoute("/compare")({
   head: () => ({ meta: [
-    { title: "Compare universities — BeyondBorder" },
+    { title: "Compare universities — FindFurther" },
     { name: "description", content: "Side-by-side comparison of universities: tuition, deadlines, scholarships, and your match." },
   ]}),
   component: ComparePage,

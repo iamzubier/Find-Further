@@ -38,11 +38,11 @@ export const Route = createFileRoute("/universities/$slug")({
   },
   head: ({ loaderData }) => ({
     meta: loaderData?.uni ? [
-      { title: `${loaderData.uni.name} — Admissions, Tuition & Hacks | BeyondBorder` },
+      { title: `${loaderData.uni.name} — Admissions, Tuition & Hacks | FindFurther` },
       { name: "description", content: `Complete guide to ${loaderData.uni.name}, ${loaderData.uni.country}: tuition, scholarships, deadlines, real student tips, and grade conversions for your curriculum.` },
       { property: "og:image", content: loaderData.uni.campus_image_url ?? "" },
     ] : [
-      { title: "Loading university profile… | BeyondBorder" },
+      { title: "Loading university profile… | FindFurther" },
     ],
   }),
   component: UniDetailPage,

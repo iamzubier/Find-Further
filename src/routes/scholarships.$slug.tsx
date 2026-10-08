@@ -83,7 +83,7 @@ export const Route = createFileRoute("/scholarships/$slug")({
     const name = s?.name ?? "Scholarship";
     return {
       meta: [
-        { title: `${name} — BeyondBorder Scholarships` },
+        { title: `${name} — FindFurther Scholarships` },
         {
           name: "description",
           content: s

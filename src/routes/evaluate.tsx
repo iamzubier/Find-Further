@@ -24,9 +24,9 @@ import { SmartCampusImage } from "@/components/SmartCampusImage";
 export const Route = createFileRoute("/evaluate")({
   head: () => ({
     meta: [
-      { title: "Evaluate My Profile — BeyondBorder" },
+      { title: "Evaluate My Profile — FindFurther" },
       { name: "description", content: "Free profile evaluation for international students. Converts your grades to US, UK, German, and ECTS scales and matches you to universities worldwide." },
-      { property: "og:title", content: "Evaluate My Profile — BeyondBorder" },
+      { property: "og:title", content: "Evaluate My Profile — FindFurther" },
       { property: "og:description", content: "Get your study-abroad profile scored in 2 minutes. Works for any curriculum." },
     ],
   }),

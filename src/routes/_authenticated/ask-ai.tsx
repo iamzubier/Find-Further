@@ -10,7 +10,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { gpaConversionLine } from "@/lib/gpa";
 
 export const Route = createFileRoute("/_authenticated/ask-ai")({
-  head: () => ({ meta: [{ title: "Ask Aria — BeyondBorder" }, { name: "robots", content: "noindex" }] }),
+  head: () => ({ meta: [{ title: "Ask Aria — FindFurther" }, { name: "robots", content: "noindex" }] }),
   component: AskAriaPage,
 });
 

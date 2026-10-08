@@ -19,7 +19,7 @@ export function Logo({ className = "" }: { className?: string; showWord?: boolea
 
 export function LogoMark({ className = "" }: { className?: string }) {
   return (
-    <span className={`font-heading font-bold italic text-foreground ${className}`} aria-label="BeyondBorder">BB</span>
+    <span className={`font-heading font-bold italic text-foreground ${className}`} aria-label="FindFurther">BB</span>
   );
 }
 

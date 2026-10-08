@@ -29,7 +29,7 @@ async function wikiThumb(name: string): Promise<string | null> {
   const title = encodeURIComponent(name.replace(/\s+/g, "_"));
   try {
     const r = await fetch(`https://en.wikipedia.org/api/rest_v1/page/summary/${title}`, {
-      headers: { "User-Agent": "BeyondBorder/1.0 (admin)" },
+      headers: { "User-Agent": "FindFurther/1.0 (admin)" },
       signal: AbortSignal.timeout(7000),
     });
     if (!r.ok) return null;
@@ -43,7 +43,7 @@ async function wikiThumb(name: string): Promise<string | null> {
 async function fetchOgImage(url: string): Promise<string | null> {
   try {
     const r = await fetch(url, {
-      headers: { "User-Agent": "Mozilla/5.0 (compatible; BeyondBorderBot/1.0)", Accept: "text/html" },
+      headers: { "User-Agent": "Mozilla/5.0 (compatible; FindFurtherBot/1.0)", Accept: "text/html" },
       redirect: "follow",
       signal: AbortSignal.timeout(8000),
     });

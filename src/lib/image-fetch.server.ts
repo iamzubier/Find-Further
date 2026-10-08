@@ -20,7 +20,7 @@ async function fetchWikipediaPageImage(title: string): Promise<string | null> {
       origin: "*",
     });
     const r = await fetch(`${WIKI_ENDPOINT}?${params.toString()}`, {
-      headers: { "User-Agent": "BeyondBorder/1.0 (image fetch)" },
+      headers: { "User-Agent": "FindFurther/1.0 (image fetch)" },
     });
     if (!r.ok) return null;
     const j: any = await r.json();
