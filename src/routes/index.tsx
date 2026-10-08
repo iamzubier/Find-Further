@@ -15,9 +15,9 @@ import tipsImg from "@/assets/tips-lamp.jpg";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "BeyondBorder — The atlas for ambitious students" },
+      { title: "FindFurther — The atlas for ambitious students" },
       { name: "description", content: "10,000+ universities. 180+ live scholarships. An AI advisor named Aria. The luxury field guide for studying abroad — built for students from everywhere." },
-      { property: "og:title", content: "BeyondBorder — Find your university. Know your chances. Get in." },
+      { property: "og:title", content: "FindFurther — Find your university. Know your chances. Get in." },
       { property: "og:description", content: "The luxury atlas for students applying abroad — universities, scholarships, AI advisor." },
     ],
   }),
@@ -57,7 +57,7 @@ function Hero() {
             <div aria-hidden className="absolute inset-0" style={{ background: "linear-gradient(120deg, oklch(0.28 0.07 162 / 0.92) 0%, oklch(0.32 0.07 162 / 0.82) 50%, oklch(0.20 0.05 162 / 0.88) 100%)" }} />
             <div aria-hidden className="absolute inset-0 grain-overlay pointer-events-none" />
             <div className="relative z-10">
-              <span className="font-heading italic text-gold text-lg md:text-xl mb-3 block">BeyondBorder</span>
+              <span className="font-heading italic text-gold text-lg md:text-xl mb-3 block">FindFurther</span>
               <h1 className="font-heading text-4xl md:text-6xl lg:text-7xl leading-[1.05] max-w-2xl text-[#f5f0e0] drop-shadow-[0_2px_24px_rgba(0,0,0,0.4)]">
                 The Global <em className="not-italic" style={{ fontStyle: "italic" }}>Academic</em> Archive.
               </h1>

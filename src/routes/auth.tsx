@@ -16,7 +16,7 @@ const SearchSchema = z.object({ tab: z.enum(["login","signup"]).optional() });
 
 export const Route = createFileRoute("/auth")({
   validateSearch: (s) => SearchSchema.parse(s),
-  head: () => ({ meta: [{ title: "Sign in — BeyondBorder" }, { name: "robots", content: "noindex" }] }),
+  head: () => ({ meta: [{ title: "Sign in — FindFurther" }, { name: "robots", content: "noindex" }] }),
   component: AuthPage,
 });
 
@@ -30,7 +30,7 @@ function AuthPage() {
   return (
     <div className="mx-auto max-w-md px-4 py-12">
       <div className="card-surface p-6 md:p-8">
-        <h1 className="font-heading text-3xl font-extrabold">Welcome to BeyondBorder</h1>
+        <h1 className="font-heading text-3xl font-extrabold">Welcome to FindFurther</h1>
         <p className="mt-1 text-sm text-muted-foreground">Free account. Profile-aware recommendations.</p>
 
         <Tabs defaultValue={search.tab ?? "signup"} className="mt-6">

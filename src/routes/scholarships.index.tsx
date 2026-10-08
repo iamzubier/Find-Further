@@ -37,7 +37,7 @@ export const Route = createFileRoute("/scholarships/")({
         content:
           "67+ fully-funded, government, university & NGO scholarships for Bangladeshi & South Asian students. Hidden costs, MOI waivers, real eligibility — one portal.",
       },
-      { property: "og:title", content: "Scholarships — BeyondBorder" },
+      { property: "og:title", content: "Scholarships — FindFurther" },
       {
         property: "og:description",
         content:

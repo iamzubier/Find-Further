@@ -9,7 +9,7 @@ import { daysLeft } from "@/lib/data";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/shortlist")({
-  head: () => ({ meta: [{ title: "Saved — BeyondBorder" }, { name: "robots", content: "noindex" }] }),
+  head: () => ({ meta: [{ title: "Saved — FindFurther" }, { name: "robots", content: "noindex" }] }),
   component: ShortlistPage,
 });
 

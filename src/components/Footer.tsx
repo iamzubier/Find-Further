@@ -49,7 +49,7 @@ export function Footer() {
 
       <div className="relative border-t border-white/10">
         <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-2 px-4 py-6 text-xs text-white/50 sm:flex-row lg:px-6">
-          <span>© {new Date().getFullYear()} BeyondBorder — crafted for the next generation of scholars.</span>
+          <span>© {new Date().getFullYear()} FindFurther — crafted for the next generation of scholars.</span>
           <span className="serif-italic gold-text tracking-wider">Ad · Astra</span>
         </div>
       </div>

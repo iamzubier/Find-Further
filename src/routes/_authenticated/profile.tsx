@@ -12,7 +12,7 @@ import { gpaConversionLine } from "@/lib/gpa";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/profile")({
-  head: () => ({ meta: [{ title: "Your profile — BeyondBorder" }, { name: "robots", content: "noindex" }] }),
+  head: () => ({ meta: [{ title: "Your profile — FindFurther" }, { name: "robots", content: "noindex" }] }),
   component: ProfilePage,
 });
 
