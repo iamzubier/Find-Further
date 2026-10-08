@@ -1,1 +1,21 @@
+name: Fetch university logos
 
+# Manual only: Actions tab -> "Fetch university logos" -> Run workflow
+on:
+  workflow_dispatch:
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: oven-sh/setup-bun@v2
+
+      # The script only uses built-in features, so no install step is needed
+      - run: bun run scripts/fetch-logos.ts
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: logo-report
+          path: out/
