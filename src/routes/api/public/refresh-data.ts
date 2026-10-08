@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { fixAllImagesBatch } from "@/lib/admin-fix-all-images.functions";
 
 /**
  * Daily data-refresh endpoint, called by pg_cron.
@@ -74,18 +75,49 @@ export const Route = createFileRoute("/api/public/refresh-data")({
           .select("value")
           .eq("key", "refresh_key")
           .maybeSingle();
+        const { data: imageOffsetRow } = await supabaseAdmin
+          .from("cron_config")
+          .select("value")
+          .eq("key", "image_refresh_offset")
+          .maybeSingle();
         const cronKey = cronRow?.value;
+        const imageOffset = Math.max(0, Number.parseInt(imageOffsetRow?.value ?? "0", 10) || 0);
         const ok = (adminSecret && key === adminSecret) || (cronKey && key === cronKey);
         if (!ok) {
           return new Response("Unauthorized", { status: 401 });
         }
         const now = new Date();
-        const results: Record<string, number> = { deadlines_rolled: 0, marked_stale: 0, status_flipped: 0, universities_synced: 0 };
+        const results: Record<string, number> = {
+          deadlines_rolled: 0,
+          marked_stale: 0,
+          status_flipped: 0,
+          universities_synced: 0,
+          images_checked: 0,
+          logos_updated: 0,
+          campus_images_updated: 0,
+        };
 
         try {
           results.universities_synced = await syncExternalUniversities(supabaseAdmin);
         } catch (error) {
           console.error("[refresh-data] university sync failed", error);
+        }
+
+        // Check a small rotating batch daily so stale, broken, and placeholder
+        // logos/campus images are repaired without manual commands.
+        try {
+          const imageRefresh = await fixAllImagesBatch({
+            data: { key: adminSecret ?? cronKey ?? "", offset: imageOffset, limit: 15 },
+          });
+          results.images_checked = imageRefresh.batch;
+          results.logos_updated = imageRefresh.logosUpdated;
+          results.campus_images_updated = imageRefresh.campusUpdated;
+          await supabaseAdmin.from("cron_config").upsert({
+            key: "image_refresh_offset",
+            value: String(imageRefresh.done ? 0 : imageOffset + imageRefresh.batch),
+          });
+        } catch (error) {
+          console.error("[refresh-data] image refresh failed", error);
         }
 
         // 1. Roll expired deadlines forward one year (annual cycles)
