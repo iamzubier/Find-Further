@@ -230,14 +230,14 @@ function CountriesMarquee() {
 function FeatureTrio() {
   const items = [
     {
-      icon: Compass, kicker: "Chapter I", title: "Explore the world",
+      icon: Compass, kicker: "Chapter I", title: "Explore Universities Across The world",
       body: "Browse 10,000+ universities worldwide — filter by region, country, program, and tuition with precision tools.",
-      cta: "Open the atlas", to: "/universities" as const, image: "C:\Users\ONE\Downloads\github\Dream Travel Bucket List ✈️ _ Most Beautiful Places Around the World 🌍.jpeg",
+      cta: "Explore universities", to: "/universities" as const, image: "C:\Users\ONE\Downloads\github\Dream Travel Bucket List ✈️ _ Most Beautiful Places Around the World 🌍.jpeg",
     },
     {
       icon: GitCompare, kicker: "Chapter II", title: "Compare side-by-side",
-      body: "Stack up to three universities — tuition, acceptance rate, scholarships, deadlines. Decide with data, not vibes.",
-      cta: "Start a comparison", to: "/compare" as const, image: compareImg,
+      body: "Put your top university choices to the test. Compare scholarship availability, living costs, and entry requirements to find the smartest investment.",
+      cta: "Start comparison", to: "/compare" as const, image: compareImg,
     },
     {
       icon: Lightbulb, kicker: "Chapter III", title: "Tips & hacks from Aria",
