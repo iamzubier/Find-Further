@@ -1,5 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { Logo } from "@/components/Logo";
+import { Twitter, Instagram, Linkedin, Facebook } from "lucide-react";
 
 export function Footer() {
   return (
@@ -20,6 +21,21 @@ export function Footer() {
           </div>
           <p className="mt-4 text-sm leading-relaxed text-white/70">
             The atlas for students with ambition. <span className="serif-italic gold-text">No borders. No commissions.</span>
+<div className="flex items-center gap-4 mt-4">
+  <a href="https://twitter.com/yourhandle" target="_blank" rel="noopener noreferrer" className="text-white/60 hover:text-[#FF8C00] transition-colors">
+    <Twitter className="w-5 h-5" />
+  </a>
+  <a href="https://instagram.com/yourhandle" target="_blank" rel="noopener noreferrer" className="text-white/60 hover:text-[#FF8C00] transition-colors">
+    <Instagram className="w-5 h-5" />
+  </a>
+  <a href="https://linkedin.com/company/yourhandle" target="_blank" rel="noopener noreferrer" className="text-white/60 hover:text-[#FF8C00] transition-colors">
+    <Linkedin className="w-5 h-5" />
+  </a>
+  <a href="https://facebook.com/yourhandle" target="_blank" rel="noopener noreferrer" className="text-white/60 hover:text-[#FF8C00] transition-colors">
+    <Facebook className="w-5 h-5" />
+  </a>
+</div>
+          
           </p>
           <div className="mt-6 hairline-gold w-16" />
         </div>
