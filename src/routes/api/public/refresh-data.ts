@@ -15,19 +15,11 @@ export const Route = createFileRoute("/api/public/refresh-data")({
 
         // Accept either the admin secret or the rotating cron key stored in the DB
         const adminSecret = process.env["ADMIN_SECRET"];
-        const { data: cronRow } = await (supabaseAdmin as unknown as {
-          schema: (s: string) => {
-            from: (t: string) => {
-              select: (c: string) => {
-                eq: (k: string, v: string) => {
-                  maybeSingle: () => Promise<{ data: { value?: string } | null }>;
-                };
-              };
-            };
-          };
-        })
-          .schema("private")
+        const { data: cronRow } = await supabaseAdmin
           .from("cron_config")
+          .select("value")
+          .eq("key", "refresh_key")
+          .maybeSingle()
           .select("value")
           .eq("key", "refresh_key")
           .maybeSingle();

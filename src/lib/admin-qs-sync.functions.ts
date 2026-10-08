@@ -132,7 +132,8 @@ export const qsSyncBatch = createServerFn({ method: "POST" })
           if (error) failed.push({ name: row.name, error: error.message });
           else updated.push(match.name);
         } else {
-          // INSERT new university
+          // INSERT the catalog parent first, then its detail row. The detail table
+          // intentionally references the catalog so new QS records remain browsable.
           let slug = slugify(row.name);
           if (existingSlugs.has(slug)) {
             const suffix = row.qs_rank ? `-${row.qs_rank}` : `-${Math.random().toString(36).slice(2, 6)}`;
@@ -159,9 +160,29 @@ export const qsSyncBatch = createServerFn({ method: "POST" })
             insertRow.admission_reqs = { student_faculty_ratio: row.student_faculty_ratio };
           }
 
+          const { error: catalogError } = await supabaseAdmin
+            .from("universities_catalog")
+            .upsert(
+              {
+                id: slug,
+                slug,
+                name: row.name,
+                country: row.country?.trim() || "Unknown",
+                region: "OTHER",
+                has_curated_data: true,
+                updated_at: new Date().toISOString(),
+              },
+              { onConflict: "slug" },
+            );
+
+          if (catalogError) {
+            failed.push({ name: row.name, error: catalogError.message });
+            continue;
+          }
+
           const { error } = await supabaseAdmin
             .from("universities_detail")
-            .insert(insertRow as never);
+            .upsert(insertRow as never, { onConflict: "slug" });
 
           if (error) {
             failed.push({ name: row.name, error: error.message });
