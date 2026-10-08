@@ -46,37 +46,38 @@
 
 /* Rolex-inspired luxury palette — deep emerald, champagne gold, ivory */
 :root {
-  --background: oklch(0.962 0.020 95);           /* Parchment cream #f5f0e0 */
-  --foreground: oklch(0.32 0.07 162);            /* Deep Emerald #064e3b */
-  --card: oklch(0.995 0.004 95);                 /* Near-white parchment */
-  --card-foreground: oklch(0.32 0.07 162);
-  --popover: oklch(0.995 0.004 95);
-  --popover-foreground: oklch(0.32 0.07 162);
-  --primary: oklch(0.32 0.07 162);               /* Deep Emerald #064e3b */
-  --primary-foreground: oklch(0.962 0.020 95);
-  --primary-glow: oklch(0.50 0.11 162);          /* Emerald glow #0d7a5f */
-  --secondary: oklch(0.92 0.025 95);             /* Soft parchment */
-  --secondary-foreground: oklch(0.32 0.07 162);
-  --muted: oklch(0.92 0.018 95);
-  --muted-foreground: oklch(0.48 0.04 162);
-  --accent: oklch(0.74 0.12 85);                 /* Antique Gold #c9a84c */
-  --accent-foreground: oklch(0.32 0.07 162);
-  --gold: oklch(0.74 0.12 85);                   /* Antique Gold #c9a84c */
-  --gold-foreground: oklch(0.32 0.07 162);
+   --background: oklch(0.955 0.018 85);           /* Oat */
+  --foreground: oklch(0.33 0.09 328);            /* Deep Plum */
+  --card: oklch(0.99 0.006 85);                  /* Near-white oat */
+  --card-foreground: oklch(0.33 0.09 328);
+  --popover: oklch(0.99 0.006 85);
+  --popover-foreground: oklch(0.33 0.09 328);
+  --primary: oklch(0.33 0.09 328);               /* Deep Plum */
+  --primary-foreground: oklch(0.955 0.018 85);   /* Oat text on plum */
+  --primary-glow: oklch(0.50 0.14 328);          /* Lighter plum glow */
+  --secondary: oklch(0.91 0.025 85);             /* Soft oat */
+  --secondary-foreground: oklch(0.33 0.09 328);
+  --muted: oklch(0.91 0.02 85);
+  --muted-foreground: oklch(0.48 0.05 328);
+  --accent: oklch(0.73 0.17 55);                 /* Tangerine */
+  --accent-foreground: oklch(0.33 0.09 328);
+  --gold: oklch(0.73 0.17 55);                   /* Tangerine (replaces gold) */
+  --gold-foreground: oklch(0.33 0.09 328);
   --destructive: oklch(0.43 0.18 25);
   --destructive-foreground: oklch(1 0 0);
-  --warning: oklch(0.72 0.16 70);
+  --warning: oklch(0.80 0.15 95);                /* Yellow-amber, kept distinct from tangerine */
   --warning-foreground: oklch(0.18 0 0);
-  --border: oklch(0.74 0.12 85 / 0.30);          /* Gold hairline */
-  --input: oklch(0.88 0.02 95);
-  --ring: oklch(0.32 0.07 162);
+  --border: oklch(0.73 0.17 55 / 0.30);          /* Tangerine hairline */
+  --input: oklch(0.87 0.025 85);
+  --ring: oklch(0.33 0.09 328);
   --radius: 4px;
-
-  --gradient-emerald: linear-gradient(135deg, oklch(0.30 0.07 162) 0%, oklch(0.41 0.10 162) 55%, oklch(0.52 0.11 162) 100%);
-  --gradient-gold: linear-gradient(135deg, oklch(0.52 0.10 75) 0%, oklch(0.64 0.11 75) 100%);
-  --gradient-hero: linear-gradient(135deg, oklch(0.07 0 0) 0%, oklch(0.20 0.05 162) 55%, oklch(0.30 0.07 162) 100%);
-  --shadow-luxe: 0 1px 2px rgba(0,0,0,0.06), 0 8px 24px -10px rgba(0, 60, 40, 0.22);
-  --shadow-gold: 0 4px 24px -8px oklch(0.60 0.11 75 / 0.50);
+ 
+  /* Names kept the same so components don't break; values are now plum / tangerine */
+  --gradient-emerald: linear-gradient(135deg, oklch(0.30 0.09 328) 0%, oklch(0.41 0.12 328) 55%, oklch(0.52 0.14 328) 100%);
+  --gradient-gold: linear-gradient(135deg, oklch(0.64 0.17 50) 0%, oklch(0.75 0.16 58) 100%);
+  --gradient-hero: linear-gradient(135deg, oklch(0.07 0 0) 0%, oklch(0.20 0.06 328) 55%, oklch(0.30 0.09 328) 100%);
+  --shadow-luxe: 0 1px 2px rgba(0,0,0,0.06), 0 8px 24px -10px rgba(70, 25, 75, 0.22);
+  --shadow-gold: 0 4px 24px -8px oklch(0.65 0.17 55 / 0.50);
 }
 
 .dark {
