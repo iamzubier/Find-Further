@@ -67,6 +67,23 @@ async function normalizeCatastrophicSsrResponse(response: Response): Promise<Res
 }
 
 export default {
+  async scheduled(_controller: unknown, env: unknown, ctx: { waitUntil?: (promise: Promise<unknown>) => void }) {
+    const runtimeEnv = (env ?? {}) as { ADMIN_SECRET?: string; REFRESH_KEY?: string; APP_ORIGIN?: string };
+    const key = runtimeEnv.REFRESH_KEY ?? runtimeEnv.ADMIN_SECRET;
+    if (!key) return;
+
+    const run = fetch(`${runtimeEnv.APP_ORIGIN ?? "https://beyondborder.app"}/api/public/refresh-data`, {
+      method: "POST",
+      headers: { "x-refresh-key": key },
+    }).then(async (response) => {
+      if (!response.ok) throw new Error(`Scheduled refresh failed: ${response.status}`);
+      return response.text();
+    });
+
+    if (ctx.waitUntil) ctx.waitUntil(run);
+    else await run;
+  },
+
   async fetch(request: Request, env: unknown, ctx: unknown) {
     try {
       const handler = await getServerEntry();
