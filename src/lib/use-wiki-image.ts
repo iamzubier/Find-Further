@@ -33,14 +33,24 @@ function cleanWikiImage(src?: string | null, meta = ""): string | null {
 }
 
 async function fetchSummaryThumb(name: string): Promise<string | null> {
-  const r = await fetch(
-    `https://en.wikipedia.org/api/rest_v1/page/summary/${titleize(name)}?redirect=true`,
-    { headers: { Accept: "application/json" } },
-  );
+  // Use the action API (returns 200 even for missing pages, avoiding console 404 noise)
+  const url = new URL("https://en.wikipedia.org/w/api.php");
+  url.searchParams.set("action", "query");
+  url.searchParams.set("titles", normalizeName(name));
+  url.searchParams.set("redirects", "1");
+  url.searchParams.set("prop", "pageimages|description");
+  url.searchParams.set("piprop", "original|thumbnail");
+  url.searchParams.set("pithumbsize", "1200");
+  url.searchParams.set("format", "json");
+  url.searchParams.set("origin", "*");
+  const r = await fetch(url.toString());
   if (!r.ok) return null;
   const j: any = await r.json();
-  if (BAD_CONTEXT_HINT.test(`${j?.title ?? ""} ${j?.description ?? ""}`)) return null;
-  return cleanWikiImage(j?.originalimage?.source ?? j?.thumbnail?.source, `${j?.title ?? ""} ${j?.description ?? ""}`);
+  const page = Object.values(j?.query?.pages ?? {})[0] as any;
+  if (!page || page.missing !== undefined) return null;
+  const meta = `${page?.title ?? ""} ${page?.description ?? ""}`;
+  if (BAD_CONTEXT_HINT.test(meta)) return null;
+  return cleanWikiImage(page?.original?.source ?? page?.thumbnail?.source, meta);
 }
 
 function scoreSearchPage(page: any, query: string): number {
