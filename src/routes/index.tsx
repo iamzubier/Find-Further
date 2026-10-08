@@ -232,7 +232,7 @@ function FeatureTrio() {
     {
       icon: Compass, kicker: "Chapter I", title: "Explore the world",
       body: "Browse 10,000+ universities worldwide — filter by region, country, program, and tuition with precision tools.",
-      cta: "Open the atlas", to: "/universities" as const, image: exploreImg,
+      cta: "Open the atlas", to: "/universities" as const, image: "C:\Users\ONE\Downloads\github\Dream Travel Bucket List ✈️ _ Most Beautiful Places Around the World 🌍.jpeg",
     },
     {
       icon: GitCompare, kicker: "Chapter II", title: "Compare side-by-side",
