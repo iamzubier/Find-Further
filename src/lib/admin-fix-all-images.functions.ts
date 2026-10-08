@@ -76,12 +76,19 @@ const Input = z.object({
 export const fixAllImagesBatch = createServerFn({ method: "POST" })
   .inputValidator((d) => Input.parse(d))
   .handler(async ({ data }) => {
-    if (data.key !== process.env.ADMIN_SECRET) throw new Error("Unauthorized");
+    const { data: cronRow } = await supabaseAdmin
+      .from("cron_config")
+      .select("value")
+      .eq("key", "refresh_key")
+      .maybeSingle();
+    const isAuthorized = data.key === process.env.ADMIN_SECRET || data.key === cronRow?.value;
+    if (!isAuthorized) throw new Error("Unauthorized");
 
+    // Inspect every row in small batches: existing URLs can be stale, blocked,
+    // or generic placeholders even when they are not null.
     const { data: rows, error, count } = await supabaseAdmin
       .from("universities_detail")
       .select("slug, name, official_url, campus_image_url, logo_url", { count: "exact" })
-      .or("logo_url.is.null,campus_image_url.is.null")
       .order("slug")
       .range(data.offset, data.offset + data.limit - 1);
     if (error) throw new Error(error.message);
@@ -91,7 +98,8 @@ export const fixAllImagesBatch = createServerFn({ method: "POST" })
     for (const u of rows ?? []) {
       const update: { logo_url?: string; campus_image_url?: string } = {};
 
-      if (isWeakLogoUrl(u.logo_url)) {
+      const logoNeedsRefresh = isWeakLogoUrl(u.logo_url) || !(await headOk(u.logo_url ?? ""));
+      if (logoNeedsRefresh) {
         const logo = await fetchUniversityWikipediaLogo(u.name);
         if (logo && (await headOk(logo))) {
           update.logo_url = logo;
@@ -99,12 +107,18 @@ export const fixAllImagesBatch = createServerFn({ method: "POST" })
         }
       }
 
-      if (!u.campus_image_url) {
+      const campusNeedsRefresh =
+        !u.campus_image_url ||
+        /images\.unsplash\.com|source\.unsplash\.com/i.test(u.campus_image_url) ||
+        !(await headOk(u.campus_image_url));
+      if (campusNeedsRefresh) {
         let img: string | null = await wikiThumb(u.name);
         if (!img && u.official_url) img = await fetchOgImage(u.official_url);
         if (!img) { img = fallbackFor(u.slug); fallbackUsed++; }
-        update.campus_image_url = img;
-        campusUpdated++;
+        if (img !== u.campus_image_url) {
+          update.campus_image_url = img;
+          campusUpdated++;
+        }
       }
 
       if (Object.keys(update).length === 0) continue;
