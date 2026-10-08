@@ -76,7 +76,7 @@ const Input = z.object({
 export const fixAllImagesBatch = createServerFn({ method: "POST" })
   .inputValidator((d) => Input.parse(d))
   .handler(async ({ data }) => {
-    const { data: cronRow } = await supabaseAdmin
+    const { data: cronRow } = await (supabaseAdmin as any)
       .from("cron_config")
       .select("value")
       .eq("key", "refresh_key")

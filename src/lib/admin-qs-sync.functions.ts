@@ -170,7 +170,6 @@ export const qsSyncBatch = createServerFn({ method: "POST" })
                 country: row.country?.trim() || "Unknown",
                 region: "OTHER",
                 has_curated_data: true,
-                updated_at: new Date().toISOString(),
               },
               { onConflict: "slug" },
             );

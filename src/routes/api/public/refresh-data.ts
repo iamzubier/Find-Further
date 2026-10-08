@@ -66,7 +66,7 @@ export const Route = createFileRoute("/api/public/refresh-data")({
     handlers: {
       POST: async ({ request }) => {
         const key = request.headers.get("x-refresh-key") ?? "";
-        const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+        const supabaseAdmin: any = (await import("@/integrations/supabase/client.server")).supabaseAdmin;
 
         // Accept either the admin secret or the rotating cron key stored in the DB
         const adminSecret = process.env["ADMIN_SECRET"];
