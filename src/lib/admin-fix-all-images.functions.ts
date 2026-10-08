@@ -76,7 +76,13 @@ const Input = z.object({
 export const fixAllImagesBatch = createServerFn({ method: "POST" })
   .inputValidator((d) => Input.parse(d))
   .handler(async ({ data }) => {
-    if (data.key !== process.env.ADMIN_SECRET) throw new Error("Unauthorized");
+    const { data: cronRow } = await supabaseAdmin
+      .from("cron_config")
+      .select("value")
+      .eq("key", "refresh_key")
+      .maybeSingle();
+    const isAuthorized = data.key === process.env.ADMIN_SECRET || data.key === cronRow?.value;
+    if (!isAuthorized) throw new Error("Unauthorized");
 
     // Inspect every row in small batches: existing URLs can be stale, blocked,
     // or generic placeholders even when they are not null.
