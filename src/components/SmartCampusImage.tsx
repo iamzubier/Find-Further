@@ -132,24 +132,24 @@ export function SmartCampusImage({
           />
           <div
             aria-hidden
-            className="absolute -right-10 top-3 h-28 w-28 rounded-full border border-white/20"
+            className="absolute -right-10 top-3 h-28 w-28 rounded-full border border-heading/20"
             style={{ transform: `rotate(${arcRotation}deg)` }}
           />
           <div
             aria-hidden
-            className="absolute -right-2 top-10 h-20 w-20 rounded-full border border-white/10"
+            className="absolute -right-2 top-10 h-20 w-20 rounded-full border border-heading/10"
             style={{ transform: `rotate(${-arcRotation}deg)` }}
           />
           <div
             aria-hidden
-            className="absolute bottom-3 left-3 rounded-md border border-white/25 bg-white/5 px-3 py-1.5 font-semibold tracking-[0.22em] text-white/75 backdrop-blur-[2px]"
+            className="absolute bottom-3 left-3 rounded-md border border-heading/25 bg-heading/5 px-3 py-1.5 font-semibold tracking-[0.22em] text-heading/75 backdrop-blur-[2px]"
             style={{ fontSize: "0.72rem", lineHeight: 1 }}
           >
             {monogram}
           </div>
           <div
             aria-hidden
-            className="absolute -bottom-4 right-3 select-none text-white/12"
+            className="absolute -bottom-4 right-3 select-none text-heading/12"
             style={{ fontSize: "5.5rem", fontWeight: 700, lineHeight: 1 }}
           >
             {monogram}

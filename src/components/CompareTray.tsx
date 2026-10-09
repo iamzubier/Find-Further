@@ -13,7 +13,7 @@ export function CompareTray() {
   const slots = [0, 1, 2];
 
   return (
-    <div className="fixed inset-x-0 bottom-0 z-50 border-t border-border bg-white shadow-[0_-4px_12px_-2px_rgba(0,0,0,0.08)]">
+    <div className="fixed inset-x-0 bottom-0 z-50 border-t border-border bg-heading shadow-[0_-4px_12px_-2px_rgba(0,0,0,0.08)]">
       <div className="mx-auto flex max-w-6xl items-center gap-3 px-4 py-3">
         <div className="hidden items-center gap-2 text-xs font-bold uppercase tracking-wider text-muted-foreground md:flex">
           <GitCompare className="h-4 w-4 text-primary" /> Compare
@@ -33,7 +33,7 @@ export function CompareTray() {
               );
             }
             return (
-              <div key={it.slug} className="flex h-12 min-w-[180px] items-center gap-2 rounded border border-border bg-white px-2 pr-1">
+              <div key={it.slug} className="flex h-12 min-w-[180px] items-center gap-2 rounded border border-border bg-heading px-2 pr-1">
                 <SmartLogo name={it.name} logoUrl={it.logoUrl} size={32} />
                 <span className="min-w-0 flex-1 truncate text-xs font-semibold text-foreground">{it.name}</span>
                 <button

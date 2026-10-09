@@ -65,14 +65,14 @@ function HydrationShimmer() {
   }, []);
   return (
     <div className="min-h-screen bg-background pb-32">
-      <div className="relative h-[420px] w-full overflow-hidden bg-gradient-to-br from-neutral-100 to-neutral-200">
+      <div className="relative h-[420px] w-full overflow-hidden bg-gradient-to-br from-raised to-raised">
         <div className="absolute inset-0 animate-pulse bg-[linear-gradient(110deg,transparent_35%,rgba(255,255,255,0.6)_50%,transparent_65%)] bg-[length:200%_100%]" />
         <div className="absolute inset-x-0 bottom-0 mx-auto max-w-6xl px-4 pb-8">
           <div className="flex items-end gap-5">
-            <div className="h-20 w-20 animate-pulse rounded-lg bg-white/70 ring-4 ring-white" />
+            <div className="h-20 w-20 animate-pulse rounded-lg bg-heading/70 ring-4 ring-heading" />
             <div className="flex-1">
-              <div className="h-10 w-2/3 animate-pulse rounded bg-white/70" />
-              <div className="mt-3 h-4 w-1/3 animate-pulse rounded bg-white/60" />
+              <div className="h-10 w-2/3 animate-pulse rounded bg-heading/70" />
+              <div className="mt-3 h-4 w-1/3 animate-pulse rounded bg-heading/60" />
             </div>
           </div>
         </div>
@@ -90,10 +90,10 @@ function HydrationShimmer() {
         <div className="space-y-4">
           {[1, 2, 3].map((i) => (
             <div key={i} className="card-surface p-6">
-              <div className="h-5 w-1/3 animate-pulse rounded bg-neutral-200" />
-              <div className="mt-4 h-3 w-full animate-pulse rounded bg-neutral-100" />
-              <div className="mt-2 h-3 w-5/6 animate-pulse rounded bg-neutral-100" />
-              <div className="mt-2 h-3 w-3/4 animate-pulse rounded bg-neutral-100" />
+              <div className="h-5 w-1/3 animate-pulse rounded bg-raised" />
+              <div className="mt-4 h-3 w-full animate-pulse rounded bg-raised" />
+              <div className="mt-2 h-3 w-5/6 animate-pulse rounded bg-raised" />
+              <div className="mt-2 h-3 w-3/4 animate-pulse rounded bg-raised" />
             </div>
           ))}
         </div>
@@ -229,7 +229,7 @@ function Hero({ uni }: { uni: any }) {
       <div className="absolute inset-x-0 top-0 z-20 mx-auto max-w-6xl p-5">
         <Link
           to="/universities"
-          className="inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-white/5 px-3 py-1.5 text-xs font-medium uppercase tracking-wider text-white/85 backdrop-blur-md transition-all hover:border-[oklch(0.74_0.10_85_/_0.5)] hover:text-white"
+          className="inline-flex items-center gap-1.5 rounded-full border border-heading/15 bg-heading/5 px-3 py-1.5 text-xs font-medium uppercase tracking-wider text-heading/85 backdrop-blur-md transition-all hover:border-[oklch(0.74_0.10_85_/_0.5)] hover:text-heading"
         >
           <ArrowLeft className="h-3.5 w-3.5" /> All universities
         </Link>
@@ -248,7 +248,7 @@ function Hero({ uni }: { uni: any }) {
               logoUrl={logoUrl || null}
               website={website}
               size={112}
-              className="relative z-10 border-2 border-[oklch(0.74_0.10_85_/_0.7)] bg-white shadow-2xl"
+              className="relative z-10 border-2 border-[oklch(0.74_0.10_85_/_0.7)] bg-heading shadow-2xl"
             />
           </div>
 
@@ -257,10 +257,10 @@ function Hero({ uni }: { uni: any }) {
               <span className="h-px w-6" style={{ background: "var(--gradient-gold)" }} />
               Institutional Profile
             </div>
-            <h1 className="font-heading text-4xl md:text-5xl font-bold text-white drop-shadow-lg tracking-tight m-0 leading-[1.05]">
+            <h1 className="font-heading text-4xl md:text-5xl font-bold text-heading drop-shadow-lg tracking-tight m-0 leading-[1.05]">
               {uni.name}
             </h1>
-            <div className="mt-3 flex flex-wrap items-center gap-3 text-sm text-white/85">
+            <div className="mt-3 flex flex-wrap items-center gap-3 text-sm text-heading/85">
               {uni.country_flag && <span className="text-xl">{uni.country_flag}</span>}
               <span className="inline-flex items-center gap-1.5">
                 <MapPin className="h-4 w-4 text-[oklch(0.80_0.11_85)]" />
@@ -275,7 +275,7 @@ function Hero({ uni }: { uni: any }) {
                 </span>
               )}
               {uni.founded_year && (
-                <span className="font-heading italic text-white/70">Est. {uni.founded_year}</span>
+                <span className="font-heading italic text-heading/70">Est. {uni.founded_year}</span>
               )}
             </div>
           </div>
@@ -371,14 +371,14 @@ function StudentSystemLine({ usGpa, evalSum }: { usGpa: number; evalSum: EvalSum
   const inStudent = requirementInStudentSystem(usGpa, evalSum.curriculum);
   const ok = evalSum.converted.us4 >= usGpa;
   return (
-    <span className={`ml-2 inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-semibold ring-1 ${ok ? "bg-emerald-500/10 text-emerald-700 ring-emerald-500/30" : "bg-rose-500/10 text-rose-700 ring-rose-500/30"}`}>
+    <span className={`ml-2 inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-semibold ring-1 ${ok ? "bg-accent/10 text-accent ring-accent/30" : "bg-rose-500/10 text-rose-700 ring-rose-500/30"}`}>
       = {inStudent} in your {CURRICULUMS[evalSum.curriculum].scale} {ok ? "✓" : "✗"}
     </span>
   );
 }
 
 function YourScore({ ok, mine }: { ok: boolean; mine: string }) {
-  return <span className={`ml-2 rounded-full px-2 py-0.5 text-[11px] font-semibold ring-1 ${ok ? "bg-emerald-500/10 text-emerald-700 ring-emerald-500/30" : "bg-rose-500/10 text-rose-700 ring-rose-500/30"}`}>{mine} {ok ? "✓" : "✗"}</span>;
+  return <span className={`ml-2 rounded-full px-2 py-0.5 text-[11px] font-semibold ring-1 ${ok ? "bg-accent/10 text-accent ring-accent/30" : "bg-rose-500/10 text-rose-700 ring-rose-500/30"}`}>{mine} {ok ? "✓" : "✗"}</span>;
 }
 
 function Admissions({ uni }: any) {
@@ -650,7 +650,7 @@ function TipCard({ t }: { t: any }) {
               <span className="text-muted-foreground">Helpful?</span>
               <button
                 onClick={() => setVote(vote === "up" ? null : "up")}
-                className={`rounded-md p-1 ring-1 transition ${vote === "up" ? "bg-emerald-500/15 text-emerald-700 ring-emerald-500/30" : "ring-border text-muted-foreground hover:text-foreground"}`}
+                className={`rounded-md p-1 ring-1 transition ${vote === "up" ? "bg-accent/15 text-accent ring-accent/30" : "ring-border text-muted-foreground hover:text-foreground"}`}
                 aria-label="Helpful"
               >👍</button>
               <button
@@ -730,7 +730,7 @@ function Tips({ uni, tips }: any) {
       <div className="mb-4 flex flex-wrap items-center gap-2">
         {homeName && (
           <button onClick={() => setOnlyMine(v => !v)}
-            className={`rounded-full px-3 py-1 text-xs font-semibold ring-1 ${onlyMine ? "bg-emerald-600 text-white ring-emerald-600" : "bg-emerald-500/10 text-emerald-700 ring-emerald-500/30"}`}>
+            className={`rounded-full px-3 py-1 text-xs font-semibold ring-1 ${onlyMine ? "bg-accent text-heading ring-accent" : "bg-accent/10 text-accent ring-accent/30"}`}>
             🌍 Mentioning {homeName}
           </button>
         )}
@@ -815,10 +815,10 @@ function inferScholarshipLevel(s: any): "undergraduate" | "postgraduate" | "phd"
 }
 
 const LEVEL_BADGE_DETAIL: Record<string, { label: string; cls: string }> = {
-  undergraduate: { label: "Bachelor's", cls: "bg-emerald-500/15 text-emerald-700 ring-emerald-500/30 dark:text-emerald-300" },
-  postgraduate:  { label: "Master's",   cls: "bg-blue-500/15 text-blue-700 ring-blue-500/30 dark:text-blue-300" },
-  phd:           { label: "PhD",        cls: "bg-purple-500/15 text-purple-700 ring-purple-500/30 dark:text-purple-300" },
-  all:           { label: "All levels", cls: "bg-amber-500/15 text-amber-700 ring-amber-500/30 dark:text-amber-300" },
+  undergraduate: { label: "Bachelor's", cls: "bg-accent/15 text-accent ring-accent/30 dark:text-accent" },
+  postgraduate:  { label: "Master's",   cls: "bg-accent/15 text-accent ring-accent/30 dark:text-accent" },
+  phd:           { label: "PhD",        cls: "bg-accent/15 text-accent ring-accent/30 dark:text-accent" },
+  all:           { label: "All levels", cls: "bg-earth/15 text-earth ring-earth/30 dark:text-earth" },
 };
 
 function ScholarshipsByLevel({ scholarships }: { scholarships: any[] }) {
@@ -1050,7 +1050,7 @@ const EXAM_LIB: Record<string, ExamRef> = {
 
 function statusFor(required: number | undefined, mine: number | undefined): { txt: string; cls: string } | null {
   if (!required || !mine) return null;
-  if (mine >= required) return { txt: "✓ Competitive", cls: "text-emerald-600" };
+  if (mine >= required) return { txt: "✓ Competitive", cls: "text-accent" };
   return { txt: "✗ Below requirement", cls: "text-rose-600" };
 }
 
@@ -1279,7 +1279,7 @@ function EvalMatchRing({ uni, evalSum }: { uni: any; evalSum: EvalSummary }) {
   if (r.sat_min && evalSum.tests.sat) s += (evalSum.tests.sat - r.sat_min) / 12;
   if (evalSum.targetCountries.length && evalSum.targetCountries.some(c => uni.country?.toLowerCase().includes(c.toLowerCase()))) s += 8;
   const score = Math.max(5, Math.min(99, Math.round(s)));
-  const color = score >= 75 ? "text-emerald-600" : score >= 50 ? "text-amber-600" : "text-rose-600";
+  const color = score >= 75 ? "text-accent" : score >= 50 ? "text-earth" : "text-rose-600";
   return (
     <div className="text-center">
       <div className={`font-heading text-5xl font-extrabold ${color}`}>{score}%</div>
@@ -1306,7 +1306,7 @@ function MatchRing({ uni }: any) {
     });
   }, [user, uni]);
   if (score === null) return <div className="text-center text-xs text-muted-foreground">Calculating match…</div>;
-  const color = score >= 75 ? "text-emerald-600" : score >= 50 ? "text-amber-600" : "text-rose-600";
+  const color = score >= 75 ? "text-accent" : score >= 50 ? "text-earth" : "text-rose-600";
   return (
     <div className="text-center">
       <div className={`font-heading text-5xl font-extrabold ${color}`}>{score}%</div>
