@@ -406,7 +406,7 @@ const heroSrc = bannerUrl || photo.data?.url || null;
   };
 
   return (
-    <<div className="absolute inset-0 z-0">
+    <div className="absolute inset-0 z-0">
         <TopoBackground />
         <SmartCampusImage
           src={heroSrc}
