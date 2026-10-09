@@ -668,9 +668,8 @@ function ScholarshipCard({ s, variant }: { s: ViewSch; variant: "active" | "prep
   const imageSrc = banner || wikiByProvider.data || wikiByName.data || null;
 
   return (
-    <Link
-      to="/scholarships/\$slug"
-      params={{ slug: s.slug }}
+    <a
+      href={`/scholarships/${s.slug}`}
       className="group relative flex min-h-[390px] flex-col overflow-hidden rounded-lg bg-[#f5f0e0] shadow-sm ring-1 ring-[#651F2B]/15 transition-shadow hover:shadow-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#651F2B]"
     >
       <div className="absolute inset-0">
