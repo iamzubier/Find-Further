@@ -315,9 +315,7 @@ function CatalogBrowser() {
     }
     return Array.from(map.entries());
   }, [listQuery.data, imagesQuery.data, qsPhotosQuery.data]);
-    }
-    return Array.from(map.entries());
-  }, [listQuery.data, imagesQuery.data]);
+    
 
   return (
     <>
