@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { Button } from "@/components/ui/button";
@@ -43,7 +43,13 @@ function HomePage() {
 function Hero() {
   const countFn = useServerFn(getUniversityCount);
   const { data: countData } = useQuery({ queryKey: ["uni-count"], queryFn: () => countFn(), staleTime: 60_000 });
-  const countLabel = countData?.count ? `${countData.count.toLocaleString()}+` : "10,000+";
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  const countLabel = mounted && countData?.count ? `${countData.count.toLocaleString()}+` : "10,000+";
   const featuredSch = SCHOLARSHIPS.slice(0, 3);
 
   return (
@@ -562,7 +568,7 @@ function CtaStrip() {
           </Button>
         </div>
         <p className="relative mt-8 border-t border-border pt-5 text-center text-xs text-muted-foreground">
-          {UNIVERSITIES.length} sample universities · {SCHOLARSHIPS.length} live scholarships · updated {new Date().toLocaleDateString("en-US", { month: "long", year: "numeric" })}
+          {UNIVERSITIES.length} sample universities · {SCHOLARSHIPS.length} live scholarships · updated October 2026
         </p>
       </div>
     </section>
