@@ -1,15 +1,15 @@
 import { Link } from "@tanstack/react-router";
 
+export const OFFICIAL_LOGO_URL = "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/464120b8-38ac-453b-9198-c6597c4294d0-wRX4vldGqof9v8fZygtfncVgQCxKAk.png";
+
 export function Logo({ className = "" }: { className?: string; showWord?: boolean }) {
   return (
-    <Link to="/" className={`group inline-flex items-center gap-2.5 ${className}`}>
-      <span
-        aria-hidden
-        className="flex h-8 w-8 items-center justify-center rounded-md bg-emerald-grad text-[11px] font-bold tracking-tight text-heading shadow-[0_2px_8px_-2px_rgba(0,60,40,0.4)] transition-transform duration-500 group-hover:rotate-[8deg]"
-        style={{ background: "var(--gradient-emerald)" }}
-      >
-        <span className="gold-text font-heading italic">B</span>
-      </span>
+    <Link to="/" className={`group inline-flex items-center gap-2.5 ${className}`} aria-label="FindFurther home">
+      <img
+        src={OFFICIAL_LOGO_URL}
+        alt="FindFurther mascot logo"
+        className="h-10 w-10 rounded-full object-cover shadow-[0_2px_10px_-2px_rgba(101,31,43,0.4)] transition-transform duration-500 group-hover:rotate-[5deg]"
+      />
       <span className="font-heading text-[1.4rem] font-bold leading-none tracking-tight text-foreground">
         Find<span className="italic font-medium gradient-text">Further</span>
       </span>
@@ -19,7 +19,11 @@ export function Logo({ className = "" }: { className?: string; showWord?: boolea
 
 export function LogoMark({ className = "" }: { className?: string }) {
   return (
-    <span className={`font-heading font-bold italic text-foreground ${className}`} aria-label="FindFurther">FF</span>
+    <img
+      src={OFFICIAL_LOGO_URL}
+      alt="FindFurther mascot logo"
+      className={`rounded-full object-cover ${className}`}
+    />
   );
 }
 
