@@ -382,12 +382,12 @@ function ScholarshipsHub() {
       <WtfScholarshipsCarousel all={all} />
 
       {/* Intent matrix */}
-      <section className="rounded-md border border-border bg-heading p-5 md:p-6">
+      <section className="rounded-md border border-[#1d080d]/20 bg-heading p-5 md:p-6">
         <div className="grid gap-6 md:grid-cols-3">
           <div>
             <div className="mb-2 flex items-center gap-2">
               <Wallet className="h-4 w-4 text-primary" />
-              <h3 className="font-heading text-sm font-bold uppercase tracking-wide text-foreground">Your budget</h3>
+              <h3 className="font-heading text-sm font-bold uppercase tracking-wide text-[#1d080d]">Your budget</h3>
             </div>
             <div className="flex flex-col gap-1.5">
               {BUDGETS.map((b) => (
@@ -396,12 +396,12 @@ function ScholarshipsHub() {
                   onClick={() => setBudget(b.key)}
                   className={`rounded border px-3 py-2 text-left text-sm transition ${
                     budget === b.key
-                      ? "border-primary bg-primary/5 font-semibold text-foreground"
-                      : "border-border text-muted-foreground hover:border-primary/40 hover:text-foreground"
+                      ? "border-primary bg-primary/5 font-semibold text-[#1d080d]"
+                      : "border-[#1d080d]/20 text-[#1d080d]/70 hover:border-primary/40 hover:text-[#1d080d]"
                   }`}
                 >
                   <div className="text-sm">{b.label}</div>
-                  <div className="text-[11px] text-muted-foreground">{b.sub}</div>
+                  <div className="text-[11px] text-[#1d080d]/70">{b.sub}</div>
                 </button>
               ))}
             </div>
@@ -410,7 +410,7 @@ function ScholarshipsHub() {
           <div>
             <div className="mb-2 flex items-center gap-2">
               <Sparkles className="h-4 w-4 text-primary" />
-              <h3 className="font-heading text-sm font-bold uppercase tracking-wide text-foreground">Your profile</h3>
+              <h3 className="font-heading text-sm font-bold uppercase tracking-wide text-[#1d080d]">Your profile</h3>
             </div>
             <div className="flex flex-col gap-1.5">
               {PROFILES.map((p) => {
@@ -421,8 +421,8 @@ function ScholarshipsHub() {
                     onClick={() => setProfile(p.key)}
                     className={`flex items-center gap-2 rounded border px-3 py-2 text-left text-sm transition ${
                       profile === p.key
-                        ? "border-primary bg-primary/5 font-semibold text-foreground"
-                        : "border-border text-muted-foreground hover:border-primary/40 hover:text-foreground"
+                        ? "border-primary bg-primary/5 font-semibold text-[#1d080d]"
+                        : "border-[#1d080d]/20 text-[#1d080d]/70 hover:border-primary/40 hover:text-[#1d080d]"
                     }`}
                   >
                     <Icon className="h-4 w-4 shrink-0" />
@@ -437,32 +437,32 @@ function ScholarshipsHub() {
             <div>
               <div className="mb-2 flex items-center gap-2">
                 <AlertTriangle className="h-4 w-4 text-primary" />
-                <h3 className="font-heading text-sm font-bold uppercase tracking-wide text-foreground">Hidden-wall toggles</h3>
+                <h3 className="font-heading text-sm font-bold uppercase tracking-wide text-[#1d080d]">Hidden-wall toggles</h3>
               </div>
               <div className="flex flex-col gap-1.5">
-                <label className="flex cursor-pointer items-start gap-2 rounded border border-border px-3 py-2 text-sm hover:border-primary/40">
+                <label className="flex cursor-pointer items-start gap-2 rounded border border-[#1d080d]/20 px-3 py-2 text-sm hover:border-primary/40">
                   <input type="checkbox" checked={noFee} onChange={(e) => setNoFee(e.target.checked)} className="mt-0.5 h-4 w-4 accent-primary" />
                   <span>
-                    <span className="font-medium text-foreground">Only $0 application fees</span>
-                    <span className="block text-[11px] text-muted-foreground">Hide awards that charge to apply</span>
+                    <span className="font-medium text-[#1d080d]">Only $0 application fees</span>
+                    <span className="block text-[11px] text-[#1d080d]/70">Hide awards that charge to apply</span>
                   </span>
                 </label>
-                <label className="flex cursor-pointer items-start gap-2 rounded border border-border px-3 py-2 text-sm hover:border-primary/40">
+                <label className="flex cursor-pointer items-start gap-2 rounded border border-[#1d080d]/20 px-3 py-2 text-sm hover:border-primary/40">
                   <input type="checkbox" checked={moiOnly} onChange={(e) => setMoiOnly(e.target.checked)} className="mt-0.5 h-4 w-4 accent-primary" />
                   <span>
-                    <span className="font-medium text-foreground">Accepts MOI (no IELTS)</span>
-                    <span className="block text-[11px] text-muted-foreground">Medium-of-instruction letter in lieu of IELTS/TOEFL</span>
+                    <span className="font-medium text-[#1d080d]">Accepts MOI (no IELTS)</span>
+                    <span className="block text-[11px] text-[#1d080d]/70">Medium-of-instruction letter in lieu of IELTS/TOEFL</span>
                   </span>
                 </label>
-                <label className="flex cursor-pointer items-start gap-2 rounded border border-border px-3 py-2 text-sm hover:border-primary/40">
+                <label className="flex cursor-pointer items-start gap-2 rounded border border-[#1d080d]/20 px-3 py-2 text-sm hover:border-primary/40">
                   <input type="checkbox" checked={satOnly} onChange={(e) => setSatOnly(e.target.checked)} className="mt-0.5 h-4 w-4 accent-primary" />
                   <span>
-                    <span className="font-medium text-foreground">SAT-based merit awards only</span>
-                    <span className="block text-[11px] text-muted-foreground">Show only scholarships with a published SAT cutoff</span>
+                    <span className="font-medium text-[#1d080d]">SAT-based merit awards only</span>
+                    <span className="block text-[11px] text-[#1d080d]/70">Show only scholarships with a published SAT cutoff</span>
                   </span>
                 </label>
-                <div className="rounded border border-border px-3 py-2">
-                  <label className="block text-[11px] font-medium text-foreground">Your SAT score (optional)</label>
+                <div className="rounded border border-[#1d080d]/20 px-3 py-2">
+                  <label className="block text-[11px] font-medium text-[#1d080d]">Your SAT score (optional)</label>
                   <input
                     type="number"
                     inputMode="numeric"
@@ -471,9 +471,9 @@ function ScholarshipsHub() {
                     placeholder="e.g. 1450"
                     value={userSat}
                     onChange={(e) => setUserSat(e.target.value)}
-                    className="mt-1 h-8 w-full rounded border border-border bg-heading px-2 text-sm text-foreground"
+                    className="mt-1 h-8 w-full rounded border border-[#1d080d]/20 bg-heading px-2 text-sm text-[#1d080d]"
                   />
-                  <div className="mt-1 text-[10px] text-muted-foreground">Hides awards whose minimum SAT exceeds your score.</div>
+                  <div className="mt-1 text-[10px] text-[#1d080d]/70">Hides awards whose minimum SAT exceeds your score.</div>
                 </div>
               </div>
             </div>
@@ -482,7 +482,7 @@ function ScholarshipsHub() {
               <select
                 value={providerType}
                 onChange={(e) => setProviderType(e.target.value as any)}
-                className="h-10 rounded border border-border bg-heading px-2 text-sm text-foreground"
+                className="h-10 rounded border border-[#1d080d]/20 bg-heading px-2 text-sm text-[#1d080d]"
               >
                 {PROVIDER_TYPES.map((p) => (
                   <option key={p.key} value={p.key}>{p.label}</option>
@@ -491,7 +491,7 @@ function ScholarshipsHub() {
               <select
                 value={region}
                 onChange={(e) => setRegion(e.target.value as any)}
-                className="h-10 rounded border border-border bg-heading px-2 text-sm text-foreground"
+                className="h-10 rounded border border-[#1d080d]/20 bg-heading px-2 text-sm text-[#1d080d]"
               >
                 {REGIONS.map((r) => (
                   <option key={r} value={r}>{r === "all" ? "All regions" : r}</option>
@@ -501,7 +501,7 @@ function ScholarshipsHub() {
 
             <div className="grid grid-cols-[1fr_auto] gap-2">
               <div className="relative">
-                <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#1d080d]/70" />
                 <Input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search name, country, provider…" className="h-10 bg-heading pl-9" />
               </div>
               <Button variant="outline" size="sm" onClick={reset} className="h-10">
@@ -520,14 +520,14 @@ function ScholarshipsHub() {
             <div className="font-heading text-sm font-bold text-destructive">
               Closing soon: {closingSoon.length} match{closingSoon.length > 1 ? "es" : ""} close within 30 days
             </div>
-            <div className="mt-0.5 text-xs text-foreground/80">Sorted by deadline — apply to the urgent ones first.</div>
+            <div className="mt-0.5 text-xs text-[#1d080d]/80">Sorted by deadline — apply to the urgent ones first.</div>
           </div>
         </div>
       )}
 
       {/* Loading */}
       {dbQuery.isLoading && (
-        <div className="mt-10 flex items-center justify-center gap-3 rounded-md border border-border bg-heading p-12 text-sm text-muted-foreground">
+        <div className="mt-10 flex items-center justify-center gap-3 rounded-md border border-[#1d080d]/20 bg-heading p-12 text-sm text-[#1d080d]/70">
           <Loader2 className="h-4 w-4 animate-spin" /> Loading scholarships…
         </div>
       )}
@@ -585,24 +585,24 @@ function SectionHeader({
   icon, title, subtitle, count, accent,
 }: { icon: React.ReactNode; title: string; subtitle: string; count: number; accent?: "amber" }) {
   return (
-    <div className="mb-5 flex items-end justify-between gap-4 border-b border-border pb-3">
+    <div className="mb-5 flex items-end justify-between gap-4 border-b border-[#1d080d]/20 pb-3">
       <div className="min-w-0">
         <div className="flex items-center gap-2">
           {icon}
-          <h2 className={`font-heading text-2xl font-bold ${accent === "amber" ? "text-earth" : "text-foreground"}`}>{title}</h2>
+          <h2 className={`font-heading text-2xl font-bold ${accent === "amber" ? "text-earth" : "text-[#1d080d]"}`}>{title}</h2>
         </div>
-        <p className="mt-1 text-sm text-muted-foreground">{subtitle}</p>
+        <p className="mt-1 text-sm text-[#1d080d]/70">{subtitle}</p>
       </div>
-      <div className="shrink-0 rounded-full border border-border bg-heading px-3 py-1 text-xs font-semibold text-foreground">{count}</div>
+      <div className="shrink-0 rounded-full border border-[#1d080d]/20 bg-heading px-3 py-1 text-xs font-semibold text-[#1d080d]">{count}</div>
     </div>
   );
 }
 
 function EmptyState({ reset }: { reset: () => void }) {
   return (
-    <div className="rounded-md border border-dashed border-border bg-heading p-12 text-center">
-      <p className="font-heading text-lg font-bold text-foreground">No scholarships match these exact criteria.</p>
-      <p className="mt-1 text-sm text-muted-foreground">Try broadening your degree level, budget or region filters.</p>
+    <div className="rounded-md border border-dashed border-[#1d080d]/20 bg-heading p-12 text-center">
+      <p className="font-heading text-lg font-bold text-[#1d080d]">No scholarships match these exact criteria.</p>
+      <p className="mt-1 text-sm text-[#1d080d]/70">Try broadening your degree level, budget or region filters.</p>
       <Button onClick={reset} className="mt-5 bg-primary text-primary-foreground hover:bg-primary/90">
         <RotateCcw className="mr-2 h-4 w-4" /> Reset filters
       </Button>
@@ -791,15 +791,15 @@ function WtfScholarshipsCarousel({ all }: { all: ViewSch[] }) {
     <section className="mb-8">
       <div className="mb-3 flex items-center gap-2">
         <Sparkles className="h-4 w-4 text-primary" />
-        <h2 className="font-heading text-sm font-bold uppercase tracking-wide text-foreground">WTF scholarships</h2>
-        <span className="text-xs text-muted-foreground">— the ones most people don't know exist</span>
+        <h2 className="font-heading text-sm font-bold uppercase tracking-wide text-[#1d080d]">WTF scholarships</h2>
+        <span className="text-xs text-[#1d080d]/70">— the ones most people don't know exist</span>
       </div>
       <div className="grid gap-4 md:grid-cols-3">
         {buckets.map((bucket) => (
           <div key={bucket.title} className="rounded-md border border-[#651F2B]/15 bg-white/50 p-4">
             <div className="mb-2 flex items-center gap-2">
               <span className="text-lg">{bucket.emoji}</span>
-              <h3 className="font-heading text-sm font-bold text-foreground">{bucket.title}</h3>
+              <h3 className="font-heading text-sm font-bold text-[#1d080d]">{bucket.title}</h3>
             </div>
             <ul className="space-y-1.5">
               {bucket.items.slice(0, 4).map((s) => (
@@ -807,7 +807,7 @@ function WtfScholarshipsCarousel({ all }: { all: ViewSch[] }) {
                   <Link
                     to="/scholarships/$slug"
                     params={{ slug: s.slug }}
-                    className="group flex items-start gap-2 text-xs text-foreground/85 hover:text-primary"
+                    className="group flex items-start gap-2 text-xs text-[#1d080d]/85 hover:text-primary"
                   >
                     <span className="text-sm leading-none">{s.countryFlag}</span>
                     <span className="line-clamp-1 flex-1 font-medium group-hover:underline">{s.name}</span>
@@ -815,7 +815,7 @@ function WtfScholarshipsCarousel({ all }: { all: ViewSch[] }) {
                 </li>
               ))}
               {bucket.items.length === 0 && (
-                <li className="text-xs text-muted-foreground">Nothing in this bucket yet.</li>
+                <li className="text-xs text-[#1d080d]/70">Nothing in this bucket yet.</li>
               )}
             </ul>
           </div>
