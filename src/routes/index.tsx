@@ -47,14 +47,14 @@ function Hero() {
   const featuredSch = SCHOLARSHIPS.slice(0, 3);
 
   return (
-    <section className="relative bg-[oklch(0.962_0.020_95)] py-10 lg:py-16">
+    <section className="relative bg-background py-10 lg:py-16">
       <div className="mx-auto max-w-7xl px-4 lg:px-8">
         <div className="grid grid-cols-1 gap-4 md:grid-cols-12 md:auto-rows-[minmax(180px,auto)]">
 
           {/* Brand & Hero — Deep Emerald with library backdrop */}
           <div className="md:col-span-8 md:row-span-2 relative overflow-hidden border-b-4 border-gold p-8 md:p-12 flex flex-col justify-between text-[#f5f0e0] min-h-[460px]">
             <img src={heroLibrary} alt="" className="absolute inset-0 h-full w-full object-cover" />
-            <div aria-hidden className="absolute inset-0" style={{ background: "linear-gradient(120deg, oklch(0.28 0.07 162 / 0.92) 0%, oklch(0.32 0.07 162 / 0.82) 50%, oklch(0.20 0.05 162 / 0.88) 100%)" }} />
+            <div aria-hidden className="absolute inset-0" style={{ background: "linear-gradient(120deg, rgba(36,72,85,.94) 0%, rgba(45,83,93,.84) 50%, rgba(29,59,70,.94) 100%)" }} />
             <div aria-hidden className="absolute inset-0 grain-overlay pointer-events-none" />
             <div className="relative z-10">
               <span className="font-heading italic text-gold text-lg md:text-xl mb-3 block">FindFurther</span>

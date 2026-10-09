@@ -59,8 +59,8 @@ export function Navbar({ profileStrength }: { profileStrength?: number }) {
     <header
       className={`sticky top-0 z-50 transition-all duration-500 ${
         scrolled
-          ? "border-b border-border bg-white/85 backdrop-blur-xl shadow-[0_1px_0_oklch(0.74_0.10_85_/_0.25)]"
-          : "border-b border-transparent bg-white/60 backdrop-blur-md"
+          ? "border-b border-border bg-[#244855]/95 backdrop-blur-xl shadow-[0_1px_0_rgba(230,72,51,.25)]"
+          : "border-b border-transparent bg-[#244855]/90 backdrop-blur-md"
       }`}
     >
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 lg:px-6">
