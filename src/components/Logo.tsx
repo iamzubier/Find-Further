@@ -5,7 +5,7 @@ export function Logo({ className = "" }: { className?: string; showWord?: boolea
     <Link to="/" className={`group inline-flex items-center gap-2.5 ${className}`}>
       <span
         aria-hidden
-        className="flex h-8 w-8 items-center justify-center rounded-md bg-emerald-grad text-[11px] font-bold tracking-tight text-white shadow-[0_2px_8px_-2px_rgba(0,60,40,0.4)] transition-transform duration-500 group-hover:rotate-[8deg]"
+        className="flex h-8 w-8 items-center justify-center rounded-md bg-emerald-grad text-[11px] font-bold tracking-tight text-heading shadow-[0_2px_8px_-2px_rgba(0,60,40,0.4)] transition-transform duration-500 group-hover:rotate-[8deg]"
         style={{ background: "var(--gradient-emerald)" }}
       >
         <span className="gold-text font-heading italic">B</span>

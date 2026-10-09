@@ -13,7 +13,7 @@ export function TopoBackground({ className = "" }: { className?: string }) {
     <>
       <div
         aria-hidden
-        className={`absolute inset-0 z-0 bg-slate-950 bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(30,58,138,0.35),rgba(255,255,255,0))] ${className}`}
+        className={`absolute inset-0 z-0 bg-background bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(30,58,138,0.35),rgba(255,255,255,0))] ${className}`}
       />
       <div
         aria-hidden
@@ -22,7 +22,7 @@ export function TopoBackground({ className = "" }: { className?: string }) {
       />
       <div
         aria-hidden
-        className="absolute inset-0 z-[2] bg-gradient-to-t from-slate-950 via-slate-950/70 to-transparent"
+        className="absolute inset-0 z-[2] bg-gradient-to-t from-background via-background/70 to-transparent"
       />
     </>
   );

@@ -39,7 +39,7 @@ import {
   AlertCircle,
 } from "lucide-react";
 import { SmartCampusImage } from "@/components/SmartCampusImage";
-import { useWikiImage } from "@/lib/use-wiki-image";
+import { useCampusPhoto } from "@/lib/use-campus-photo";
 import { TopoBackground } from "@/components/TopoBackground";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/integrations/supabase/client";
@@ -144,7 +144,7 @@ function ScholarshipDetailPage() {
 
       <div className="mx-auto max-w-6xl px-4 py-10">
         <Tabs defaultValue="overview" className="w-full">
-          <TabsList className="mb-8 grid h-auto w-full grid-cols-2 gap-1 bg-neutral-100 p-1 md:grid-cols-4 lg:grid-cols-8">
+          <TabsList className="mb-8 grid h-auto w-full grid-cols-2 gap-1 bg-raised p-1 md:grid-cols-4 lg:grid-cols-8">
             <TabsTrigger value="overview" className="text-xs">Overview</TabsTrigger>
             <TabsTrigger value="covers" className="text-xs">What It Covers</TabsTrigger>
             <TabsTrigger value="who" className="text-xs">Who Can Apply</TabsTrigger>
@@ -209,7 +209,7 @@ function ScholarshipDetailPage() {
 function Overview({ v }: { v: View }) {
   return (
     <div className="grid gap-6 md:grid-cols-3">
-      <div className="md:col-span-2 rounded-md border border-border bg-white p-6">
+      <div className="md:col-span-2 rounded-md border border-border bg-heading p-6">
         <h2 className="font-heading text-2xl font-bold text-foreground">About this award</h2>
         <p className="mt-3 text-sm leading-relaxed text-foreground/85">
           {v.description || `${v.name} is a ${fundingLabel(v.funding_type).toLowerCase()} ${providerLabel(v.provider_type).toLowerCase()} award hosted in ${v.country}.`}
@@ -223,12 +223,12 @@ function Overview({ v }: { v: View }) {
           <Row label="Annual value" value={v.amount || "Varies"} />
         </dl>
       </div>
-      <div className="rounded-md border border-amber-200 bg-amber-50/30 p-6">
-        <div className="flex items-center gap-2 text-amber-800">
+      <div className="rounded-md border border-earth bg-earth/30 p-6">
+        <div className="flex items-center gap-2 text-earth">
           <Sparkles className="h-4 w-4" />
           <h3 className="font-heading text-sm font-bold uppercase tracking-wide">The wow fact</h3>
         </div>
-        <p className="mt-3 text-sm leading-relaxed text-amber-900">
+        <p className="mt-3 text-sm leading-relaxed text-earth">
           {v.application_fee_usd === 0
             ? `Zero application fee — most peers pay $50-150 just to be considered.`
             : v.accepts_moi_waiver
@@ -323,16 +323,16 @@ function HydrationShimmer() {
   }, []);
   return (
     <div className="mx-auto max-w-3xl px-4 py-20">
-      <div className="rounded-md border border-border bg-white p-10 text-center shadow-sm">
+      <div className="rounded-md border border-border bg-heading p-10 text-center shadow-sm">
         <div className="mx-auto h-12 w-12 animate-pulse rounded-full bg-primary/15" />
         <h1 className="mt-6 font-heading text-2xl font-bold text-foreground">
           Building this scholarship profile…
         </h1>
         <p className="mt-2 text-sm text-muted-foreground transition-opacity">{ROTATING[i]}</p>
         <div className="mx-auto mt-8 max-w-md space-y-2">
-          <div className="h-3 animate-pulse rounded bg-neutral-200" />
-          <div className="h-3 w-5/6 animate-pulse rounded bg-neutral-200" />
-          <div className="h-3 w-2/3 animate-pulse rounded bg-neutral-200" />
+          <div className="h-3 animate-pulse rounded bg-raised" />
+          <div className="h-3 w-5/6 animate-pulse rounded bg-raised" />
+          <div className="h-3 w-2/3 animate-pulse rounded bg-raised" />
         </div>
       </div>
     </div>
@@ -346,7 +346,7 @@ function HydrationError({ slug, message }: { slug: string; message: string }) {
         Couldn't build this profile
       </h1>
       <p className="mt-3 text-sm text-muted-foreground">
-        We tried to pull live data for <code className="rounded bg-neutral-100 px-1.5 py-0.5">{slug}</code> but ran into:
+        We tried to pull live data for <code className="rounded bg-raised px-1.5 py-0.5">{slug}</code> but ran into:
       </p>
       <p className="mx-auto mt-2 max-w-md rounded border border-destructive/30 bg-destructive/5 p-3 text-sm text-destructive">
         {message}
@@ -386,9 +386,8 @@ function Hero({ v }: { v: View }) {
   const isPrep = v.cycle_status === "closed_prep_mode";
   const bannerUrl = typeof v.banner_image_url === "string" ? v.banner_image_url.trim() : "";
   const providerName = v.provider && v.provider !== "—" ? v.provider : "";
-  const wikiByProvider = useWikiImage(providerName, !bannerUrl && !!providerName);
-  const wikiByName = useWikiImage(v.name, !bannerUrl && !providerName);
-  const heroSrc = bannerUrl || wikiByProvider.data || wikiByName.data || null;
+ const photo = useCampusPhoto({ provider: providerName, country: v.country, enabled: !bannerUrl });
+const heroSrc = bannerUrl || photo.data?.url || null;
 
   const save = async () => {
     if (!user) {
@@ -414,35 +413,42 @@ function Hero({ v }: { v: View }) {
           src={heroSrc}
           name={v.name}
           alt={`${v.name} scholarship cover`}
-          className="opacity-35"
+          className="opacity-60"
           loading="eager"
         />
+        <div className="absolute inset-0 bg-gradient-to-t from-background/70 via-background/35 to-background/20" />
       </div>
 
-      <div className="relative z-10 mx-auto max-w-6xl px-4 py-10 text-white">
-        <Link to="/scholarships" className="inline-flex items-center gap-1 text-sm text-white/80 hover:text-white">
+      <div className="relative z-10 mx-auto max-w-6xl px-4 py-10 text-heading">
+        {!bannerUrl && photo.data && (
+  <a href={photo.data.pageUrl} target="_blank" rel="noopener noreferrer"
+     className="absolute bottom-2 right-3 max-w-[70%] truncate text-[10px] text-heading/60 hover:text-heading">
+    Photo: {photo.data.credit}
+  </a>
+)}
+        <Link to="/scholarships" className="inline-flex items-center gap-1 text-sm text-heading/80 hover:text-heading">
           <ArrowLeft className="h-4 w-4" /> All scholarships
         </Link>
 
         <div className="mt-6 grid gap-8 md:grid-cols-[1fr_auto] md:items-end">
           <div>
-            <div className="flex flex-wrap items-center gap-2 text-sm text-white/85">
+            <div className="flex flex-wrap items-center gap-2 text-sm text-heading/85">
               <span className="text-2xl">{v.countryFlag}</span>
               <span>{v.country}</span>
               <span aria-hidden>·</span>
-              <span className="rounded-full bg-white/15 px-2.5 py-0.5 text-xs font-semibold backdrop-blur">
+              <span className="rounded-full bg-heading/15 px-2.5 py-0.5 text-xs font-semibold backdrop-blur">
                 {fundingLabel(v.funding_type)}
               </span>
-              <span className="rounded-full bg-white/15 px-2.5 py-0.5 text-xs font-semibold backdrop-blur">
+              <span className="rounded-full bg-heading/15 px-2.5 py-0.5 text-xs font-semibold backdrop-blur">
                 {providerLabel(v.provider_type)}
               </span>
             </div>
-            <h1 className="mt-3 text-4xl md:text-5xl font-serif font-bold !text-white drop-shadow-xl tracking-tight">
+            <h1 className="mt-3 text-4xl md:text-5xl font-serif font-bold !text-heading drop-shadow-xl tracking-tight">
               {v.name}
             </h1>
-            <p className="text-xl !text-slate-200 mt-4 font-medium">{v.provider}</p>
+            <p className="text-xl !text-muted-foreground mt-4 font-medium">{v.provider}</p>
             {v.description && (
-              <p className="mt-3 max-w-2xl text-sm !text-slate-200 md:text-base">{v.description}</p>
+              <p className="mt-3 max-w-2xl text-sm !text-muted-foreground md:text-base">{v.description}</p>
             )}
 
             <div className="mt-5 inline-flex flex-wrap items-center gap-2">
@@ -453,37 +459,37 @@ function Hero({ v }: { v: View }) {
                   </Button>
                 </a>
               )}
-              <Button variant="outline" onClick={save} className="border-white/30 bg-white/10 text-white hover:bg-white/20">
+              <Button variant="outline" onClick={save} className="border-heading/30 bg-heading/10 text-heading hover:bg-heading/20">
                 <Heart className="mr-2 h-4 w-4" /> Save to Shortlist
               </Button>
             </div>
           </div>
 
           {/* Countdown or prep card */}
-          <div className="rounded-md border border-white/20 bg-black/40 p-5 text-center backdrop-blur">
+          <div className="rounded-md border border-heading/20 bg-background/40 p-5 text-center backdrop-blur">
             {isPrep ? (
               <>
-                <div className="inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-[0.2em] text-amber-200">
+                <div className="inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-[0.2em] text-earth">
                   <CalendarClock className="h-3 w-3" /> Prep mode
                 </div>
-                <div className="mt-3 font-heading text-xl font-bold text-white">
+                <div className="mt-3 font-heading text-xl font-bold text-heading">
                   Portal closed
                 </div>
-                <div className="mt-1 text-sm text-white/85">
-                  Reopens ~ <b className="text-white">{v.expected_next_open_month ?? "next cycle"}</b>
+                <div className="mt-1 text-sm text-heading/85">
+                  Reopens ~ <b className="text-heading">{v.expected_next_open_month ?? "next cycle"}</b>
                 </div>
-                <p className="mt-3 text-xs text-white/75">
+                <p className="mt-3 text-xs text-heading/75">
                   {v.prep_hint ?? "Start collecting references and a draft SOP now."}
                 </p>
               </>
             ) : (
               <>
-                <div className="inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-[0.2em] text-white/70">
+                <div className="inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-[0.2em] text-heading/70">
                   <Clock className="h-3 w-3" />
                   {c.closed ? "Closed" : "Closes in"}
                 </div>
                 {c.closed ? (
-                  <div className="mt-3 font-heading text-2xl font-bold text-white/80">Applications closed</div>
+                  <div className="mt-3 font-heading text-2xl font-bold text-heading/80">Applications closed</div>
                 ) : (
                   <div className="mt-3 grid grid-cols-4 gap-3">
                     {[
@@ -493,27 +499,27 @@ function Hero({ v }: { v: View }) {
                       { v: c.seconds, l: "Sec" },
                     ].map((u) => (
                       <div key={u.l}>
-                        <div className="font-heading text-3xl font-extrabold tabular-nums text-white">
+                        <div className="font-heading text-3xl font-extrabold tabular-nums text-heading">
                           {String(u.v).padStart(2, "0")}
                         </div>
-                        <div className="mt-0.5 text-[10px] uppercase tracking-wide text-white/60">{u.l}</div>
+                        <div className="mt-0.5 text-[10px] uppercase tracking-wide text-heading/60">{u.l}</div>
                       </div>
                     ))}
                   </div>
                 )}
-                <div className="mt-3 text-xs text-white/70">
-                  Deadline: <b className="text-white">{new Date(v.deadline).toLocaleDateString()}</b>
+                <div className="mt-3 text-xs text-heading/70">
+                  Deadline: <b className="text-heading">{new Date(v.deadline).toLocaleDateString()}</b>
                   {!c.closed && d >= 0 && d <= 30 && (
-                    <span className="ml-2 rounded-full bg-destructive px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-white">
+                    <span className="ml-2 rounded-full bg-destructive px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-heading">
                       Urgent
                     </span>
                   )}
                 </div>
               </>
             )}
-            <div className="mt-4 border-t border-white/15 pt-3 text-left text-xs text-white/70">
+            <div className="mt-4 border-t border-heading/15 pt-3 text-left text-xs text-heading/70">
               <div>Total annual value</div>
-              <div className="mt-0.5 font-heading text-base font-bold text-white">{v.amount || "Varies"}</div>
+              <div className="mt-0.5 font-heading text-base font-bold text-heading">{v.amount || "Varies"}</div>
             </div>
           </div>
         </div>
@@ -578,10 +584,10 @@ function FinancialDashboard({ v }: { v: View }) {
 
       <div className="grid gap-4 md:grid-cols-2">
         {/* Covered column */}
-        <div className="rounded-md border border-emerald-200 bg-emerald-50/30 p-5">
-          <div className="mb-3 flex items-center gap-2 border-b border-emerald-200 pb-2">
-            <Check className="h-4 w-4 text-emerald-700" />
-            <h3 className="font-heading text-sm font-bold uppercase tracking-wide text-emerald-800">
+        <div className="rounded-md border border-accent bg-accent/30 p-5">
+          <div className="mb-3 flex items-center gap-2 border-b border-accent pb-2">
+            <Check className="h-4 w-4 text-accent" />
+            <h3 className="font-heading text-sm font-bold uppercase tracking-wide text-accent">
               Covered by award
             </h3>
           </div>
@@ -590,9 +596,9 @@ function FinancialDashboard({ v }: { v: View }) {
               const Icon = c.icon;
               return (
                 <li key={c.label} className="flex items-start gap-3 text-sm">
-                  <Icon className="mt-0.5 h-4 w-4 shrink-0 text-emerald-700" />
+                  <Icon className="mt-0.5 h-4 w-4 shrink-0 text-accent" />
                   <span className="flex-1 text-foreground">{c.label}</span>
-                  {c.note && <span className="text-xs font-semibold text-emerald-700">{c.note}</span>}
+                  {c.note && <span className="text-xs font-semibold text-accent">{c.note}</span>}
                 </li>
               );
             })}
@@ -603,10 +609,10 @@ function FinancialDashboard({ v }: { v: View }) {
         </div>
 
         {/* Out-of-pocket column */}
-        <div className="rounded-md border border-amber-200 bg-amber-50/30 p-5">
-          <div className="mb-3 flex items-center gap-2 border-b border-amber-200 pb-2">
-            <X className="h-4 w-4 text-amber-700" />
-            <h3 className="font-heading text-sm font-bold uppercase tracking-wide text-amber-800">
+        <div className="rounded-md border border-earth bg-earth/30 p-5">
+          <div className="mb-3 flex items-center gap-2 border-b border-earth pb-2">
+            <X className="h-4 w-4 text-earth" />
+            <h3 className="font-heading text-sm font-bold uppercase tracking-wide text-earth">
               You still pay
             </h3>
           </div>
@@ -615,14 +621,14 @@ function FinancialDashboard({ v }: { v: View }) {
               const Icon = c.icon;
               return (
                 <li key={c.label} className="flex items-start gap-3">
-                  <Icon className="mt-0.5 h-4 w-4 shrink-0 text-amber-700" />
+                  <Icon className="mt-0.5 h-4 w-4 shrink-0 text-earth" />
                   <span className="flex-1 text-foreground">{c.label}</span>
-                  {c.note && <span className="text-xs font-semibold text-amber-700">{c.note}</span>}
+                  {c.note && <span className="text-xs font-semibold text-earth">{c.note}</span>}
                 </li>
               );
             })}
             {v.hidden_costs_for_student && (
-              <li className="mt-3 rounded border border-amber-200 bg-white p-3 text-xs leading-relaxed text-amber-900">
+              <li className="mt-3 rounded border border-earth bg-heading p-3 text-xs leading-relaxed text-earth">
                 <b className="block uppercase tracking-wide">Realistic hidden costs</b>
                 <span>{v.hidden_costs_for_student}</span>
               </li>
@@ -632,7 +638,7 @@ function FinancialDashboard({ v }: { v: View }) {
       </div>
 
       {v.hidden_obligations && (
-        <div className="mt-4 rounded-md border border-border bg-white p-5">
+        <div className="mt-4 rounded-md border border-border bg-heading p-5">
           <div className="mb-2 flex items-center gap-2">
             <Sparkles className="h-4 w-4 text-primary" />
             <h3 className="font-heading text-sm font-bold uppercase tracking-wide text-foreground">
@@ -658,7 +664,7 @@ function LanguageMeritMatrix({ v }: { v: View }) {
         </p>
       </header>
       <div className="grid gap-4 md:grid-cols-2">
-        <div className="rounded-md border border-border bg-white p-5">
+        <div className="rounded-md border border-border bg-heading p-5">
           <div className="flex items-center gap-2">
             <Languages className="h-5 w-5 text-primary" />
             <h3 className="font-heading text-sm font-bold uppercase tracking-wide text-foreground">
@@ -668,9 +674,9 @@ function LanguageMeritMatrix({ v }: { v: View }) {
           <div className="mt-4 flex items-start gap-3 text-sm">
             {v.accepts_moi_waiver ? (
               <>
-                <Check className="mt-0.5 h-5 w-5 shrink-0 text-emerald-700" />
+                <Check className="mt-0.5 h-5 w-5 shrink-0 text-accent" />
                 <div>
-                  <b className="text-emerald-700">MOI letter accepted.</b>
+                  <b className="text-accent">MOI letter accepted.</b>
                   <span className="block text-foreground/85">
                     A signed Medium-of-Instruction letter from your previous university typically substitutes for IELTS / TOEFL — saving ~$250 + weeks of test prep. Always confirm on the official portal.
                   </span>
@@ -678,9 +684,9 @@ function LanguageMeritMatrix({ v }: { v: View }) {
               </>
             ) : (
               <>
-                <X className="mt-0.5 h-5 w-5 shrink-0 text-amber-700" />
+                <X className="mt-0.5 h-5 w-5 shrink-0 text-earth" />
                 <div>
-                  <b className="text-amber-800">IELTS / TOEFL required.</b>
+                  <b className="text-earth">IELTS / TOEFL required.</b>
                   <span className="block text-foreground/85">
                     No MOI shortcut for this country. Plan for IELTS Academic 6.5+ or TOEFL iBT 90+ as a typical floor.
                   </span>
@@ -690,7 +696,7 @@ function LanguageMeritMatrix({ v }: { v: View }) {
           </div>
         </div>
 
-        <div className="rounded-md border border-border bg-white p-5">
+        <div className="rounded-md border border-border bg-heading p-5">
           <div className="flex items-center gap-2">
             <GraduationCap className="h-5 w-5 text-primary" />
             <h3 className="font-heading text-sm font-bold uppercase tracking-wide text-foreground">
@@ -767,10 +773,10 @@ function Timeline({ v }: { v: View }) {
       <ol className="relative space-y-5 border-l-2 border-border pl-6">
         {months.map((m, i) => (
           <li key={m.label} className="relative">
-            <span className="absolute -left-[33px] flex h-8 w-8 items-center justify-center rounded-full border-2 border-primary bg-white font-heading text-xs font-bold text-primary">
+            <span className="absolute -left-[33px] flex h-8 w-8 items-center justify-center rounded-full border-2 border-primary bg-heading font-heading text-xs font-bold text-primary">
               {6 - i}
             </span>
-            <div className="rounded-md border border-border bg-white p-4">
+            <div className="rounded-md border border-border bg-heading p-4">
               <h3 className="font-heading text-sm font-bold uppercase tracking-wide text-foreground">
                 {m.label}
               </h3>
@@ -822,7 +828,7 @@ function DocChecklist({ v }: { v: View }) {
           <h2 className="font-heading text-2xl font-bold text-foreground">Document checklist</h2>
         </div>
       </header>
-      <div className="rounded-md border border-border bg-white p-6">
+      <div className="rounded-md border border-border bg-heading p-6">
         <ul className="space-y-3">
           {docs.map((doc) => (
             <li key={doc} className="flex items-start gap-3 text-sm">
@@ -859,7 +865,7 @@ function InsiderTips({ v }: { v: View }) {
       </header>
       <div className="grid gap-4 md:grid-cols-2">
         {tips.map((t) => (
-          <article key={t} className="rounded-md border border-border bg-white p-5">
+          <article key={t} className="rounded-md border border-border bg-heading p-5">
             <blockquote className="border-l-4 border-primary pl-4 text-sm leading-relaxed text-foreground/90">
               "{t}"
             </blockquote>
@@ -878,7 +884,7 @@ function InsiderTips({ v }: { v: View }) {
 function WhoCanApply({ v }: { v: View }) {
   const gpaUS = v.minGpa ?? 3.5;
   return (
-    <section className="rounded-md border border-border bg-white p-6">
+    <section className="rounded-md border border-border bg-heading p-6">
       <div className="flex items-center gap-2">
         <Users className="h-5 w-5 text-primary" />
         <h2 className="font-heading text-2xl font-bold text-foreground">Eligibility</h2>
@@ -966,7 +972,7 @@ function RecipientTips({ v }: { v: View }) {
         </header>
         <div className="grid gap-4 md:grid-cols-2">
           {tips.map((t: any) => (
-            <article key={t.id} className="rounded-md border border-border bg-white p-5">
+            <article key={t.id} className="rounded-md border border-border bg-heading p-5">
               {t.tag && (
                 <span className="mb-2 inline-block rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-primary">
                   {t.tag}
@@ -1017,19 +1023,19 @@ function SuccessStories({ v }: { v: View }) {
         </p>
       </header>
       {!stories || stories.length === 0 ? (
-        <div className="rounded-md border border-dashed border-border bg-white p-10 text-center text-sm text-muted-foreground">
+        <div className="rounded-md border border-dashed border-border bg-heading p-10 text-center text-sm text-muted-foreground">
           No verified success stories indexed yet for this award. Check back after the next cycle.
         </div>
       ) : (
         <div className="grid gap-5 md:grid-cols-2">
           {stories.map((s: any) => (
-            <article key={s.id} className="rounded-md border border-border bg-white p-5">
+            <article key={s.id} className="rounded-md border border-border bg-heading p-5">
               <div className="flex items-center justify-between gap-2">
                 <h3 className="font-heading text-base font-bold text-foreground">
                   Anonymous recipient · {s.applicant_country ?? "Unknown"}
                 </h3>
                 {s.year_awarded && (
-                  <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-bold text-emerald-700">
+                  <span className="rounded-full bg-accent px-2 py-0.5 text-[10px] font-bold text-accent">
                     {s.year_awarded}
                   </span>
                 )}
@@ -1189,7 +1195,7 @@ function OddsCalculator({ v }: { v: View }) {
 
   if (!submitted || !hasInputs) {
     return (
-      <section className="rounded-md border border-border bg-white p-6 shadow-sm">
+      <section className="rounded-md border border-border bg-heading p-6 shadow-sm">
         <div className="flex items-center gap-2">
           <Calculator className="h-5 w-5 text-primary" />
           <h2 className="font-heading text-2xl font-bold text-foreground">Live odds calculator</h2>
@@ -1208,7 +1214,7 @@ function OddsCalculator({ v }: { v: View }) {
             <label className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">IELTS / TOEFL eq.</label>
             <Input type="number" step="0.1" min="0" max="9" value={ielts} onChange={(e) => setIelts(e.target.value)} placeholder="7.0" className="mt-1" disabled={v.accepts_moi_waiver} />
             {v.accepts_moi_waiver
-              ? <p className="mt-1 text-[11px] text-emerald-700">MOI accepted — language counted as full marks</p>
+              ? <p className="mt-1 text-[11px] text-accent">MOI accepted — language counted as full marks</p>
               : <p className="mt-1 text-[11px] text-muted-foreground">Target: {ieltsTarget.toFixed(1)}</p>}
           </div>
           <div>
@@ -1220,7 +1226,7 @@ function OddsCalculator({ v }: { v: View }) {
             <select
               value={eca}
               onChange={(e) => setEca(e.target.value as EcaLevel)}
-              className="mt-1 h-10 w-full rounded-md border border-border bg-white px-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
+              className="mt-1 h-10 w-full rounded-md border border-border bg-heading px-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
             >
               {ECA_OPTIONS.map((o) => (
                 <option key={o.v} value={o.v}>{o.label} — {o.hint}</option>
@@ -1288,7 +1294,7 @@ function OddsCalculator({ v }: { v: View }) {
 
   return (
     <section className="space-y-6">
-      <div className="rounded-md border border-border bg-white p-6 shadow-sm">
+      <div className="rounded-md border border-border bg-heading p-6 shadow-sm">
         <div className="flex items-center gap-2">
           <Calculator className="h-5 w-5 text-primary" />
           <h2 className="font-heading text-2xl font-bold text-foreground">Your match score</h2>
@@ -1332,23 +1338,23 @@ function OddsCalculator({ v }: { v: View }) {
 
       {/* Action plan */}
       <div className="grid gap-4 md:grid-cols-2">
-        <div className="rounded-md border border-emerald-200 bg-emerald-50/40 p-5">
-          <h3 className="flex items-center gap-2 font-heading text-sm font-bold uppercase tracking-wide text-emerald-800">
+        <div className="rounded-md border border-accent bg-accent/40 p-5">
+          <h3 className="flex items-center gap-2 font-heading text-sm font-bold uppercase tracking-wide text-accent">
             <Check className="h-4 w-4" /> Strong points
           </h3>
-          <ul className="mt-3 space-y-2 text-sm text-emerald-900">
+          <ul className="mt-3 space-y-2 text-sm text-accent">
             {strong.length === 0
-              ? <li className="text-emerald-800/70">No standout strengths yet — focus the action plan on the right.</li>
+              ? <li className="text-accent/70">No standout strengths yet — focus the action plan on the right.</li>
               : strong.map((s, i) => <li key={i} className="flex gap-2"><Check className="mt-0.5 h-4 w-4 shrink-0" /><span>{s}</span></li>)}
           </ul>
         </div>
-        <div className="rounded-md border border-amber-300 bg-amber-50/40 p-5">
-          <h3 className="flex items-center gap-2 font-heading text-sm font-bold uppercase tracking-wide text-amber-800">
+        <div className="rounded-md border border-earth bg-earth/40 p-5">
+          <h3 className="flex items-center gap-2 font-heading text-sm font-bold uppercase tracking-wide text-earth">
             <AlertCircle className="h-4 w-4" /> Vulnerabilities
           </h3>
-          <ul className="mt-3 space-y-2 text-sm text-amber-900">
+          <ul className="mt-3 space-y-2 text-sm text-earth">
             {weak.length === 0
-              ? <li className="text-amber-800/70">No major gaps detected. Polish the SOP and submit early.</li>
+              ? <li className="text-earth/70">No major gaps detected. Polish the SOP and submit early.</li>
               : weak.map((s, i) => <li key={i} className="flex gap-2"><AlertCircle className="mt-0.5 h-4 w-4 shrink-0" /><span>{s}</span></li>)}
           </ul>
         </div>
@@ -1369,7 +1375,7 @@ function SubScore({ label, pts, max }: { label: string; pts: number; max: number
         <span className="font-semibold uppercase tracking-wide text-muted-foreground">{label}</span>
         <span className="tabular-nums text-foreground/80">{pts} / {max}</span>
       </div>
-      <div className="h-2 w-full overflow-hidden rounded-full bg-neutral-200">
+      <div className="h-2 w-full overflow-hidden rounded-full bg-raised">
         <div
           className="h-full rounded-full transition-all duration-700 ease-out"
           style={{ width: `${pct}%`, backgroundColor: "#1E3A8A" }}

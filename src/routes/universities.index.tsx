@@ -82,12 +82,12 @@ function UniversitiesPage() {
         </div>
       </div>
 
-      <div className="card-surface mt-5 flex flex-wrap items-center justify-between gap-3 border-emerald-500/30 bg-emerald-500/5 p-4">
+      <div className="card-surface mt-5 flex flex-wrap items-center justify-between gap-3 border-accent/30 bg-accent/5 p-4">
         <p className="text-sm">
-          <Sparkles className="mr-1 inline h-4 w-4 text-emerald-600" />
+          <Sparkles className="mr-1 inline h-4 w-4 text-accent" />
           <b>See your chances</b> at every university — works for any curriculum (HSC, A-Levels, IB, Gaokao, Abitur…).
         </p>
-        <Button asChild size="sm" className="bg-emerald-600 text-white hover:bg-emerald-700">
+        <Button asChild size="sm" className="bg-accent text-heading hover:bg-accent">
           <Link to="/evaluate">✨ Evaluate my profile</Link>
         </Button>
       </div>
@@ -296,22 +296,22 @@ function CatalogBrowser() {
             value={q}
             onChange={(e) => { setQ(e.target.value); setPage(0); }}
             placeholder="Search universities by name…"
-            className="h-11 bg-white pl-9"
+            className="h-11 bg-heading pl-9"
           />
         </div>
         <Select value={region} onValueChange={(v) => { setRegion(v); setCountry("all"); setPage(0); }}>
-          <SelectTrigger className="h-11 bg-white"><SelectValue placeholder="Region" /></SelectTrigger>
+          <SelectTrigger className="h-11 bg-heading"><SelectValue placeholder="Region" /></SelectTrigger>
           <SelectContent>{REGIONS.map(r => <SelectItem key={r.value} value={r.value}>{r.label}</SelectItem>)}</SelectContent>
         </Select>
         <Select value={country} onValueChange={(v) => { setCountry(v); setPage(0); }}>
-          <SelectTrigger className="h-11 bg-white"><SelectValue placeholder="Country" /></SelectTrigger>
+          <SelectTrigger className="h-11 bg-heading"><SelectValue placeholder="Country" /></SelectTrigger>
           <SelectContent>
             <SelectItem value="all">All countries</SelectItem>
             {(countriesQuery.data ?? []).map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}
           </SelectContent>
         </Select>
         <Select value={qsRange} onValueChange={(v) => { setQsRange(v); setPage(0); }}>
-          <SelectTrigger className="h-11 bg-white"><SelectValue placeholder="QS Rank" /></SelectTrigger>
+          <SelectTrigger className="h-11 bg-heading"><SelectValue placeholder="QS Rank" /></SelectTrigger>
           <SelectContent>{QS_RANGES.map(r => <SelectItem key={r.value} value={r.value}>{r.label}</SelectItem>)}</SelectContent>
         </Select>
         <label className="flex items-center gap-2 whitespace-nowrap px-3 text-sm text-foreground">
@@ -365,7 +365,7 @@ function CatalogCard({ u }: { u: any }) {
   const wiki = useWikiImage(u.name, !u.campus_image_url);
   const imageSrc = u.campus_image_url || wiki.data || null;
   return (
-    <article className="group relative flex h-full flex-col overflow-hidden rounded-xl border border-border bg-white transition-all duration-500 hover:-translate-y-1 hover:border-[oklch(0.74_0.10_85_/_0.6)] hover:shadow-[0_20px_40px_-20px_rgba(0,60,40,0.25)]">
+    <article className="group relative flex h-full flex-col overflow-hidden rounded-xl border border-border bg-heading transition-all duration-500 hover:-translate-y-1 hover:border-[oklch(0.74_0.10_85_/_0.6)] hover:shadow-[0_20px_40px_-20px_rgba(0,60,40,0.25)]">
       {/* Top campus image banner */}
       <div className="relative h-40 w-full overflow-hidden" style={{ background: "var(--gradient-hero)" }}>
         <SmartCampusImage src={imageSrc} name={u.name} noOverlay />
@@ -390,9 +390,9 @@ function CatalogCard({ u }: { u: any }) {
           </span>
         )}
         <div className="absolute bottom-3 left-3">
-          <SmartLogo name={u.name} logoUrl={u.logo_url} website={u.website} size={52} className="ring-2 ring-white shadow-xl" />
+          <SmartLogo name={u.name} logoUrl={u.logo_url} website={u.website} size={52} className="ring-2 ring-heading shadow-xl" />
         </div>
-        <div className="absolute bottom-3 right-3 text-[10px] font-semibold uppercase tracking-[0.18em] text-white/90 drop-shadow">
+        <div className="absolute bottom-3 right-3 text-[10px] font-semibold uppercase tracking-[0.18em] text-heading/90 drop-shadow">
           {u.country}
         </div>
       </div>
@@ -482,30 +482,30 @@ export function UniversityCard({ u, match }: { u: University; match?: number }) 
   };
 
   return (
-    <div className="group relative min-h-[280px] overflow-hidden rounded-md border border-border text-white shadow-md transition-all hover:-translate-y-0.5 hover:shadow-2xl">
+    <div className="group relative min-h-[280px] overflow-hidden rounded-md border border-border text-heading shadow-md transition-all hover:-translate-y-0.5 hover:shadow-2xl">
       <SmartCampusImage src={u.campusImageUrl} name={u.name} noOverlay />
-      <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-black/55 to-black/90" aria-hidden />
+      <div className="absolute inset-0 bg-gradient-to-b from-background/30 via-background/55 to-background/90" aria-hidden />
       <div className="relative z-[1] flex h-full min-h-[280px] flex-col p-5 md:p-6">
         <div className="flex flex-wrap items-start justify-between gap-2">
           <div className="flex items-center gap-2">
-            <span className="rounded-md bg-white/15 px-2 py-0.5 text-xs font-semibold backdrop-blur">#{u.qsRank}</span>
+            <span className="rounded-md bg-heading/15 px-2 py-0.5 text-xs font-semibold backdrop-blur">#{u.qsRank}</span>
             <span className="text-xl">{u.countryFlag}</span>
-            <span className="text-xs text-white/85">{u.country}</span>
+            <span className="text-xs text-heading/85">{u.country}</span>
           </div>
           <div className="flex items-center gap-2">
             {typeof match === "number" && (
-              <span className="rounded-full bg-emerald-500 px-2.5 py-0.5 text-xs font-bold text-white">{match}% match</span>
+              <span className="rounded-full bg-accent px-2.5 py-0.5 text-xs font-bold text-heading">{match}% match</span>
             )}
-            <span className="rounded-full bg-white/15 px-2.5 py-0.5 text-xs font-semibold backdrop-blur">{u.dealTag}</span>
+            <span className="rounded-full bg-heading/15 px-2.5 py-0.5 text-xs font-semibold backdrop-blur">{u.dealTag}</span>
           </div>
         </div>
 
         <div className="mt-auto pt-8">
           <h3 className="font-heading text-2xl font-extrabold leading-tight md:text-3xl">{u.name}</h3>
-          <p className="mt-2 line-clamp-2 max-w-2xl text-sm text-white/85">{u.blurb}</p>
+          <p className="mt-2 line-clamp-2 max-w-2xl text-sm text-heading/85">{u.blurb}</p>
           <div className="mt-4 flex flex-wrap items-end justify-between gap-3">
             <div className="space-y-0.5 text-sm">
-              <div className="text-[10px] uppercase tracking-wide text-white/70">Tuition · Deadline</div>
+              <div className="text-[10px] uppercase tracking-wide text-heading/70">Tuition · Deadline</div>
               <div className="font-semibold">{u.tuition} · {u.deadline}</div>
             </div>
             <div className="flex flex-wrap items-center gap-2">
@@ -514,7 +514,7 @@ export function UniversityCard({ u, match }: { u: University; match?: number }) 
                 size="sm"
                 onClick={onCompare}
                 disabled={cmpFull || inCmp}
-                className={`border-white/30 bg-white/10 backdrop-blur hover:bg-white/20 ${inCmp ? "text-emerald-300" : "text-white"}`}
+                className={`border-heading/30 bg-heading/10 backdrop-blur hover:bg-heading/20 ${inCmp ? "text-accent" : "text-heading"}`}
               >
                 <GitCompare className="mr-1 h-4 w-4" />
                 {inCmp ? "Added ✓" : cmpFull ? "Compare full" : "Compare"}
@@ -524,7 +524,7 @@ export function UniversityCard({ u, match }: { u: University; match?: number }) 
                 size="sm"
                 onClick={save}
                 disabled={saving}
-                className="border-white/30 bg-white/10 text-white backdrop-blur hover:bg-white/20"
+                className="border-heading/30 bg-heading/10 text-heading backdrop-blur hover:bg-heading/20"
               >
                 <Heart className="mr-1 h-4 w-4" /> Save
               </Button>
@@ -606,7 +606,7 @@ function HipolabsFallback({ query }: { query: string }) {
       {hipoQuery.isFetching && (
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {[0, 1, 2].map((i) => (
-            <div key={i} className="h-24 animate-pulse rounded-md border border-dashed border-border bg-neutral-50" />
+            <div key={i} className="h-24 animate-pulse rounded-md border border-dashed border-border bg-raised" />
           ))}
         </div>
       )}
@@ -631,7 +631,7 @@ function HipolabsFallback({ query }: { query: string }) {
                   to="/universities/$slug"
                   params={{ slug }}
                   search={{ name: u.name, country: u.country }}
-                  className="group flex flex-col rounded-md border border-dashed border-border bg-white p-4 transition-all hover:-translate-y-0.5 hover:border-primary/60 hover:shadow-sm"
+                  className="group flex flex-col rounded-md border border-dashed border-border bg-heading p-4 transition-all hover:-translate-y-0.5 hover:border-primary/60 hover:shadow-sm"
                 >
                   <div className="flex items-start gap-3">
                     <SmartLogo name={u.name} website={site} size={40} />
