@@ -682,7 +682,7 @@ function ScholarshipCard({ s, variant }: { s: ViewSch; variant: "active" | "prep
           className="transition-transform duration-700 group-hover:scale-[1.04]"
           noOverlay
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/50 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#1d080d]/95 via-[#2a0e14]/80 to-transparent" />
       </div>
 
       <div className="absolute right-3 top-3 z-10 flex items-center gap-1.5">
