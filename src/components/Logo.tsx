@@ -11,7 +11,7 @@ export function Logo({ className = "" }: { className?: string; showWord?: boolea
         className="h-10 w-10 rounded-full object-cover shadow-[0_2px_10px_-2px_rgba(101,31,43,0.4)] transition-transform duration-500 group-hover:rotate-[5deg]"
       />
       <span className="font-heading text-[1.4rem] font-bold leading-none tracking-tight text-foreground">
-        Find<span className="italic font-medium gradient-text">Further</span>
+        Find<span className="font-bold gradient-text">Further</span>
       </span>
     </Link>
   );
