@@ -295,7 +295,7 @@ function ScholarshipsHub() {
       >
         <div
           aria-hidden
-          className="pointer-events-none absolute inset-0 opacity-70"
+          className="pointer-events-none absolute inset-0 opacity-90"
           style={{
             background:
               "radial-gradient(ellipse 70% 60% at 80% 0%, rgba(217,181,101,.18), transparent 65%), radial-gradient(ellipse 60% 50% at 10% 100%, rgba(120,35,50,.5), transparent 60%)",
