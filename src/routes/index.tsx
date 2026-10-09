@@ -73,10 +73,10 @@ function Hero() {
                 A curated registry of premier universities and prestigious scholarship opportunities — for the modern scholar applying abroad.
               </p>
               <div className="mt-7 flex flex-wrap gap-3">
-                <Button asChild className="rounded-none bg-gold px-7 py-6 font-semibold uppercase tracking-[0.2em] text-xs hover:bg-[#f5f0e0]" style={{ color: "oklch(0.32 0.07 162)" }}>
+                <Button asChild className="rounded-none bg-[#f5f0e0]! px-7 py-6 font-semibold uppercase tracking-[0.2em] text-xs text-[#651F2B]! hover:bg-gold!">
                   <Link to="/universities">Begin Inquiry</Link>
                 </Button>
-                <Button asChild variant="outline" className="rounded-none border-gold bg-transparent px-7 py-6 font-semibold uppercase tracking-[0.2em] text-xs text-gold hover:bg-gold hover:text-[oklch(0.32_0.07_162)]">
+                <Button asChild variant="outline" className="rounded-none border-gold bg-transparent! px-7 py-6 font-semibold uppercase tracking-[0.2em] text-xs text-[#f5f0e0]! hover:bg-gold! hover:text-[#651F2B]!">
                   <Link to="/scholarships">View Catalog</Link>
                 </Button>
               </div>
