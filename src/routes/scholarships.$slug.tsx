@@ -406,8 +406,7 @@ const heroSrc = bannerUrl || photo.data?.url || null;
   };
 
   return (
-    <div className="relative w-full overflow-hidden border-b border-border" style={{ minHeight: 400 }}>
-      <div className="absolute inset-0 z-0">
+    <<div className="absolute inset-0 z-0">
         <TopoBackground />
         <SmartCampusImage
           src={heroSrc}
@@ -415,9 +414,10 @@ const heroSrc = bannerUrl || photo.data?.url || null;
           alt={`${v.name} scholarship cover`}
           className="object-cover h-full w-full"
           loading="eager"
+          noOverlay
         />
-        {/* Dark gradient on the left/bottom for text, fading to transparent on the right/top */}
-        <div className="absolute inset-0 bg-gradient-to-t from-[#f5f0e0] via-[#f5f0e0]/90 to-transparent to-70% md:bg-gradient-to-r md:from-[#f5f0e0] md:via-[#f5f0e0]/80 md:to-transparent" />
+        {/* Tighter gradient that stops halfway across the screen */}
+        <div className="absolute inset-0 bg-gradient-to-t from-background via-background/90 to-transparent to-70% md:bg-gradient-to-r md:from-background md:via-background/60 md:to-transparent md:to-50%" />
       </div>
       <div className="relative z-10 mx-auto max-w-6xl px-4 py-10 text-heading">
         {!bannerUrl && photo.data && (
