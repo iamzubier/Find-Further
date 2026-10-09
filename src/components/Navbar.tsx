@@ -57,8 +57,8 @@ export function Navbar({ profileStrength }: { profileStrength?: number }) {
     <header
       className={`sticky top-0 z-50 transition-all duration-500 ${
         scrolled
-          ? "border-b border-border bg-white/85 backdrop-blur-xl shadow-[0_1px_0_oklch(0.74_0.10_85_/_0.25)]"
-          : "border-b border-transparent bg-white/60 backdrop-blur-md"
+          ? "border-b border-border bg-background"
+          : "border-b border-transparent bg-background"
       }`}
     >
             <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 md:grid md:grid-cols-[1fr_auto_1fr] lg:px-6">
@@ -74,8 +74,8 @@ export function Navbar({ profileStrength }: { profileStrength?: number }) {
             <div
               className="flex items-center gap-2 rounded-full border px-3 py-1 text-[11px]"
               style={{
-                borderColor: "oklch(0.74 0.10 85 / 0.45)",
-                background: "linear-gradient(135deg, oklch(0.74 0.10 85 / 0.08), transparent)",
+                borderColor: "var(--border)",
+                background: "var(--card)",
               }}
             >
               <Sparkles className="h-3 w-3 text-gold" />
@@ -100,7 +100,7 @@ export function Navbar({ profileStrength }: { profileStrength?: number }) {
               <Button
                 asChild
                 size="sm"
-                className="gold-sheen text-[13px] font-semibold text-primary-foreground shadow-[0_4px_14px_-4px_rgba(0,60,40,0.45)] transition-all hover:shadow-[0_6px_20px_-4px_rgba(0,60,40,0.55)]"
+                className="gold-sheen text-[13px] font-semibold text-primary-foreground transition-opacity hover:opacity-90"
                 style={{ background: "var(--gradient-emerald)" }}
               >
                 <Link to="/auth" search={{ tab: "signup" }}>Sign up</Link>
