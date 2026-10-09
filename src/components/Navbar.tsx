@@ -8,11 +8,9 @@ import { Logo } from "@/components/Logo";
 
 export function Navbar({ profileStrength }: { profileStrength?: number }) {
   const { user, loading } = useAuth();
-        <span className="gold-text font-heading italic">F</span>
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-        <span className="font-heading text-[1.5rem] font-semibold uppercase leading-none tracking-wide text-foreground">
-        Find<span className="font-semibold text-accent">Further</span>
-      </span>
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 8);
     onScroll();
