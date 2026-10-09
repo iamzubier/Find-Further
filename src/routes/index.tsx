@@ -76,7 +76,7 @@ function Hero() {
                 <Button asChild className="rounded-none bg-[#f5f0e0]! px-7 py-6 font-semibold uppercase tracking-[0.2em] text-xs text-[#651F2B]! hover:bg-gold!">
                   <Link to="/universities">Begin Inquiry</Link>
                 </Button>
-                <Button asChild variant="outline" className="rounded-none border-gold bg-transparent! px-7 py-6 font-semibold uppercase tracking-[0.2em] text-xs text-[#f5f0e0]! hover:bg-gold! hover:text-[#651F2B]!">
+                <Button asChild className="rounded-none border border-[#C9A24A] bg-transparent! px-7 py-6 font-semibold uppercase tracking-[0.2em] text-xs text-[#f5f0e0]! hover:bg-[#C9A24A]! hover:text-[#651F2B]!">
                   <Link to="/scholarships">View Catalog</Link>
                 </Button>
               </div>
