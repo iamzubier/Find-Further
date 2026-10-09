@@ -8,9 +8,11 @@ import { Logo } from "@/components/Logo";
 
 export function Navbar({ profileStrength }: { profileStrength?: number }) {
   const { user, loading } = useAuth();
-  const pathname = useRouterState({ select: (s) => s.location.pathname });
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const { location } = useRouterState();
+  const pathname = location.pathname;
+
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 8);
     onScroll();
@@ -57,25 +59,25 @@ export function Navbar({ profileStrength }: { profileStrength?: number }) {
     <header
       className={`sticky top-0 z-50 transition-all duration-500 ${
         scrolled
-          ? "border-b border-border bg-background"
-          : "border-b border-transparent bg-background"
+          ? "border-b border-border bg-[#FAF3E8]/95 backdrop-blur-xl shadow-[0_1px_0_rgba(101,31,43,.16)]"
+          : "border-b border-transparent bg-[#FAF3E8]/90 backdrop-blur-md"
       }`}
     >
-            <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 md:grid md:grid-cols-[1fr_auto_1fr] lg:px-6">
-                <Logo className="justify-self-start" />
+      <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 lg:px-6">
+        <Logo />
 
-                <nav className="hidden items-center justify-self-center gap-8 md:flex">
+        <nav className="hidden items-center gap-8 md:flex">
           {links.map((l) => <NavLink key={l.to} {...l} />)}
           {authedLinks.map((l) => <NavLink key={l.to} {...l} />)}
         </nav>
 
-                <div className="hidden items-center gap-3 justify-self-end md:flex">
+        <div className="hidden items-center gap-3 ml-auto md:flex">
           {typeof profileStrength === "number" && user && (
             <div
               className="flex items-center gap-2 rounded-full border px-3 py-1 text-[11px]"
               style={{
-                borderColor: "var(--border)",
-                background: "var(--card)",
+                borderColor: "oklch(0.74 0.10 85 / 0.45)",
+                background: "linear-gradient(135deg, oklch(0.74 0.10 85 / 0.08), transparent)",
               }}
             >
               <Sparkles className="h-3 w-3 text-gold" />
@@ -100,7 +102,7 @@ export function Navbar({ profileStrength }: { profileStrength?: number }) {
               <Button
                 asChild
                 size="sm"
-                className="gold-sheen text-[13px] font-semibold text-primary-foreground transition-opacity hover:opacity-90"
+                className="gold-sheen text-[13px] font-semibold text-primary-foreground shadow-[0_4px_14px_-4px_rgba(0,60,40,0.45)] transition-all hover:shadow-[0_6px_20px_-4px_rgba(0,60,40,0.55)]"
                 style={{ background: "var(--gradient-emerald)" }}
               >
                 <Link to="/auth" search={{ tab: "signup" }}>Sign up</Link>

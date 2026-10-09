@@ -4,7 +4,7 @@ import { Twitter, Instagram, Linkedin, Facebook } from "lucide-react";
 
 export function Footer() {
   return (
-    <footer className="mt-24 relative overflow-hidden" style={{ background: "var(--gradient-hero)" }}>
+    <footer className="mt-24 relative overflow-hidden border-t border-border" style={{ background: "#1D3B46" }}>
       {/* Top gold hairline */}
       <div className="hairline-gold" />
       {/* Subtle radial highlight */}
