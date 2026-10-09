@@ -54,7 +54,7 @@ function Hero() {
           {/* Brand & Hero — Deep Emerald with library backdrop */}
           <div className="md:col-span-8 md:row-span-2 relative overflow-hidden border-b-4 border-gold p-8 md:p-12 flex flex-col justify-between text-[#f5f0e0] min-h-[460px]">
             <img src={heroLibrary} alt="" className="absolute inset-0 h-full w-full object-cover" />
-            <div aria-hidden className="absolute inset-0" style={{ background: "linear-gradient(120deg, oklch(0.28 0.07 162 / 0.92) 0%, oklch(0.32 0.07 162 / 0.82) 50%, oklch(0.20 0.05 162 / 0.88) 100%)" }} />
+            <div aria-hidden className="absolute inset-0" style={{ background: "linear-gradient(120deg, oklch(0.30 0.09 330 / 0.88) 0%, oklch(0.34 0.09 330 / 0.72) 50%, oklch(0.22 0.06 330 / 0.85) 100%)" }} />
             <div aria-hidden className="absolute inset-0 grain-overlay pointer-events-none" />
             <div className="relative z-10">
               <span className="font-heading italic text-gold text-lg md:text-xl mb-3 block">FindFurther</span>
@@ -67,10 +67,10 @@ function Hero() {
                 A curated registry of premier universities and prestigious scholarship opportunities — for the modern scholar applying abroad.
               </p>
               <div className="mt-7 flex flex-wrap gap-3">
-                <Button asChild className="rounded-none bg-gold px-7 py-6 font-semibold uppercase tracking-[0.2em] text-xs hover:bg-[#f5f0e0]" style={{ color: "oklch(0.32 0.07 162)" }}>
+                <Button asChild className="rounded-none bg-gold px-7 py-6 font-semibold uppercase tracking-[0.2em] text-xs hover:bg-[#f5f0e0]" style={{ color: "oklch(0.30 0.09 330)" }}>
                   <Link to="/universities">Begin Inquiry</Link>
                 </Button>
-                <Button asChild variant="outline" className="rounded-none border-gold bg-transparent px-7 py-6 font-semibold uppercase tracking-[0.2em] text-xs text-gold hover:bg-gold hover:text-[oklch(0.32_0.07_162)]">
+                <Button asChild variant="outline" className="rounded-none border-gold bg-transparent px-7 py-6 font-semibold uppercase tracking-[0.2em] text-xs text-gold hover:bg-gold hover:text-[oklch(0.30_0.09_330)]">
                   <Link to="/scholarships">View Catalog</Link>
                 </Button>
               </div>
@@ -89,7 +89,7 @@ function Hero() {
           {/* Registry — vertical list */}
           <div className="md:col-span-4 md:row-span-3 bg-card p-7 md:p-8 border border-gold/30 flex flex-col">
             <div className="border-b border-gold pb-4 mb-6 flex justify-between items-end">
-              <h3 className="font-heading text-2xl text-foreground">Registry</h3>
+              <h3 className="font-heading text-2xl text-foreground">Latest</h3>
               <span className="text-[10px] uppercase tracking-[0.18em] text-gold font-semibold">Active Grants</span>
             </div>
             <div className="space-y-7 flex-1">
@@ -109,7 +109,7 @@ function Hero() {
           </div>
 
           {/* Search — Emerald glow */}
-          <div className="md:col-span-5 p-7 md:p-8 flex flex-col justify-center text-[#f5f0e0]" style={{ background: "oklch(0.50 0.11 162)" }}>
+          <div className="md:col-span-5 p-7 md:p-8 flex flex-col justify-center text-[#f5f0e0]" style={{ background: "oklch(0.48 0.12 330)" }}>
             <label className="text-[10px] uppercase tracking-[0.22em] mb-4 text-gold font-bold">Discovery Tool</label>
             <form
               onSubmit={(e) => {
@@ -165,7 +165,7 @@ function Hero() {
           {/* Closing maxim — lamp backdrop */}
           <div className="md:col-span-4 relative overflow-hidden p-8 flex flex-col justify-center border-l-4 border-gold text-[#f5f0e0] min-h-[260px]">
             <img src={tipsImg} alt="" className="absolute inset-0 h-full w-full object-cover" />
-            <div aria-hidden className="absolute inset-0" style={{ background: "linear-gradient(135deg, oklch(0.32 0.07 162 / 0.94) 0%, oklch(0.20 0.05 162 / 0.92) 100%)" }} />
+            <div aria-hidden className="absolute inset-0" style={{ background: "linear-gradient(135deg, oklch(0.32 0.09 330 / 0.92) 0%, oklch(0.20 0.06 330 / 0.90) 100%)" }} />
             <p className="relative font-heading italic text-base md:text-lg leading-snug text-[#f5f0e0]">
               "The beautiful thing about learning is that no one can take it away from you."
             </p>
@@ -232,7 +232,7 @@ function FeatureTrio() {
     {
       icon: Compass, kicker: "Chapter I", title: "Explore Universities Across The world",
       body: "Browse 10,000+ universities worldwide — filter by region, country, program, and tuition with precision tools.",
-      cta: "Explore universities", to: "/universities" as const, image: "C:\Users\ONE\Downloads\github\Dream Travel Bucket List ✈️ _ Most Beautiful Places Around the World 🌍.jpeg",
+      cta: "Explore universities", to: "/universities" as const, image: exploreImg,
     },
     {
       icon: GitCompare, kicker: "Chapter II", title: "Compare side-by-side",
