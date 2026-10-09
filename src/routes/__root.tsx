@@ -17,6 +17,7 @@ import { Footer } from "@/components/Footer";
 import { CompareTray } from "@/components/CompareTray";
 import { Toaster } from "@/components/ui/sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { OFFICIAL_LOGO_URL } from "@/components/Logo";
 
 
 function NotFoundComponent() {
@@ -77,10 +78,11 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:title", content: "FindFurther — Find your university. Know your chances. Get in." },
       { name: "twitter:description", content: "Find your path to the world's best universities. Live tuition, scholarships, real student tips, and an AI advisor — for students worldwide." },
-      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/2425a2bc-0171-48bd-9071-f843d2987e75/id-preview-39b034da--274d7c91-5cdd-47da-ba96-0d50f890c26f.lovable.app-1779653228260.png" },
-      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/2425a2bc-0171-48bd-9071-f843d2987e75/id-preview-39b034da--274d7c91-5cdd-47da-ba96-0d50f890c26f.lovable.app-1779653228260.png" },
+      { property: "og:image", content: OFFICIAL_LOGO_URL },
+      { name: "twitter:image", content: OFFICIAL_LOGO_URL },
     ],
     links: [
+      { rel: "icon", href: OFFICIAL_LOGO_URL, type: "image/png" },
       { rel: "stylesheet", href: appCss },
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "" },
