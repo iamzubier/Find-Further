@@ -679,10 +679,10 @@ function ScholarshipCard({ s, variant }: { s: ViewSch; variant: "active" | "prep
           src={imageSrc}
           name={s.name}
           alt={`${s.name} scholarship cover`}
-          className="opacity-60 transition-transform duration-700 group-hover:scale-[1.04]"
+          className="transition-transform duration-700 group-hover:scale-[1.04]"
           noOverlay
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-[#2a0e14]/40 via-[#43151d]/65 to-[#1d080d]/95" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/50 to-transparent" />
       </div>
 
       <div className="absolute right-3 top-3 z-10 flex items-center gap-1.5">
