@@ -60,7 +60,7 @@ function Hero() {
           {/* Brand & Hero — Deep Emerald with library backdrop */}
           <div className="md:col-span-8 md:row-span-2 relative overflow-hidden border-b-4 border-gold p-8 md:p-12 flex flex-col justify-between text-[#f5f0e0] min-h-[460px]">
             <img src={heroLibrary} alt="" className="absolute inset-0 h-full w-full object-cover" />
-            <div aria-hidden className="absolute inset-0" style={{ background: "linear-gradient(120deg, rgba(36,72,85,.94) 0%, rgba(45,83,93,.84) 50%, rgba(29,59,70,.94) 100%)" }} />
+            <div aria-hidden className="absolute inset-0" style={{ background: "linear-gradient(120deg, rgba(101,31,43,.94) 0%, rgba(101,31,43,.82) 50%, rgba(67,21,29,.95) 100%)" }} />
             <div aria-hidden className="absolute inset-0 grain-overlay pointer-events-none" />
             <div className="relative z-10">
               <span className="font-heading italic text-gold text-lg md:text-xl mb-3 block">FindFurther</span>
@@ -115,7 +115,7 @@ function Hero() {
           </div>
 
           {/* Search — Emerald glow */}
-          <div className="md:col-span-5 p-7 md:p-8 flex flex-col justify-center text-[#f5f0e0]" style={{ background: "oklch(0.50 0.11 162)" }}>
+          <div className="md:col-span-5 p-7 md:p-8 flex flex-col justify-center text-[#f5f0e0]" style={{ background: "#651F2B" }}>
             <label className="text-[10px] uppercase tracking-[0.22em] mb-4 text-gold font-bold">Discovery Tool</label>
             <form
               onSubmit={(e) => {
@@ -171,7 +171,7 @@ function Hero() {
           {/* Closing maxim — lamp backdrop */}
           <div className="md:col-span-4 relative overflow-hidden p-8 flex flex-col justify-center border-l-4 border-gold text-[#f5f0e0] min-h-[260px]">
             <img src={tipsImg} alt="" className="absolute inset-0 h-full w-full object-cover" />
-            <div aria-hidden className="absolute inset-0" style={{ background: "linear-gradient(135deg, oklch(0.32 0.07 162 / 0.94) 0%, oklch(0.20 0.05 162 / 0.92) 100%)" }} />
+            <div aria-hidden className="absolute inset-0" style={{ background: "linear-gradient(135deg, rgba(101,31,43,.94) 0%, rgba(67,21,29,.94) 100%)" }} />
             <p className="relative font-heading italic text-base md:text-lg leading-snug text-[#f5f0e0]">
               "The beautiful thing about learning is that no one can take it away from you."
             </p>
