@@ -413,12 +413,12 @@ const heroSrc = bannerUrl || photo.data?.url || null;
           src={heroSrc}
           name={v.name}
           alt={`${v.name} scholarship cover`}
-          className="opacity-60"
+          className="object-cover h-full w-full"
           loading="eager"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-background/70 via-background/35 to-background/20" />
+        {/* Dark gradient on the left/bottom for text, fading to transparent on the right/top */}
+        <div className="absolute inset-0 bg-gradient-to-t from-[#f5f0e0] via-[#f5f0e0]/90 to-transparent to-70% md:bg-gradient-to-r md:from-[#f5f0e0] md:via-[#f5f0e0]/80 md:to-transparent" />
       </div>
-
       <div className="relative z-10 mx-auto max-w-6xl px-4 py-10 text-heading">
         {!bannerUrl && photo.data && (
   <a href={photo.data.pageUrl} target="_blank" rel="noopener noreferrer"
