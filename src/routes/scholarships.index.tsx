@@ -246,21 +246,22 @@ function ScholarshipsHub() {
     });
   }, [all, level, budget, profile, providerType, region, noFee, moiOnly, satOnly, hasUserSat, satNum, q]);
 
-  const active = useMemo(
-    () =>
-      filtered
-        .filter((s) => s.cycle_status === "active_open" || s.cycle_status === "rolling_admissions")
-        .sort((a, b) => {
-          if (!a.deadline) return 1;
-          if (!b.deadline) return -1;
-          return +new Date(a.deadline) - +new Date(b.deadline);
-        }),
-    [filtered],
-  );
-  const prepMode = useMemo(
-    () => filtered.filter((s) => s.cycle_status === "closed_prep_mode"),
-    [filtered],
-  );
+    const { active, prepMode } = useMemo(() => {
+    const isOpenNow = (s: ViewSch) => {
+      if (s.cycle_status === "rolling_admissions") return true;
+      if (s.cycle_status !== "active_open") return false;
+      return !s.deadline || daysLeft(s.deadline) >= 0;
+    };
+    const open = filtered.filter(isOpenNow).sort((a, b) => {
+      if (!a.deadline) return 1;
+      if (!b.deadline) return -1;
+      return +new Date(a.deadline) - +new Date(b.deadline);
+    });
+    const rest = filtered.filter(
+      (s) => !isOpenNow(s) && (s.cycle_status === "closed_prep_mode" || s.cycle_status === "active_open"),
+    );
+    return { active: open, prepMode: rest };
+  }, [filtered]);
 
   const closingSoon = active.filter((s) => {
     if (!s.deadline) return false;
@@ -288,66 +289,62 @@ function ScholarshipsHub() {
   return (
     <div>
       {/* ─── Cinematic Hero ─── */}
-      <section
+            <section
         className="relative overflow-hidden"
-        style={{ background: "var(--gradient-hero)" }}
+        style={{ background: "linear-gradient(135deg,#651F2B 0%,#4a1620 60%,#2a0e14 100%)" }}
       >
         <div
           aria-hidden
           className="pointer-events-none absolute inset-0 opacity-70"
           style={{
             background:
-              "radial-gradient(ellipse 70% 60% at 80% 0%, oklch(0.74 0.10 85 / 0.22), transparent 65%), radial-gradient(ellipse 60% 50% at 10% 100%, oklch(0.52 0.12 160 / 0.35), transparent 60%)",
+              "radial-gradient(ellipse 70% 60% at 80% 0%, rgba(217,181,101,.18), transparent 65%), radial-gradient(ellipse 60% 50% at 10% 100%, rgba(120,35,50,.5), transparent 60%)",
           }}
         />
         <div
           aria-hidden
-          className="pointer-events-none absolute inset-0 opacity-[0.06]"
+          className="pointer-events-none absolute inset-0"
           style={{
             backgroundImage:
-              "linear-gradient(oklch(0.74 0.10 85) 1px, transparent 1px), linear-gradient(90deg, oklch(0.74 0.10 85) 1px, transparent 1px)",
+              "linear-gradient(rgba(217,181,101,.07) 1px, transparent 1px), linear-gradient(90deg, rgba(217,181,101,.07) 1px, transparent 1px)",
             backgroundSize: "56px 56px",
           }}
         />
-        <div className="hairline-gold absolute inset-x-0 top-0" />
 
         <div className="relative mx-auto max-w-7xl px-4 pt-16 pb-12 md:pt-24 md:pb-16 lg:px-6">
-          <div className="mb-8 flex items-center gap-3 text-[10px] font-bold uppercase tracking-[0.28em] text-heading/60">
-            <span className="h-px w-10 bg-gold/60" />
+          <div className="mb-8 flex items-center gap-3 text-[10px] font-bold uppercase tracking-[0.28em] text-[#f5f0e0]/60">
+            <span className="h-px w-10 bg-[#D9B565]/60" />
             Vol. {new Date().getFullYear()} — Atlas
-            <span className="h-px w-10 bg-gold/60" />
+            <span className="h-px w-10 bg-[#D9B565]/60" />
           </div>
 
-          <h1 className="font-heading text-6xl font-extrabold leading-[0.95] tracking-tight text-heading md:text-[7.5rem]">
-            <span className="serif-italic gold-text font-medium">Funded.</span>
+          <h1 className="font-heading text-6xl font-extrabold leading-[0.95] tracking-tight text-[#f5f0e0] md:text-[7.5rem]">
+            <span className="font-medium italic text-[#D9B565]">Funded.</span>
           </h1>
-          <div className="mt-4 font-heading text-2xl font-light tracking-tight text-heading/80 md:text-3xl">
+          <div className="mt-4 font-heading text-2xl font-light tracking-tight text-[#f5f0e0]/80 md:text-3xl">
             Everywhere worth going.
           </div>
 
-          {/* KPI strip — bigger, breathier, the headline does the talking */}
-          <div className="mt-12 grid max-w-4xl grid-cols-2 gap-px overflow-hidden rounded-md border border-heading/10 bg-heading/5 sm:grid-cols-4">
+          <div className="mt-12 grid max-w-4xl grid-cols-2 gap-px overflow-hidden rounded-md border border-[#f5f0e0]/15 bg-[#f5f0e0]/15 sm:grid-cols-4">
             {[
               { v: all.length, l: "Awards" },
               { v: fullyFundedCount, l: "Fully funded" },
               { v: noFeeCount, l: "$0 to apply" },
               { v: countriesCount, l: "Countries" },
             ].map((k) => (
-              <div key={k.l} className="bg-[oklch(0.18_0.04_160_/_0.6)] px-6 py-6 backdrop-blur">
-                <div className="font-heading text-4xl font-bold tabular-nums text-heading md:text-5xl">
+              <div key={k.l} className="bg-[#2a0e14]/70 px-6 py-6 backdrop-blur">
+                <div className="font-heading text-4xl font-bold tabular-nums text-[#f5f0e0] md:text-5xl">
                   {k.v}
                 </div>
-                <div className="mt-1.5 text-[10px] font-semibold uppercase tracking-[0.22em] text-gold/80">
+                <div className="mt-1.5 text-[10px] font-semibold uppercase tracking-[0.22em] text-[#D9B565]">
                   {k.l}
                 </div>
               </div>
             ))}
           </div>
 
-          {/* Level switcher — luxury pill tabs */}
           <div className="mt-10">
-            <div className="inline-flex flex-wrap gap-1.5 rounded-full border border-heading/10 bg-background/20 p-1.5 backdrop-blur-xl">
-
+            <div className="inline-flex flex-wrap gap-1.5 rounded-full border border-[#f5f0e0]/20 bg-[#2a0e14]/40 p-1.5 backdrop-blur-xl">
               {LEVELS.map((l) => {
                 const Icon = l.icon;
                 const isActive = level === l.key;
@@ -356,17 +353,16 @@ function ScholarshipsHub() {
                   <button
                     key={l.key}
                     onClick={() => setLevel(l.key)}
-                    className={`group relative inline-flex items-center gap-2 rounded-full px-4 py-2.5 text-[13px] font-semibold transition-all duration-500 ${
+                    className={`inline-flex items-center gap-2 rounded-full px-4 py-2.5 text-[13px] font-semibold transition-all duration-300 ${
                       isActive
-                        ? "text-accent shadow-[0_4px_18px_-4px_oklch(0.74_0.10_85_/_0.55)]"
-                        : "text-heading/75 hover:text-heading"
+                        ? "bg-[#f5f0e0] text-[#651F2B] shadow-lg"
+                        : "text-[#f5f0e0]/80 hover:text-[#f5f0e0]"
                     }`}
-                    style={isActive ? { background: "var(--gradient-gold)" } : undefined}
                   >
                     <Icon className="h-3.5 w-3.5" />
                     <span>{l.label}</span>
                     <span className={`rounded-full px-1.5 py-0.5 text-[10px] font-bold tabular-nums ${
-                      isActive ? "bg-accent/15 text-accent" : "bg-heading/10 text-heading/60"
+                      isActive ? "bg-[#651F2B]/15 text-[#651F2B]" : "bg-[#f5f0e0]/15 text-[#f5f0e0]/70"
                     }`}>
                       {count}
                     </span>
@@ -630,17 +626,20 @@ function ScholarshipCard({ s, variant }: { s: ViewSch; variant: "active" | "prep
   const { user } = useAuth();
   const [saving, setSaving] = useState(false);
   const d = s.deadline ? daysLeft(s.deadline) : null;
+  const isRolling = s.cycle_status === "rolling_admissions";
 
   const countdownCls =
-    d === null
-      ? "bg-heading/15 text-heading/80 ring-heading/20"
+    isRolling || d === null
+      ? "bg-[#f5f0e0]/15 text-[#f5f0e0] ring-[#f5f0e0]/30"
       : d < 0
-      ? "bg-heading/15 text-heading/80 ring-heading/20"
+      ? "bg-[#f5f0e0]/15 text-[#f5f0e0]/70 ring-[#f5f0e0]/25"
       : d <= 10
-      ? "bg-red-500/90 text-heading ring-red-300/60"
+      ? "bg-red-500/90 text-white ring-red-300/60"
       : d <= 30
-      ? "bg-earth/90 text-heading ring-earth/60"
-      : "bg-accent/90 text-heading ring-accent/60";
+      ? "bg-amber-600/90 text-white ring-amber-300/60"
+      : "bg-[#D9B565] text-[#43151d] ring-[#D9B565]/60";
+
+  const countdownLabel = isRolling || d === null ? "Rolling" : d < 0 ? "Closed" : d === 0 ? "Today" : `${d}d left`;
 
   const save = async (e: React.MouseEvent) => {
     e.preventDefault();
@@ -672,7 +671,7 @@ function ScholarshipCard({ s, variant }: { s: ViewSch; variant: "active" | "prep
     <Link
       to="/scholarships/$slug"
       params={{ slug: s.slug }}
-      className="group relative block h-[360px] overflow-hidden rounded-lg ring-1 ring-border shadow-sm transition-shadow hover:shadow-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+      className="group relative flex min-h-[390px] flex-col overflow-hidden rounded-lg bg-[#43151d] shadow-sm ring-1 ring-[#651F2B]/30 transition-shadow hover:shadow-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#651F2B]"
     >
       <div className="absolute inset-0">
         <TopoBackground />
@@ -680,88 +679,80 @@ function ScholarshipCard({ s, variant }: { s: ViewSch; variant: "active" | "prep
           src={imageSrc}
           name={s.name}
           alt={`${s.name} scholarship cover`}
-          className="transition-transform duration-700 group-hover:scale-[1.04] opacity-60"
+          className="opacity-60 transition-transform duration-700 group-hover:scale-[1.04]"
           noOverlay
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-background/30 via-background/40 to-background/85" />
+        <div className="absolute inset-0 bg-gradient-to-b from-[#2a0e14]/40 via-[#43151d]/65 to-[#1d080d]/95" />
       </div>
 
       <div className="absolute right-3 top-3 z-10 flex items-center gap-1.5">
-        <span className="rounded-full bg-heading/15 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-heading ring-1 ring-heading/30 backdrop-blur">
+        <span className="rounded-full bg-[#f5f0e0]/15 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-[#f5f0e0] ring-1 ring-[#f5f0e0]/30 backdrop-blur">
           {levelBadge(s.level)}
         </span>
         <button
           onClick={save}
           disabled={saving}
           aria-label="Save to shortlist"
-          className="rounded-full bg-heading/10 p-1.5 text-heading ring-1 ring-heading/30 backdrop-blur transition hover:bg-heading/20 hover:text-red-300"
+          className="rounded-full bg-[#f5f0e0]/15 p-1.5 text-[#f5f0e0] ring-1 ring-[#f5f0e0]/30 backdrop-blur transition hover:bg-[#f5f0e0]/25 hover:text-red-300"
         >
           <Heart className="h-3.5 w-3.5" />
         </button>
       </div>
 
       <div className="absolute left-3 top-3 z-10 flex flex-wrap items-center gap-1.5">
-        <span className="rounded-full bg-primary/90 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-primary-foreground ring-1 ring-heading/20 backdrop-blur">
+        <span className="rounded-full bg-[#D9B565] px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-[#43151d] ring-1 ring-[#f5f0e0]/20">
           {fundingLabel(s.funding_type)}
         </span>
         {variant === "prep" && (
-          <span className="rounded-full bg-earth/90 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-heading ring-1 ring-heading/20 backdrop-blur">
+          <span className="rounded-full bg-[#f5f0e0]/20 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-[#f5f0e0] ring-1 ring-[#f5f0e0]/30">
             Prep mode
           </span>
         )}
       </div>
 
-      <div className="relative z-10 flex h-full flex-col justify-end p-5 !text-heading">
-        <div className="flex items-center gap-2 text-sm !text-heading">
+      <div className="relative z-10 flex flex-1 flex-col justify-end p-5 pt-16 text-[#f5f0e0]">
+        <div className="flex items-center gap-2 text-sm">
           <span className="text-xl leading-none">{s.countryFlag}</span>
           <span className="font-medium">{s.country}</span>
-          <span aria-hidden className="!text-heading/60">·</span>
-          <span className="text-xs !text-heading/80">{providerLabel(s.provider_type)}</span>
+          <span aria-hidden className="text-[#f5f0e0]/50">·</span>
+          <span className="text-xs text-[#f5f0e0]/75">{providerLabel(s.provider_type)}</span>
         </div>
 
-        <h3 className="mt-2 font-heading text-xl font-extrabold leading-tight !text-heading line-clamp-2 drop-shadow-lg">
+        <h3 className="mt-2 line-clamp-2 font-heading text-xl font-extrabold leading-tight drop-shadow-lg">
           {s.name}
         </h3>
-        <div className="mt-1 truncate text-xs !text-heading/80">{s.provider}</div>
+        <div className="mt-1 truncate text-xs text-[#f5f0e0]/75">{s.provider}</div>
 
         {s.min_sat_score != null && (
-          <div className="mt-2 inline-flex items-center gap-1.5 self-start rounded-full bg-sky-500/20 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-sky-100 ring-1 ring-sky-300/40 backdrop-blur w-fit">
+          <div className="mt-2 inline-flex w-fit items-center gap-1.5 self-start rounded-full bg-[#D9B565]/20 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-[#f5f0e0] ring-1 ring-[#D9B565]/50 backdrop-blur">
             🎯 SAT ≥ {s.min_sat_score}
-            {s.min_act_score ? <span className="text-sky-200/70">· ACT {s.min_act_score}+</span> : null}
+            {s.min_act_score ? <span className="text-[#f5f0e0]/70">· ACT {s.min_act_score}+</span> : null}
           </div>
         )}
 
-        <div className="mt-4 flex items-center justify-between gap-2 border-t border-heading/15 pt-3">
+        <div className="mt-4 flex items-end justify-between gap-3 border-t border-[#f5f0e0]/20 pt-3">
           <div className="min-w-0">
-            <div className="text-[10px] uppercase tracking-wide text-heading/55">Value</div>
-            <div className="truncate text-sm font-bold text-heading">{s.amount || "Varies"}</div>
+            <div className="text-[10px] uppercase tracking-wide text-[#f5f0e0]/60">Value</div>
+            <div className="line-clamp-2 text-sm font-bold leading-snug">{s.amount || "Varies"}</div>
           </div>
           {variant === "prep" ? (
-            <span className="inline-flex items-center gap-1 rounded-full bg-earth/90 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-heading ring-1 ring-heading/20">
-              <CalendarClock className="h-3 w-3" /> Opens later
+            <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-[#f5f0e0]/20 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-[#f5f0e0] ring-1 ring-[#f5f0e0]/30">
+              <CalendarClock className="h-3 w-3" /> Next cycle
             </span>
           ) : (
-            <span className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[11px] font-bold uppercase tracking-wide ring-1 ${countdownCls}`}>
+            <span className={`inline-flex shrink-0 items-center gap-1 rounded-full px-2.5 py-1 text-[11px] font-bold uppercase tracking-wide ring-1 ${countdownCls}`}>
               <Clock className="h-3 w-3" />
-              {d === null
-                ? "Rolling"
-                : d < 0
-                ? "Closed"
-                : d === 0
-                ? "Today"
-                : s.cycle_status === "rolling_admissions"
-                ? "Rolling"
-                : `${d}d left`}
+              {countdownLabel}
             </span>
           )}
         </div>
 
-        <div className="mt-3 flex items-center justify-between text-[11px] text-heading/70">
+        <div className="mt-3 flex items-center justify-between text-[11px] text-[#f5f0e0]/75">
           <span>{s.application_fee_usd > 0 ? `$${s.application_fee_usd} fee` : "Free to apply"}</span>
           {s.accepts_moi_waiver && (
-            <span className="rounded-full bg-accent/20 px-2 py-0.5 font-semibold text-accent ring-1 ring-accent/40">MOI ok</span>
+            <span className="rounded-full bg-[#D9B565]/20 px-2 py-0.5 font-semibold text-[#D9B565] ring-1 ring-[#D9B565]/40">MOI ok</span>
           )}
-          <span className="inline-flex items-center gap-1 font-semibold text-heading group-hover:underline">
+          <span className="inline-flex items-center gap-1 font-semibold text-[#f5f0e0] group-hover:underline">
             View <ArrowRight className="h-3 w-3 transition-transform group-hover:translate-x-0.5" />
           </span>
         </div>
@@ -805,7 +796,7 @@ function WtfScholarshipsCarousel({ all }: { all: ViewSch[] }) {
       </div>
       <div className="grid gap-4 md:grid-cols-3">
         {buckets.map((bucket) => (
-          <div key={bucket.title} className={`rounded-md border bg-gradient-to-b p-4 ${bucket.tone}`}>
+          <div key={bucket.title} className="rounded-md border border-[#651F2B]/15 bg-white/50 p-4">
             <div className="mb-2 flex items-center gap-2">
               <span className="text-lg">{bucket.emoji}</span>
               <h3 className="font-heading text-sm font-bold text-foreground">{bucket.title}</h3>
