@@ -756,7 +756,7 @@ function ScholarshipCard({ s, variant }: { s: ViewSch; variant: "active" | "prep
           </span>
         </div>
       </div>
-    </Link>
+    </a>
   );
 }
 
