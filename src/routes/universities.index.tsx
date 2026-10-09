@@ -19,6 +19,14 @@ import { SmartLogo } from "@/components/SmartLogo";
 import { SmartCampusImage } from "@/components/SmartCampusImage";
 import { useWikiImage } from "@/lib/use-wiki-image";
 
+import { createClient } from "@supabase/supabase-js";
+
+// Separate read-only client for the project that holds the university photos (qs table)
+const photosDb = createClient(
+  "https://bplwocofnqipxvgtjqvx.supabase.co",
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJwbHdvY29mbnFpcHh2Z3RqcXZ4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgwNjU0OTQsImV4cCI6MjA5MzY0MTQ5NH0.vpWyVq_unespHYrI3uQz3Ki716cRjWgeXR6JSkvlWIQ",
+  { auth: { persistSession: false, autoRefreshToken: false } },
+);
 
 const SearchSchema = z.object({
   country: z.string().optional(),
@@ -281,7 +289,7 @@ function CatalogBrowser() {
     staleTime: 5 * 60 * 1000,
     queryFn: async () => {
       const map: Record<string, any> = {};
-      const { data, error } = await (supabase as any)
+            const { data, error } = await photosDb
         .from("qs")
         .select("title, image_url, image_thumb_url, image_credit, image_license, image_source_url")
         .in("title", names)
