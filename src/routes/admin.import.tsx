@@ -680,7 +680,7 @@ function FilePick({ onPick, label, disabled }: { onPick: (f: File) => void; labe
 }
 
 function Stat({ label, value, tone }: { label: string; value: number; tone: "success" | "warn" | "danger" }) {
-  const toneClass = tone === "success" ? "text-emerald-500" : tone === "warn" ? "text-amber-500" : "text-destructive";
+  const toneClass = tone === "success" ? "text-accent" : tone === "warn" ? "text-earth" : "text-destructive";
   return (
     <div className="rounded-md border border-border bg-secondary/40 p-3">
       <div className="text-xs uppercase text-muted-foreground">{label}</div>

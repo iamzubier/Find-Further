@@ -268,11 +268,11 @@ function FeatureTrio() {
           <Link
             key={title}
             to={to}
-            className="group relative isolate flex min-h-[480px] flex-col overflow-hidden rounded-2xl text-white shadow-[0_20px_50px_-20px_rgba(0,60,40,0.4)] transition-all duration-500 hover:-translate-y-2 hover:shadow-[0_40px_80px_-20px_rgba(0,60,40,0.6)] reveal-up"
+            className="group relative isolate flex min-h-[480px] flex-col overflow-hidden rounded-2xl text-heading shadow-[0_20px_50px_-20px_rgba(0,60,40,0.4)] transition-all duration-500 hover:-translate-y-2 hover:shadow-[0_40px_80px_-20px_rgba(0,60,40,0.6)] reveal-up"
             style={{ animationDelay: `${idx * 0.12}s` }}
           >
             <img src={image} alt="" loading="lazy" className="absolute inset-0 h-full w-full object-cover transition-transform duration-1000 group-hover:scale-110" />
-            <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-black/55 to-black/95" />
+            <div className="absolute inset-0 bg-gradient-to-b from-background/20 via-background/55 to-background/95" />
             {/* gold sweep on hover */}
             <div
               aria-hidden
@@ -294,15 +294,15 @@ function FeatureTrio() {
               {["I","II","III"][idx]}
             </div>
             <div className="relative z-[1] flex h-full flex-col p-7">
-              <div className="flex items-center justify-between text-[10px] uppercase tracking-[0.28em] text-white/80">
+              <div className="flex items-center justify-between text-[10px] uppercase tracking-[0.28em] text-heading/80">
                 <span>{kicker}</span>
-                <span className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-gold/60 bg-black/30 backdrop-blur transition-transform duration-500 group-hover:rotate-12">
+                <span className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-gold/60 bg-background/30 backdrop-blur transition-transform duration-500 group-hover:rotate-12">
                   <Icon className="h-4 w-4 text-gold" />
                 </span>
               </div>
               <h3 className="mt-auto pt-12 font-heading text-3xl font-bold tracking-tight">{title}</h3>
-              <p className="mt-3 text-sm leading-relaxed text-white/85">{body}</p>
-              <div className="mt-6 inline-flex items-center gap-2 text-sm font-medium text-white">
+              <p className="mt-3 text-sm leading-relaxed text-heading/85">{body}</p>
+              <div className="mt-6 inline-flex items-center gap-2 text-sm font-medium text-heading">
                 <span className="story-link">{cta}</span>
                 <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
               </div>
@@ -338,7 +338,7 @@ function ScholarshipsBand() {
               Every entry verified against official sources. Real deadlines, real money, real applicants getting in.
             </p>
           </div>
-          <Button asChild variant="outline" className="self-start border-gold/40 bg-transparent text-background hover:bg-white/5">
+          <Button asChild variant="outline" className="self-start border-gold/40 bg-transparent text-background hover:bg-heading/5">
             <Link to="/scholarships">Browse all 180+ <ArrowRight className="ml-2 h-4 w-4" /></Link>
           </Button>
         </div>
@@ -348,7 +348,7 @@ function ScholarshipsBand() {
             <Link
               key={s.id}
               to="/scholarships"
-              className="group relative overflow-hidden rounded-xl border border-white/10 bg-white/[0.04] p-6 backdrop-blur-sm transition-all hover:-translate-y-0.5 hover:border-gold/40 hover:bg-white/[0.07]"
+              className="group relative overflow-hidden rounded-xl border border-heading/10 bg-heading/[0.04] p-6 backdrop-blur-sm transition-all hover:-translate-y-0.5 hover:border-gold/40 hover:bg-heading/[0.07]"
             >
               <div className="flex items-start justify-between">
                 <span className="text-3xl">{s.countryFlag}</span>
@@ -364,7 +364,7 @@ function ScholarshipsBand() {
               </div>
               <h3 className="mt-5 font-heading text-xl font-bold leading-tight text-background">{s.name}</h3>
               <p className="mt-2 line-clamp-2 text-sm text-background/65">{s.description}</p>
-              <div className="mt-5 flex items-center justify-between border-t border-white/10 pt-4 text-xs">
+              <div className="mt-5 flex items-center justify-between border-t border-heading/10 pt-4 text-xs">
                 <span className="text-background/70"><span className="text-gold">●</span> {s.amount}</span>
                 <span className="font-medium text-background/85 transition-transform group-hover:translate-x-0.5">
                   Apply →
@@ -398,13 +398,13 @@ function WtfSection() {
             key={f.country}
             to="/universities"
             search={{ country: f.filter.country }}
-            className="group relative isolate flex min-h-[280px] flex-col overflow-hidden rounded-2xl text-white shadow-md transition-all hover:-translate-y-1 hover:shadow-2xl"
+            className="group relative isolate flex min-h-[280px] flex-col overflow-hidden rounded-2xl text-heading shadow-md transition-all hover:-translate-y-1 hover:shadow-2xl"
           >
             <img src={f.image} alt={f.country} loading="lazy" className="absolute inset-0 h-full w-full object-cover transition-transform duration-1000 group-hover:scale-110" />
-            <div className="absolute inset-0 bg-gradient-to-b from-black/25 via-black/55 to-black/95" />
-            <div className="absolute left-5 top-5 z-[1] inline-flex items-center gap-3 rounded-full border border-white/20 bg-black/30 px-3 py-1.5 backdrop-blur">
+            <div className="absolute inset-0 bg-gradient-to-b from-background/25 via-background/55 to-background/95" />
+            <div className="absolute left-5 top-5 z-[1] inline-flex items-center gap-3 rounded-full border border-heading/20 bg-background/30 px-3 py-1.5 backdrop-blur">
               <span className="text-2xl leading-none">{f.flag}</span>
-              <span className="text-xs font-medium tracking-wide text-white">{f.country}</span>
+              <span className="text-xs font-medium tracking-wide text-heading">{f.country}</span>
             </div>
             <div className="absolute right-5 top-5 z-[1] rounded-full bg-gold-grad px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-foreground">
               {f.tag}
@@ -414,7 +414,7 @@ function WtfSection() {
               <p className="mt-2 font-heading text-xl font-extrabold leading-snug md:text-2xl">
                 "{f.fact}"
               </p>
-              <div className="mt-4 inline-flex items-center gap-1.5 text-xs font-medium text-white/90">
+              <div className="mt-4 inline-flex items-center gap-1.5 text-xs font-medium text-heading/90">
                 <span className="story-link">Show me these universities</span>
                 <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-1" />
               </div>
@@ -509,9 +509,9 @@ function Stats() {
 
         <div className="relative grid gap-10 md:grid-cols-4">
           {stats.map((s, i) => (
-            <div key={s.label} className={`text-white relative ${i > 0 ? "md:border-l md:border-white/10 md:pl-8" : ""}`}>
+            <div key={s.label} className={`text-heading relative ${i > 0 ? "md:border-l md:border-heading/10 md:pl-8" : ""}`}>
               <div className="gold-text font-heading text-5xl font-extrabold tracking-tight md:text-6xl">{s.num}</div>
-              <div className="mt-2 text-xs uppercase tracking-[0.22em] text-white/70">{s.label}</div>
+              <div className="mt-2 text-xs uppercase tracking-[0.22em] text-heading/70">{s.label}</div>
               <div className="mt-4 h-px w-12 bg-gold/60" />
             </div>
           ))}

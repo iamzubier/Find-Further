@@ -252,7 +252,7 @@ function EvaluatePage() {
                   return (
                     <button key={c.code} type="button"
                       onClick={() => setF({ ...f, targetCountries: on ? f.targetCountries.filter(x => x !== c.code) : [...f.targetCountries, c.code] })}
-                      className={`rounded-md border px-3 py-1.5 text-sm transition ${on ? "border-primary bg-primary text-primary-foreground" : "border-border bg-white text-foreground hover:bg-secondary"}`}>
+                      className={`rounded-md border px-3 py-1.5 text-sm transition ${on ? "border-primary bg-primary text-primary-foreground" : "border-border bg-heading text-foreground hover:bg-secondary"}`}>
                       {c.flag} {c.name}
                     </button>
                   );
@@ -297,7 +297,7 @@ function EvaluatePage() {
             </div>
           </Section>
 
-          <div className="rounded-md border border-border bg-white p-5">
+          <div className="rounded-md border border-border bg-heading p-5">
             <div className="flex flex-wrap items-center justify-between gap-3">
               <div>
                 <p className="font-heading text-lg font-bold text-foreground">Save my profile</p>
@@ -331,7 +331,7 @@ function EvaluatePage() {
 
 function Section({ step, title, subtitle, children }: { step: number; title: string; subtitle?: string; children: React.ReactNode }) {
   return (
-    <section className="rounded-md border border-border bg-white p-6 shadow-sm">
+    <section className="rounded-md border border-border bg-heading p-6 shadow-sm">
       <header className="mb-5 flex items-baseline gap-3 border-b border-border pb-3">
         <span className="flex h-7 w-7 items-center justify-center rounded-full bg-primary text-xs font-bold text-primary-foreground">{step}</span>
         <div>
@@ -397,7 +397,7 @@ function ScorePanel({ breakdown, converted }: { breakdown: ScoreBreakdown; conve
   const c = 2 * Math.PI * r;
   const dash = (pct / 100) * c;
   return (
-    <div className="rounded-md border border-border bg-white p-6 shadow-sm">
+    <div className="rounded-md border border-border bg-heading p-6 shadow-sm">
       <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Live Profile Score</p>
       <div className="mt-4 flex items-center gap-5">
         <div className="relative">
@@ -450,10 +450,10 @@ function FeedbackPanel({ breakdown }: { breakdown: ScoreBreakdown }) {
 }
 
 function Alert({ tone, Icon, title, items, empty }: { tone: "good" | "bad" | "warn"; Icon: typeof CheckCircle2; title: string; items: string[]; empty: string }) {
-  const cls = tone === "good" ? "border-emerald-300 bg-emerald-50 text-emerald-900"
+  const cls = tone === "good" ? "border-accent bg-accent text-accent"
     : tone === "bad" ? "border-rose-300 bg-rose-50 text-rose-900"
-    : "border-amber-300 bg-amber-50 text-amber-900";
-  const iconCls = tone === "good" ? "text-emerald-700" : tone === "bad" ? "text-rose-700" : "text-amber-700";
+    : "border-earth bg-earth text-earth";
+  const iconCls = tone === "good" ? "text-accent" : tone === "bad" ? "text-rose-700" : "text-earth";
   return (
     <div className={`rounded-md border p-4 ${cls}`}>
       <p className="flex items-center gap-2 text-xs font-bold uppercase tracking-wide"><Icon className={`h-4 w-4 ${iconCls}`} /> {title}</p>
@@ -466,7 +466,7 @@ function Alert({ tone, Icon, title, items, empty }: { tone: "good" | "bad" | "wa
 
 function MatchesPanel({ matches, loading, hasTargets, converted }: { matches: MatchedUni[]; loading: boolean; hasTargets: boolean; converted: ConvertedGrades | null }) {
   return (
-    <div className="rounded-md border border-border bg-white p-5 shadow-sm">
+    <div className="rounded-md border border-border bg-heading p-5 shadow-sm">
       <div className="flex items-center justify-between border-b border-border pb-3">
         <p className="font-heading text-base font-bold text-foreground">Matched Universities {matches.length > 0 && <span className="ml-1 text-xs font-normal text-muted-foreground">({matches.length})</span>}</p>
         {loading && <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />}
@@ -482,10 +482,10 @@ function MatchesPanel({ matches, loading, hasTargets, converted }: { matches: Ma
 
 function MatchRow({ m, converted }: { m: MatchedUni; converted: ConvertedGrades | null }) {
   return (
-    <div className="overflow-hidden rounded border border-border bg-white">
+    <div className="overflow-hidden rounded border border-border bg-heading">
       <div className="relative h-20 bg-muted">
         <SmartCampusImage src={m.campus_image_url} name={m.name} noOverlay />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-background/70 to-transparent" />
         <div className="absolute right-2 top-2 rounded bg-primary px-2 py-0.5 text-[10px] font-bold text-primary-foreground">{m.matchPct}% match</div>
         <div className="absolute bottom-1.5 left-2"><SmartLogo name={m.name} logoUrl={m.logo_url} size={28} /></div>
       </div>
@@ -495,7 +495,7 @@ function MatchRow({ m, converted }: { m: MatchedUni; converted: ConvertedGrades 
         {converted && (
           <p className="mt-1.5 text-[11px] text-foreground">
             {m.meetsGpa
-              ? <>Your US {converted.us4.toFixed(2)} meets requirement <CheckCircle2 className="inline h-3 w-3 text-emerald-600" /></>
+              ? <>Your US {converted.us4.toFixed(2)} meets requirement <CheckCircle2 className="inline h-3 w-3 text-accent" /></>
               : <span className="text-rose-700">Your US {converted.us4.toFixed(2)} below typical requirement</span>}
           </p>
         )}
@@ -566,7 +566,7 @@ export function ResultsView({
 function ScoreTile({ label, value, max }: { label: string; value: number; max: number }) {
   const pct = Math.round((value / max) * 100);
   return (
-    <div className="rounded-md border border-border bg-white p-4">
+    <div className="rounded-md border border-border bg-heading p-4">
       <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">{label}</p>
       <p className="mt-1 font-heading text-2xl font-bold text-foreground">{value}<span className="text-sm font-normal text-muted-foreground">/{max}</span></p>
       <div className="mt-2 h-1 overflow-hidden rounded-full bg-muted"><div className="h-full bg-primary" style={{ width: `${pct}%` }} /></div>

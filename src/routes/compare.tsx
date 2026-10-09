@@ -83,7 +83,7 @@ function ComparePage() {
     { label: "Min GPA (US 4.0)", get: (u) => u.admission_reqs?.min_gpa_us ?? "—" },
     { label: "International %", get: (u) => u.international_pct ?? "—" },
     { label: "Scholarships", get: (u) => (u.scholarships?.length ?? 0) > 0
-      ? <span className="rounded-full bg-emerald-500/15 px-2 py-0.5 text-xs font-semibold text-emerald-600">Yes</span>
+      ? <span className="rounded-full bg-accent/15 px-2 py-0.5 text-xs font-semibold text-accent">Yes</span>
       : <span className="rounded-full bg-muted px-2 py-0.5 text-xs text-muted-foreground">—</span>
     },
     { label: "Top programs", get: (u) => {
@@ -122,7 +122,7 @@ function ComparePage() {
         <div className="mt-3"><Button variant="ghost" size="sm" onClick={clear} className="px-0 text-xs text-muted-foreground hover:bg-transparent hover:text-foreground">Clear all</Button></div>
       </header>
 
-      <div className="mt-6 overflow-x-auto rounded border border-border bg-white shadow-sm">
+      <div className="mt-6 overflow-x-auto rounded border border-border bg-heading shadow-sm">
         <table className="w-full min-w-[720px]">
           <thead>
             <tr className="border-b border-border">
@@ -131,27 +131,27 @@ function ComparePage() {
                 <th key={u.slug} className="border-l border-border p-0 align-top">
                   <div className="relative h-[120px] w-full overflow-hidden">
                     <SmartCampusImage src={u.campus_image_url || u.imageUrl} name={u.name} noOverlay />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/85 to-black/30" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-background/85 to-background/30" />
                     {idx === overallWinner && wins[idx] > 0 && (
-                      <div className="absolute left-2 top-2 inline-flex items-center gap-1 rounded bg-emerald-600 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-white">
+                      <div className="absolute left-2 top-2 inline-flex items-center gap-1 rounded bg-accent px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-heading">
                         <Trophy className="h-3 w-3" /> Best Match
                       </div>
                     )}
                     <button
                       onClick={() => remove(u.slug)}
-                      className="absolute right-2 top-2 rounded bg-black/50 p-1 text-white hover:bg-black/70"
+                      className="absolute right-2 top-2 rounded bg-background/50 p-1 text-heading hover:bg-background/70"
                       aria-label="Remove"
                     >
                       <X className="h-3.5 w-3.5" />
                     </button>
-                    <div className="absolute inset-x-0 bottom-0 p-3 text-left text-white">
+                    <div className="absolute inset-x-0 bottom-0 p-3 text-left text-heading">
                       <div className="flex items-center gap-2">
                         <SmartLogo name={u.name} logoUrl={u.logo_url} website={u.official_url} size={32} />
                         <Link to="/universities/$slug" params={{ slug: u.slug }} className="font-heading text-sm font-extrabold leading-tight hover:underline">
                           {u.name}
                         </Link>
                       </div>
-                      <div className="mt-1 text-[11px] text-white/85">{u.country_flag ?? u.countryFlag} {u.country}</div>
+                      <div className="mt-1 text-[11px] text-heading/85">{u.country_flag ?? u.countryFlag} {u.country}</div>
                     </div>
                   </div>
                 </th>
@@ -171,7 +171,7 @@ function ComparePage() {
                   return (
                     <td
                       key={u.slug}
-                      className={`border-l border-border p-3 align-top text-sm ${isBest ? "bg-green-50 font-bold text-foreground" : "text-foreground"}`}
+                      className={`border-l border-border p-3 align-top text-sm ${isBest ? "bg-accent font-bold text-foreground" : "text-foreground"}`}
                     >
                       {empty ? NA : val}
                     </td>
@@ -183,7 +183,7 @@ function ComparePage() {
         </table>
       </div>
 
-      <div className="mt-8 rounded border border-border bg-white p-6 text-center shadow-sm">
+      <div className="mt-8 rounded border border-border bg-heading p-6 text-center shadow-sm">
         <p className="font-heading text-xl font-bold text-foreground">See your exact odds for these universities.</p>
         <p className="mt-1 text-sm text-muted-foreground">Get a personalized profile score and match percentage against every column above.</p>
         <Button asChild size="lg" className="mt-4 bg-primary text-primary-foreground hover:bg-primary/90">

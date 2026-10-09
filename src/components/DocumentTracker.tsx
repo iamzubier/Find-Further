@@ -93,7 +93,7 @@ export function DocumentTracker({ slug, docs }: Props) {
       </header>
 
       {/* Progress dashboard */}
-      <div className="mb-5 rounded-md border border-border bg-white p-5 shadow-sm">
+      <div className="mb-5 rounded-md border border-border bg-heading p-5 shadow-sm">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
             <div className="font-heading text-lg font-bold text-foreground">
@@ -107,14 +107,14 @@ export function DocumentTracker({ slug, docs }: Props) {
             {pct}%
           </div>
         </div>
-        <div className="mt-4 h-3 w-full overflow-hidden rounded-full bg-neutral-200">
+        <div className="mt-4 h-3 w-full overflow-hidden rounded-full bg-raised">
           <div
             className="h-full rounded-full transition-all duration-700 ease-out"
             style={{ width: `${pct}%`, backgroundColor: "#1E3A8A" }}
           />
         </div>
         {complete && (
-          <div className="mt-4 flex items-center gap-2 rounded-md border border-emerald-300 bg-emerald-50 px-4 py-3 text-sm font-semibold text-emerald-800">
+          <div className="mt-4 flex items-center gap-2 rounded-md border border-accent bg-accent px-4 py-3 text-sm font-semibold text-accent">
             <PartyPopper className="h-4 w-4" />
             Profile Complete: You are ready to submit your application.
           </div>
@@ -122,14 +122,14 @@ export function DocumentTracker({ slug, docs }: Props) {
       </div>
 
       {/* Region selector */}
-      <div className="mb-4 rounded-md border border-border bg-white p-4">
+      <div className="mb-4 rounded-md border border-border bg-heading p-4">
         <label className="block text-xs font-semibold uppercase tracking-wide text-muted-foreground">
           Where are you applying from?
         </label>
         <select
           value={region}
           onChange={(e) => setRegion(e.target.value)}
-          className="mt-2 w-full max-w-sm rounded-md border border-border bg-white px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
+          className="mt-2 w-full max-w-sm rounded-md border border-border bg-heading px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
         >
           {REGIONS.map((r) => (
             <option key={r} value={r}>
@@ -140,7 +140,7 @@ export function DocumentTracker({ slug, docs }: Props) {
       </div>
 
       {showSouthAsiaWarning && (
-        <div className="mb-4 flex items-start gap-3 rounded-md border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+        <div className="mb-4 flex items-start gap-3 rounded-md border border-earth bg-earth px-4 py-3 text-sm text-earth">
           <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" />
           <span>
             <strong>⚠️ South Asian Applicants:</strong> Remember to book your Embassy APS Certificate or MOFA attestation
@@ -157,7 +157,7 @@ export function DocumentTracker({ slug, docs }: Props) {
           return (
             <li
               key={doc.id}
-              className={`rounded-md border border-border bg-white transition-all hover:border-primary/40 hover:shadow-sm ${
+              className={`rounded-md border border-border bg-heading transition-all hover:border-primary/40 hover:shadow-sm ${
                 isDone ? "opacity-60" : ""
               }`}
             >
@@ -169,8 +169,8 @@ export function DocumentTracker({ slug, docs }: Props) {
                   aria-label={`Mark ${doc.title} as ${isDone ? "incomplete" : "complete"}`}
                   className={`mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-md border-2 transition-all ${
                     isDone
-                      ? "border-[#1E3A8A] bg-[#1E3A8A] text-white"
-                      : "border-neutral-300 bg-white hover:border-[#1E3A8A]"
+                      ? "border-[#1E3A8A] bg-[#1E3A8A] text-heading"
+                      : "border-border bg-heading hover:border-[#1E3A8A]"
                   }`}
                 >
                   {isDone && <Check className="h-4 w-4" strokeWidth={3} />}
@@ -190,14 +190,14 @@ export function DocumentTracker({ slug, docs }: Props) {
                         onClick={() => toggleExpand(doc.id)}
                         aria-label="Show instructions"
                         aria-expanded={isOpen}
-                        className="inline-flex h-7 w-7 items-center justify-center rounded-md text-muted-foreground hover:bg-neutral-100 hover:text-primary"
+                        className="inline-flex h-7 w-7 items-center justify-center rounded-md text-muted-foreground hover:bg-raised hover:text-primary"
                       >
                         <Info className="h-4 w-4" />
                       </button>
                     )}
                   </div>
                   {doc.context && isOpen && (
-                    <div className="mt-2 rounded-md bg-neutral-50 px-3 py-2 text-xs leading-relaxed text-foreground/80">
+                    <div className="mt-2 rounded-md bg-raised px-3 py-2 text-xs leading-relaxed text-foreground/80">
                       {doc.context}
                     </div>
                   )}

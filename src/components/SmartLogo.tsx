@@ -55,7 +55,7 @@ export function SmartLogo({
   if (stage >= sources.length) {
     return (
       <div
-        className={`flex flex-none items-center justify-center overflow-hidden rounded-xl bg-slate-900 font-serif font-bold text-white shadow-md ${className}`}
+        className={`flex flex-none items-center justify-center overflow-hidden rounded-xl bg-background font-serif font-bold text-heading shadow-md ${className}`}
         style={{ width: size, height: size, fontSize: Math.round(size * 0.5), lineHeight: 1 }}
         aria-label={`${name} logo`}
       >
@@ -68,7 +68,7 @@ export function SmartLogo({
 
   return (
     <div
-      className={`flex flex-none items-center justify-center overflow-hidden rounded-xl border border-border bg-white shadow-md ${className}`}
+      className={`flex flex-none items-center justify-center overflow-hidden rounded-xl border border-border bg-heading shadow-md ${className}`}
       style={{ width: size, height: size }}
     >
       <img
