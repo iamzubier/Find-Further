@@ -87,8 +87,8 @@ function Hero() {
           </div>
 
           {/* Registry — vertical list */}
-          <div className="md:col-span-4 md:row-span-3 bg-card p-7 md:p-8 border border-gold/30 flex flex-col">
-            <div className="border-b border-gold pb-4 mb-6 flex justify-between items-end">
+          <div className="md:col-span-4 md:row-span-3 bg-card p-7 md:p-8 border border-border flex flex-col">
+            <div className="border-b border-border pb-4 mb-6 flex justify-between items-end">
               <h3 className="font-heading text-2xl text-foreground">Latest</h3>
               <span className="text-[10px] uppercase tracking-[0.18em] text-gold font-semibold">Active Grants</span>
             </div>
@@ -98,7 +98,7 @@ function Hero() {
                   <span className="text-gold text-[11px] font-bold font-heading tracking-wider mb-1 block">
                     {String(i + 1).padStart(2, "0")} / {(s.country || s.countryFlag).toUpperCase()}
                   </span>
-                  <h4 className="font-heading text-lg leading-snug text-foreground group-hover:text-primary-glow transition-colors">{s.name}</h4>
+                  <h4 className="font-heading text-lg leading-snug text-foreground group-hover:text-accent transition-colors">{s.name}</h4>
                   <p className="text-sm text-muted-foreground mt-1.5 line-clamp-2">{s.description}</p>
                 </Link>
               ))}
@@ -138,14 +138,14 @@ function Hero() {
           </div>
 
           {/* Stat — Institutions */}
-          <div className="md:col-span-3 bg-card border border-gold/30 p-7 flex flex-col justify-center items-center text-center">
-            <span className="text-4xl md:text-5xl font-heading text-primary">{countLabel}</span>
+          <div className="md:col-span-3 bg-card border border-border p-7 flex flex-col justify-center items-center text-center">
+            <span className="text-4xl md:text-5xl font-heading text-accent">{countLabel}</span>
             <span className="text-[10px] uppercase tracking-[0.2em] mt-3 text-gold font-bold">Institutions Cataloged</span>
             <div className="mt-4 h-px w-10 bg-gold/60" />
           </div>
 
           {/* Spotlight Institution — with campus photo */}
-          <div className="md:col-span-8 relative overflow-hidden border border-gold/30 group min-h-[260px] flex">
+          <div className="md:col-span-8 relative overflow-hidden border border-border group min-h-[260px] flex">
             <div className="relative w-1/2 overflow-hidden hidden md:block">
               <img src={UNIVERSITIES[0]?.campusImageUrl ?? exploreImg} alt={UNIVERSITIES[0]?.name ?? ""} className="absolute inset-0 h-full w-full object-cover transition-transform duration-1000 group-hover:scale-105" />
               <div aria-hidden className="absolute inset-0 bg-gradient-to-r from-transparent to-[oklch(0.995_0.004_95)]" />
@@ -175,7 +175,7 @@ function Hero() {
         </div>
 
         {/* Lower nav strip */}
-        <div className="mt-6 flex flex-col md:flex-row items-center justify-between py-4 border-t border-gold/30 gap-3">
+        <div className="mt-6 flex flex-col md:flex-row items-center justify-between py-4 border-t border-border gap-3">
           <span className="text-[10px] uppercase tracking-[0.24em] font-bold text-foreground/60">
             Official Registry • Est. MMXXVI • Vol. II
           </span>
@@ -257,7 +257,7 @@ function FeatureTrio() {
         <div>
           <div className="text-[10px] uppercase tracking-[0.28em] text-muted-foreground">The Field Guide</div>
           <h2 className="mt-3 font-heading text-4xl font-bold tracking-tight md:text-5xl">
-            One umbrella. <em className="gradient-text font-medium not-italic">Three doors in.</em>
+            One umbrella. <em className="gold-text font-medium not-italic">Three doors in.</em>
           </h2>
         </div>
         <div className="hidden h-px flex-1 bg-border md:block" />
@@ -440,7 +440,7 @@ function TestimonialStrip() {
           <div>
             <div className="text-[10px] uppercase tracking-[0.28em] text-muted-foreground">From the journals</div>
             <h2 className="mt-3 font-heading text-3xl font-bold tracking-tight md:text-4xl">
-              What students <em className="gradient-text not-italic font-medium">tell us.</em>
+              What students <em className="gold-text not-italic font-medium">tell us.</em>
             </h2>
           </div>
           <div className="hidden items-center gap-1 md:flex">
