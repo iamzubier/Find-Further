@@ -67,10 +67,10 @@ function Hero() {
                 A curated registry of premier universities and prestigious scholarship opportunities — for the modern scholar applying abroad.
               </p>
               <div className="mt-7 flex flex-wrap gap-3">
-                <Button asChild className="rounded-none bg-gold px-7 py-6 font-semibold uppercase tracking-[0.2em] text-xs hover:bg-[#f5f0e0]" style={{ color: "oklch(0.32 0.07 162)" }}>
+                <Button asChild className="rounded-none bg-gold px-7 py-6 font-semibold uppercase tracking-[0.2em] text-xs hover:bg-[#f5f0e0]" style={{ color: "oklch(0.30 0.09 330)" }}>
                   <Link to="/universities">Begin Inquiry</Link>
                 </Button>
-                <Button asChild variant="outline" className="rounded-none border-gold bg-transparent px-7 py-6 font-semibold uppercase tracking-[0.2em] text-xs text-gold hover:bg-gold hover:text-[oklch(0.32_0.07_162)]">
+                <Button asChild variant="outline" className="rounded-none border-gold bg-transparent px-7 py-6 font-semibold uppercase tracking-[0.2em] text-xs text-gold hover:bg-gold hover:text-[oklch(0.30_0.09_330)]">
                   <Link to="/scholarships">View Catalog</Link>
                 </Button>
               </div>
@@ -165,7 +165,7 @@ function Hero() {
           {/* Closing maxim — lamp backdrop */}
           <div className="md:col-span-4 relative overflow-hidden p-8 flex flex-col justify-center border-l-4 border-gold text-[#f5f0e0] min-h-[260px]">
             <img src={tipsImg} alt="" className="absolute inset-0 h-full w-full object-cover" />
-            <div aria-hidden className="absolute inset-0" style={{ background: "linear-gradient(135deg, oklch(0.32 0.07 162 / 0.94) 0%, oklch(0.20 0.05 162 / 0.92) 100%)" }} />
+            <div aria-hidden className="absolute inset-0" style={{ background: "linear-gradient(135deg, oklch(0.32 0.09 330 / 0.92) 0%, oklch(0.20 0.06 330 / 0.90) 100%)" }} />
             <p className="relative font-heading italic text-base md:text-lg leading-snug text-[#f5f0e0]">
               "The beautiful thing about learning is that no one can take it away from you."
             </p>
