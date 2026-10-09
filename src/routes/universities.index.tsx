@@ -186,7 +186,7 @@ function FeaturedList({ initial }: { initial: { country?: string; program?: stri
   );
 }
 
-const PAGE_SIZE = 60;
+const PAGE_SIZE = 24;
 
 const QS_RANGES = [
   { value: "all", label: "All QS Ranks", min: null, max: null },
@@ -380,7 +380,7 @@ function CatalogBrowser() {
               <span className="text-xs uppercase tracking-wide text-muted-foreground">{rows.length} on this page</span>
             </div>
             <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-              {rows.map((u: any) => <CatalogCard key={u.id} u={u} />)}
+                            {rows.map((u: any) => <CatalogCard key={u.id} u={u} photosReady={!qsPhotosQuery.isLoading} />)}
             </div>
           </section>
         ))}
@@ -398,9 +398,9 @@ function CatalogBrowser() {
   );
 }
 
-function CatalogCard({ u }: { u: any }) {
+function CatalogCard({ u, photosReady }: { u: any; photosReady: boolean }) {
   // If the DB has no campus image, fall back to a live Wikipedia thumbnail.
-    const wiki = useWikiImage(u.name, !u.campus_image_url && !u.qs_photo);
+      const wiki = useWikiImage(u.name, photosReady && !u.campus_image_url && !u.qs_photo);
   const imageSrc = u.campus_image_url || u.qs_photo || wiki.data || null;
   return (
     <article className="group relative flex h-full flex-col overflow-hidden rounded-xl border border-border bg-heading transition-all duration-500 hover:-translate-y-1 hover:border-[oklch(0.74_0.10_85_/_0.6)] hover:shadow-[0_20px_40px_-20px_rgba(0,60,40,0.25)]">
