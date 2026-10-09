@@ -270,19 +270,51 @@ function CatalogBrowser() {
     },
   });
 
+    const names = useMemo(
+    () => (listQuery.data?.rows ?? []).map((r: any) => r.name as string).filter(Boolean),
+    [listQuery.data],
+  );
+
+  const qsPhotosQuery = useQuery({
+    queryKey: ["qs-photos", names.join("|")],
+    enabled: names.length > 0,
+    staleTime: 5 * 60 * 1000,
+    queryFn: async () => {
+      const map: Record<string, any> = {};
+      const { data, error } = await (supabase as any)
+        .from("qs")
+        .select("title, image_url, image_thumb_url, image_credit, image_license, image_source_url")
+        .in("title", names)
+        .not("image_url", "is", null);
+      if (error) return map;
+      for (const r of data ?? []) map[String(r.title).toLowerCase().trim()] = r;
+      return map;
+    },
+  });
+
   const grouped = useMemo(() => {
     const rows = listQuery.data?.rows ?? [];
     const imgMap = imagesQuery.data ?? {};
+    const qsMap = qsPhotosQuery.data ?? {};
     const map = new Map<string, any[]>();
     for (const r of rows) {
       const key = r.country || "Other";
+      const qp = qsMap[String(r.name ?? "").toLowerCase().trim()];
       const enriched = {
         ...r,
         campus_image_url: r.slug ? imgMap[r.slug]?.campus_image_url ?? null : null,
         logo_url: r.slug ? imgMap[r.slug]?.logo_url ?? null : null,
+        qs_photo: qp ? (qp.image_thumb_url || qp.image_url) : null,
+        photo_credit: qp
+          ? [String(qp.image_credit ?? "").replace(/<[^>]*>/g, "").trim(), qp.image_license].filter(Boolean).join(" · ")
+          : null,
+        photo_source: qp?.image_source_url ?? null,
       };
       if (!map.has(key)) map.set(key, []);
       map.get(key)!.push(enriched);
+    }
+    return Array.from(map.entries());
+  }, [listQuery.data, imagesQuery.data, qsPhotosQuery.data]);
     }
     return Array.from(map.entries());
   }, [listQuery.data, imagesQuery.data]);
@@ -362,13 +394,23 @@ function CatalogBrowser() {
 
 function CatalogCard({ u }: { u: any }) {
   // If the DB has no campus image, fall back to a live Wikipedia thumbnail.
-  const wiki = useWikiImage(u.name, !u.campus_image_url);
-  const imageSrc = u.campus_image_url || wiki.data || null;
+    const wiki = useWikiImage(u.name, !u.campus_image_url && !u.qs_photo);
+  const imageSrc = u.campus_image_url || u.qs_photo || wiki.data || null;
   return (
     <article className="group relative flex h-full flex-col overflow-hidden rounded-xl border border-border bg-heading transition-all duration-500 hover:-translate-y-1 hover:border-[oklch(0.74_0.10_85_/_0.6)] hover:shadow-[0_20px_40px_-20px_rgba(0,60,40,0.25)]">
       {/* Top campus image banner */}
       <div className="relative h-40 w-full overflow-hidden" style={{ background: "var(--gradient-hero)" }}>
         <SmartCampusImage src={imageSrc} name={u.name} noOverlay />
+                {u.qs_photo && !u.campus_image_url && u.photo_credit && (
+          <a
+            href={u.photo_source ?? undefined}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="absolute left-3 top-3 max-w-[60%] truncate rounded bg-black/40 px-1.5 py-0.5 text-[9px] text-white/85 backdrop-blur hover:text-white"
+          >
+            📷 {u.photo_credit}
+          </a>
+        )}
         {/* dark gradient for text legibility */}
         <div
           aria-hidden
