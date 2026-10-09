@@ -63,15 +63,15 @@ export function Navbar({ profileStrength }: { profileStrength?: number }) {
           : "border-b border-transparent bg-[#FAF3E8]/90 backdrop-blur-md"
       }`}
     >
-      <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 lg:px-6">
+      <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 md:grid md:grid-cols-[1fr_auto_1fr] md:gap-6 lg:px-6">
         <Logo />
 
-        <nav className="hidden items-center gap-8 md:flex">
+        <nav className="hidden items-center justify-self-center gap-8 md:flex">
           {links.map((l) => <NavLink key={l.to} {...l} />)}
           {authedLinks.map((l) => <NavLink key={l.to} {...l} />)}
         </nav>
 
-        <div className="hidden items-center gap-3 ml-auto md:flex">
+        <div className="hidden items-center justify-self-end gap-3 md:flex">
           {typeof profileStrength === "number" && user && (
             <div
               className="flex items-center gap-2 rounded-full border px-3 py-1 text-[11px]"
