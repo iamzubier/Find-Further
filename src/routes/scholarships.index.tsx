@@ -630,14 +630,14 @@ function ScholarshipCard({ s, variant }: { s: ViewSch; variant: "active" | "prep
 
   const countdownCls =
     isRolling || d === null
-      ? "bg-[#f5f0e0]/15 text-[#f5f0e0] ring-[#f5f0e0]/30"
+      ? "bg-[#1d080d]/10 text-[#1d080d] ring-[#1d080d]/20"
       : d < 0
-      ? "bg-[#f5f0e0]/15 text-[#f5f0e0]/70 ring-[#f5f0e0]/25"
+      ? "bg-[#1d080d]/5 text-[#1d080d]/60 ring-[#1d080d]/15"
       : d <= 10
       ? "bg-red-500/90 text-white ring-red-300/60"
       : d <= 30
       ? "bg-amber-600/90 text-white ring-amber-300/60"
-      : "bg-[#D9B565] text-[#43151d] ring-[#D9B565]/60";
+      : "bg-[#D9B565] text-[#1d080d] ring-[#D9B565]/60";
 
   const countdownLabel = isRolling || d === null ? "Rolling" : d < 0 ? "Closed" : d === 0 ? "Today" : `${d}d left`;
 
@@ -669,9 +669,9 @@ function ScholarshipCard({ s, variant }: { s: ViewSch; variant: "active" | "prep
 
   return (
     <Link
-      to="/scholarships/$slug"
+      to="/scholarships/\$slug"
       params={{ slug: s.slug }}
-      className="group relative flex min-h-[390px] flex-col overflow-hidden rounded-lg bg-[#43151d] shadow-sm ring-1 ring-[#651F2B]/30 transition-shadow hover:shadow-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#651F2B]"
+      className="group relative flex min-h-[390px] flex-col overflow-hidden rounded-lg bg-[#f5f0e0] shadow-sm ring-1 ring-[#651F2B]/15 transition-shadow hover:shadow-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#651F2B]"
     >
       <div className="absolute inset-0">
         <TopoBackground />
@@ -679,80 +679,80 @@ function ScholarshipCard({ s, variant }: { s: ViewSch; variant: "active" | "prep
           src={imageSrc}
           name={s.name}
           alt={`${s.name} scholarship cover`}
-          className="transition-transform duration-700 group-hover:scale-[1.04]"
+          className="object-cover h-full w-full opacity-30 transition-transform duration-700 group-hover:scale-[1.04]"
           noOverlay
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-[#1d080d]/95 via-[#2a0e14]/80 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#f5f0e0] via-[#f5f0e0]/80 to-transparent to-70%" />
       </div>
 
       <div className="absolute right-3 top-3 z-10 flex items-center gap-1.5">
-        <span className="rounded-full bg-[#f5f0e0]/15 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-[#f5f0e0] ring-1 ring-[#f5f0e0]/30 backdrop-blur">
+        <span className="rounded-full bg-[#1d080d]/10 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-[#1d080d] ring-1 ring-[#1d080d]/20 backdrop-blur">
           {levelBadge(s.level)}
         </span>
         <button
           onClick={save}
           disabled={saving}
           aria-label="Save to shortlist"
-          className="rounded-full bg-[#f5f0e0]/15 p-1.5 text-[#f5f0e0] ring-1 ring-[#f5f0e0]/30 backdrop-blur transition hover:bg-[#f5f0e0]/25 hover:text-red-300"
+          className="rounded-full bg-[#1d080d]/10 p-1.5 text-[#1d080d] ring-1 ring-[#1d080d]/20 backdrop-blur transition hover:bg-[#1d080d]/20 hover:text-red-600"
         >
           <Heart className="h-3.5 w-3.5" />
         </button>
       </div>
 
       <div className="absolute left-3 top-3 z-10 flex flex-wrap items-center gap-1.5">
-        <span className="rounded-full bg-[#D9B565] px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-[#43151d] ring-1 ring-[#f5f0e0]/20">
+        <span className="rounded-full bg-[#D9B565] px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-[#1d080d] shadow-sm">
           {fundingLabel(s.funding_type)}
         </span>
         {variant === "prep" && (
-          <span className="rounded-full bg-[#f5f0e0]/20 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-[#f5f0e0] ring-1 ring-[#f5f0e0]/30">
+          <span className="rounded-full bg-[#1d080d]/10 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-[#1d080d] ring-1 ring-[#1d080d]/20">
             Prep mode
           </span>
         )}
       </div>
 
-      <div className="relative z-10 flex flex-1 flex-col justify-end p-5 pt-16 text-[#f5f0e0]">
+      <div className="relative z-10 flex flex-1 flex-col justify-end p-5 pt-16 text-[#1d080d]">
         <div className="flex items-center gap-2 text-sm">
           <span className="text-xl leading-none">{s.countryFlag}</span>
-          <span className="font-medium">{s.country}</span>
-          <span aria-hidden className="text-[#f5f0e0]/50">·</span>
-          <span className="text-xs text-[#f5f0e0]/75">{providerLabel(s.provider_type)}</span>
+          <span className="font-bold">{s.country}</span>
+          <span aria-hidden className="text-[#1d080d]/40">·</span>
+          <span className="text-xs font-bold text-[#1d080d]/80">{providerLabel(s.provider_type)}</span>
         </div>
 
-        <h3 className="mt-2 line-clamp-2 font-heading text-xl font-extrabold leading-tight drop-shadow-lg">
+        <h3 className="mt-2 line-clamp-2 font-heading text-xl font-extrabold leading-tight text-[#1d080d]">
           {s.name}
         </h3>
-        <div className="mt-1 truncate text-xs text-[#f5f0e0]/75">{s.provider}</div>
+        <div className="mt-1 truncate text-xs font-bold text-[#1d080d]/80">{s.provider}</div>
 
         {s.min_sat_score != null && (
-          <div className="mt-2 inline-flex w-fit items-center gap-1.5 self-start rounded-full bg-[#D9B565]/20 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-[#f5f0e0] ring-1 ring-[#D9B565]/50 backdrop-blur">
+          <div className="mt-2 inline-flex w-fit items-center gap-1.5 self-start rounded-full bg-[#D9B565] px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-[#1d080d] shadow-sm">
             🎯 SAT ≥ {s.min_sat_score}
-            {s.min_act_score ? <span className="text-[#f5f0e0]/70">· ACT {s.min_act_score}+</span> : null}
+            {s.min_act_score ? <span className="text-[#1d080d]/80">· ACT {s.min_act_score}+</span> : null}
           </div>
         )}
 
-        <div className="mt-4 flex items-end justify-between gap-3 border-t border-[#f5f0e0]/20 pt-3">
+        <div className="mt-4 flex items-end justify-between gap-3 border-t border-[#1d080d]/15 pt-3">
           <div className="min-w-0">
-            <div className="text-[10px] uppercase tracking-wide text-[#f5f0e0]/60">Value</div>
-            <div className="line-clamp-2 text-sm font-bold leading-snug">{s.amount || "Varies"}</div>
+            <div className="text-[10px] font-extrabold uppercase tracking-wide text-[#1d080d]/70">Value</div>
+            <div className="line-clamp-2 text-sm font-bold leading-snug text-[#1d080d]">{s.amount || "Varies"}</div>
           </div>
           {variant === "prep" ? (
-            <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-[#f5f0e0]/20 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-[#f5f0e0] ring-1 ring-[#f5f0e0]/30">
+            <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-[#1d080d] px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-[#f5f0e0] shadow-sm">
               <CalendarClock className="h-3 w-3" /> Next cycle
             </span>
           ) : (
-            <span className={`inline-flex shrink-0 items-center gap-1 rounded-full px-2.5 py-1 text-[11px] font-bold uppercase tracking-wide ring-1 ${countdownCls}`}>
+            <span className={`inline-flex shrink-0 items-center gap-1 rounded-full px-2.5 py-1 text-[11px] font-bold uppercase tracking-wide shadow-sm ${countdownCls}`}>
               <Clock className="h-3 w-3" />
               {countdownLabel}
             </span>
           )}
         </div>
 
-        <div className="mt-3 flex items-center justify-between text-[11px] text-[#f5f0e0]/75">
+        <div className="mt-3 flex items-center justify-between text-[11px] font-bold text-[#1d080d]/90">
           <span>{s.application_fee_usd > 0 ? `$${s.application_fee_usd} fee` : "Free to apply"}</span>
           {s.accepts_moi_waiver && (
-            <span className="rounded-full bg-[#D9B565]/20 px-2 py-0.5 font-semibold text-[#D9B565] ring-1 ring-[#D9B565]/40">MOI ok</span>
+            <span className="rounded-full bg-[#D9B565] px-2 py-0.5 font-extrabold text-[#1d080d] shadow-sm">MOI ok</span>
           )}
-          <span className="inline-flex items-center gap-1 font-semibold text-[#f5f0e0] group-hover:underline">
+          <span className="inline-flex items-center gap-1 font-bold text-[#1d080d] hover:underline group-hover:underline">
             View <ArrowRight className="h-3 w-3 transition-transform group-hover:translate-x-0.5" />
           </span>
         </div>
