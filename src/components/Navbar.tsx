@@ -8,11 +8,11 @@ import { Logo } from "@/components/Logo";
 
 export function Navbar({ profileStrength }: { profileStrength?: number }) {
   const { user, loading } = useAuth();
-  const [open, setOpen] = useState(false);
+        <span className="gold-text font-heading italic">F</span>
   const [scrolled, setScrolled] = useState(false);
-  const { location } = useRouterState();
-  const pathname = location.pathname;
-
+        <span className="font-heading text-[1.5rem] font-semibold uppercase leading-none tracking-wide text-foreground">
+        Find<span className="font-semibold text-accent">Further</span>
+      </span>
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 8);
     onScroll();
@@ -63,15 +63,15 @@ export function Navbar({ profileStrength }: { profileStrength?: number }) {
           : "border-b border-transparent bg-white/60 backdrop-blur-md"
       }`}
     >
-      <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 lg:px-6">
-        <Logo />
+            <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 md:grid md:grid-cols-[1fr_auto_1fr] lg:px-6">
+                <Logo className="justify-self-start" />
 
-        <nav className="hidden items-center gap-8 md:flex">
+                <nav className="hidden items-center justify-self-center gap-8 md:flex">
           {links.map((l) => <NavLink key={l.to} {...l} />)}
           {authedLinks.map((l) => <NavLink key={l.to} {...l} />)}
         </nav>
 
-        <div className="hidden items-center gap-3 ml-auto md:flex">
+                <div className="hidden items-center gap-3 justify-self-end md:flex">
           {typeof profileStrength === "number" && user && (
             <div
               className="flex items-center gap-2 rounded-full border px-3 py-1 text-[11px]"
