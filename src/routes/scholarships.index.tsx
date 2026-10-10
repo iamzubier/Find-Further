@@ -27,6 +27,9 @@ import { TopoBackground } from "@/components/TopoBackground";
 import { SmartCampusImage } from "@/components/SmartCampusImage";
 import { useWikiImage } from "@/lib/use-wiki-image";
 import { LoginNudge } from "./universities.index";
+import exploreImg from "@/assets/explore-spires.jpg";
+import compareImg from "@/assets/compare-notebooks.jpg";
+import tipsImg from "@/assets/tips-lamp.jpg";
 
 export const Route = createFileRoute("/scholarships/")({
   head: () => ({
@@ -204,6 +207,34 @@ function ScholarshipsHub() {
 
   const all = dbQuery.data ?? [];
 
+  /* Real campus photos for the hero collage — taken from the universities we
+     already hold verified imagery for, so every frame is an actual campus. */
+  const heroPhotosQuery = useQuery({
+    queryKey: ["scholarships-hero-campus-photos"],
+    staleTime: 30 * 60 * 1000,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("universities_detail")
+        .select("name, country, campus_image_url")
+        .not("campus_image_url", "is", null)
+        .order("qs_rank", { ascending: true, nullsFirst: false })
+        .limit(12);
+      if (error) throw error;
+      const seen = new Set<string>();
+      const rows: HeroPhoto[] = [];
+      for (const r of (data ?? []) as any[]) {
+        const name = String(r?.name ?? "").trim();
+        const src = String(r?.campus_image_url ?? "").trim();
+        if (!name || !src || seen.has(name)) continue;
+        seen.add(name);
+        rows.push({ name, country: String(r?.country ?? "").trim(), src });
+      }
+      return rows;
+    },
+  });
+
+  const heroPhotos = heroPhotosQuery.data ?? [];
+
   const satNum = Number(userSat);
   const hasUserSat = Number.isFinite(satNum) && satNum >= 400 && satNum <= 1600;
 
@@ -312,18 +343,26 @@ function ScholarshipsHub() {
         />
 
         <div className="relative mx-auto max-w-7xl px-4 pt-16 pb-12 md:pt-24 md:pb-16 lg:px-6">
-          <div className="mb-8 flex items-center gap-3 text-[10px] font-bold uppercase tracking-[0.28em] text-[#f5f0e0]/60">
-            <span className="h-px w-10 bg-[#D9B565]/60" />
-            Vol. {new Date().getFullYear()} — Atlas
-            <span className="h-px w-10 bg-[#D9B565]/60" />
+          <div className="grid gap-10 lg:grid-cols-[1.05fr_0.95fr] lg:items-end lg:gap-14">
+            <div>
+              <div className="mb-8 flex items-center gap-3 text-[10px] font-bold uppercase tracking-[0.28em] text-[#f5f0e0]/60">
+                <span className="h-px w-10 bg-[#D9B565]/60" />
+                Vol. {new Date().getFullYear()} — Atlas
+                <span className="h-px w-10 bg-[#D9B565]/60" />
+              </div>
+
+              <h1 className="font-heading text-6xl font-extrabold leading-[0.95] tracking-tight text-[#f5f0e0] md:text-[7.5rem]">
+                <span className="font-medium italic text-[#D9B565]">Funded.</span>
+              </h1>
+              <div className="mt-4 font-heading text-2xl font-light tracking-tight text-[#f5f0e0]/80 md:text-3xl">
+                Everywhere worth going.
+              </div>
+            </div>
+
+            <HeroCampusCollage photos={heroPhotos} />
           </div>
 
-          <h1 className="font-heading text-6xl font-extrabold leading-[0.95] tracking-tight text-[#f5f0e0] md:text-[7.5rem]">
-            <span className="font-medium italic text-[#D9B565]">Funded.</span>
-          </h1>
-          <div className="mt-4 font-heading text-2xl font-light tracking-tight text-[#f5f0e0]/80 md:text-3xl">
-            Everywhere worth going.
-          </div>
+
 
           <div className="mt-12 grid max-w-4xl grid-cols-2 gap-px overflow-hidden rounded-md border border-[#f5f0e0]/15 bg-[#f5f0e0]/15 sm:grid-cols-4">
             {[
