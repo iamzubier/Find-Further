@@ -317,16 +317,46 @@ function CatalogBrowser() {
     },
   });
 
+    const ids = useMemo(
+    () => (listQuery.data?.rows ?? []).map((r: any) => String(r.id)),
+    [listQuery.data],
+  );
+
+  const uniPhotosQuery = useQuery({
+    queryKey: ["uni-photos", ids.join(",")],
+    enabled: ids.length > 0,
+    staleTime: 60 * 60 * 1000,
+    queryFn: async () => {
+      const map: Record<string, any> = {};
+      const { data, error } = await photosDb
+        .from("uni_photos")
+        .select("catalog_id, thumb_url, credit, license, source_url")
+        .in("catalog_id", ids);
+      if (error || !data) return map;
+      for (const r of data as any[]) map[String(r.catalog_id)] = r;
+      return map;
+    },
+  });
+
   const grouped = useMemo(() => {
     const rows = listQuery.data?.rows ?? [];
     const imgMap = imagesQuery.data ?? {};
-    const qsMap: Record<string, any[]> = qsPhotosQuery.data ?? {};
+    const upMap = uniPhotosQuery.data ?? {};
+    const maps = (qsPhotosQuery.data ?? { byName: {}, byHost: {} }) as {
+      byName: Record<string, any[]>; byHost: Record<string, any[]>;
+    };
     const map = new Map<string, any[]>();
     for (const r of rows) {
       const key = r.country || "Other";
-      const cands = (qsMap[normName(String(r.name ?? ""))] ?? []).filter((c: any) => sameC(c.country, r.country));
+      const h = hostOf(r.website);
+      let cands = (h ? maps.byHost[h] ?? [] : []).filter((c: any) => sameC(c.country, r.country));
+      if (cands.length !== 1) {
+        cands = (maps.byName[normName(String(r.name ?? ""))] ?? []).filter((c: any) => sameC(c.country, r.country));
+      }
       const qp = cands.length === 1 ? cands[0] : undefined;
-      const photo = qp ? (qp.image_thumb_url || qp.image_url || null) : null;
+      const up = upMap[String(r.id)];
+      const photo = qp ? (qp.image_thumb_url || qp.image_url || null) : (up?.thumb_url ?? null);
+      const creditParts = qp ? [qp.image_credit, qp.image_license] : [up?.credit, up?.license];
       const enriched = {
         ...r,
         campus_image_url: r.slug ? imgMap[r.slug]?.campus_image_url ?? null : null,
@@ -334,15 +364,15 @@ function CatalogBrowser() {
         qs_rank: r.qs_rank ?? (qp?.qs_rank_latest ? String(qp.qs_rank_latest).replace(/^=/, "") : null),
         qs_photo: photo,
         photo_credit: photo
-          ? [String(qp.image_credit ?? "").replace(/<[^>]*>/g, "").trim(), qp.image_license].filter(Boolean).join(" · ")
+          ? creditParts.map((x: any) => String(x ?? "").replace(/<[^>]*>/g, "").trim()).filter(Boolean).join(" · ")
           : null,
-        photo_source: photo ? qp.image_source_url ?? null : null,
+        photo_source: photo ? ((qp ? qp.image_source_url : up?.source_url) ?? null) : null,
       };
       if (!map.has(key)) map.set(key, []);
       map.get(key)!.push(enriched);
     }
     return Array.from(map.entries());
-  }, [listQuery.data, imagesQuery.data, qsPhotosQuery.data]);
+  }, [listQuery.data, imagesQuery.data, qsPhotosQuery.data, uniPhotosQuery.data]);;
     
 
   return (
