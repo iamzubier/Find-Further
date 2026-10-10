@@ -2,7 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import { scoreProfile, matchUniversity, type EvalInput, type MatchedUni } from "./evaluation";
+import { scoreProfile, matchUniversity, countryToCode, type EvalInput, type MatchedUni } from "./evaluation";
 import { convertToAll, type RawGrade, type ConvertedGrades } from "./curriculum";
 
 const RawSchema = z.discriminatedUnion("curriculum", [
@@ -53,9 +53,12 @@ async function runEvaluation(input: z.infer<typeof PayloadSchema>) {
     .select("slug,name,country,city,qs_rank,logo_url,campus_image_url,admission_reqs,tuition,scholarships")
     .limit(400);
 
+    const wanted = new Set(input.target_countries);
   const matches: MatchedUni[] = (unis ?? [])
+    .filter(u => wanted.size === 0 || wanted.has(countryToCode(u.country ?? "")))
     .map(u => matchUniversity(u as Parameters<typeof matchUniversity>[0], evalInput))
-    .sort((a, b) => b.matchPct - a.matchPct)
+    .sort((a, b) =>
+      (b.coverage >= 0.3 ? 1 : 0) - (a.coverage >= 0.3 ? 1 : 0) || b.matchPct - a.matchPct)
     .slice(0, 24);
 
   return { converted, breakdown, matches };
