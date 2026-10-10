@@ -486,17 +486,19 @@ function MatchRow({ m, converted }: { m: MatchedUni; converted: ConvertedGrades 
       <div className="relative h-20 bg-muted">
         <SmartCampusImage src={m.campus_image_url} name={m.name} noOverlay />
         <div className="absolute inset-0 bg-gradient-to-t from-background/70 to-transparent" />
-        <div className="absolute right-2 top-2 rounded bg-primary px-2 py-0.5 text-[10px] font-bold text-primary-foreground">{m.matchPct}% match</div>
+        <div className="absolute right-2 top-2 flex items-center gap-1">           {m.coverage > 0 && m.coverage < 0.5 && <span className="rounded bg-black/50 px-1.5 py-0.5 text-[9px] font-semibold text-white">Limited data</span>}           <span className="rounded bg-primary px-2 py-0.5 text-[10px] font-bold text-primary-foreground">             {m.coverage === 0 ? "Not enough data" : `${m.matchPct}% match`}           </span>         </div>
         <div className="absolute bottom-1.5 left-2"><SmartLogo name={m.name} logoUrl={m.logo_url} size={28} /></div>
       </div>
       <div className="p-3">
         <p className="line-clamp-1 text-sm font-semibold text-foreground">{m.name}</p>
         <p className="text-[11px] text-muted-foreground">{m.city ? `${m.city}, ` : ""}{m.country}{m.qs_rank ? ` · QS #${m.qs_rank}` : ""}</p>
-        {converted && (
+                {converted && (
           <p className="mt-1.5 text-[11px] text-foreground">
-            {m.meetsGpa
-              ? <>Your US {converted.us4.toFixed(2)} meets requirement <CheckCircle2 className="inline h-3 w-3 text-accent" /></>
-              : <span className="text-rose-700">Your US {converted.us4.toFixed(2)} below typical requirement</span>}
+            {!m.gpaKnown
+              ? <span className="text-muted-foreground">Grade requirement not verified yet</span>
+              : m.meetsGpa
+                ? <>Your US {converted.us4.toFixed(2)} meets requirement <CheckCircle2 className="inline h-3 w-3 text-accent" /></>
+                : <span className="text-rose-700">Your US {converted.us4.toFixed(2)} below typical requirement</span>}
           </p>
         )}
         <div className="mt-2 flex items-center justify-between">
