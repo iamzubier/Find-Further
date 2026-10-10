@@ -12,4 +12,18 @@ export default defineConfig({
   tanstackStart: {
     server: { entry: "server" },
   },
+  vite: {
+    optimizeDeps: {
+      // Start's browser entry statically imports its server storage module
+      // (node:async_hooks). When Vite pre-bundles it, the framework's
+      // isomorphic-fn compiler never sees those files, so the server-only
+      // branch ships to the browser and the client bundle throws. Serving
+      // them unbundled lets the compiler strip that branch.
+      exclude: [
+        "@tanstack/start-client-core",
+        "@tanstack/start-storage-context",
+        "@tanstack/start-fn-stubs",
+      ],
+    },
+  },
 });
