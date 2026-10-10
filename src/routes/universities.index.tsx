@@ -17,7 +17,7 @@ import { useCompare } from "@/lib/compare-store";
 import { toast } from "sonner";
 import { SmartLogo } from "@/components/SmartLogo";
 import { SmartCampusImage } from "@/components/SmartCampusImage";
-import { useWikiImage } from "@/lib/use-wiki-image";
+
 
 import { createClient } from "@supabase/supabase-js";
 
@@ -27,6 +27,23 @@ const photosDb = createClient(
   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJwbHdvY29mbnFpcHh2Z3RqcXZ4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgwNjU0OTQsImV4cCI6MjA5MzY0MTQ5NH0.vpWyVq_unespHYrI3uQz3Ki716cRjWgeXR6JSkvlWIQ",
   { auth: { persistSession: false, autoRefreshToken: false } },
 );
+
+const normName = (s: string) =>
+  s.toLowerCase()
+    .normalize("NFKD").replace(/[\u0300-\u036f]/g, "")
+    .replace(/\(.*?\)/g, " ")
+    .replace(/&/g, " and ")
+    .replace(/\bthe\b/g, " ")
+    .replace(/[^a-z0-9]+/g, " ")
+    .trim();
+
+const normC = (s?: string | null) =>
+  (s ?? "").toLowerCase().replace(/\(.*?\)/g, " ").replace(/[^a-z ]+/g, " ")
+    .replace(/\b(sar|the|republic of|peoples)\b/g, " ").replace(/\s+/g, " ").trim();
+const sameC = (a?: string | null, b?: string | null) => {
+  const x = normC(a), y = normC(b);
+  return !x || !y || x === y || x.includes(y) || y.includes(x);
+};
 
 const SearchSchema = z.object({
   country: z.string().optional(),
@@ -278,45 +295,48 @@ function CatalogBrowser() {
     },
   });
 
-    const names = useMemo(
-    () => (listQuery.data?.rows ?? []).map((r: any) => r.name as string).filter(Boolean),
-    [listQuery.data],
-  );
-
-  const qsPhotosQuery = useQuery({
-    queryKey: ["qs-photos", names.join("|")],
-    enabled: names.length > 0,
-    staleTime: 5 * 60 * 1000,
+      const qsPhotosQuery = useQuery({
+    queryKey: ["qs-photos-all"],
+    staleTime: 60 * 60 * 1000,
     queryFn: async () => {
-      const map: Record<string, any> = {};
-            const { data, error } = await photosDb
-        .from("qs")
-        .select("title, image_url, image_thumb_url, image_credit, image_license, image_source_url")
-        .in("title", names)
-        .not("image_url", "is", null);
-      if (error) return map;
-      for (const r of data ?? []) map[String(r.title).toLowerCase().trim()] = r;
-      return map;
+      const byName: Record<string, any[]> = {};
+      for (let from = 0; ; from += 1000) {
+        const { data, error } = await photosDb
+          .from("qs")
+          .select("title, country, qs_rank_latest, image_thumb_url, image_url, image_credit, image_license, image_source_url")
+          .order("id")
+          .range(from, from + 999);
+        if (error || !data) break;
+        for (const r of data as any[]) {
+          const k = normName(String(r.title ?? ""));
+          if (k) (byName[k] = byName[k] || []).push(r);
+        }
+        if (data.length < 1000) break;
+      }
+      return byName;
     },
   });
 
   const grouped = useMemo(() => {
     const rows = listQuery.data?.rows ?? [];
     const imgMap = imagesQuery.data ?? {};
-    const qsMap = qsPhotosQuery.data ?? {};
+    const qsMap: Record<string, any[]> = qsPhotosQuery.data ?? {};
     const map = new Map<string, any[]>();
     for (const r of rows) {
       const key = r.country || "Other";
-      const qp = qsMap[String(r.name ?? "").toLowerCase().trim()];
+      const cands = (qsMap[normName(String(r.name ?? ""))] ?? []).filter((c: any) => sameC(c.country, r.country));
+      const qp = cands.length === 1 ? cands[0] : undefined;
+      const photo = qp ? (qp.image_thumb_url || qp.image_url || null) : null;
       const enriched = {
         ...r,
         campus_image_url: r.slug ? imgMap[r.slug]?.campus_image_url ?? null : null,
         logo_url: r.slug ? imgMap[r.slug]?.logo_url ?? null : null,
-        qs_photo: qp ? (qp.image_thumb_url || qp.image_url) : null,
-        photo_credit: qp
+        qs_rank: r.qs_rank ?? (qp?.qs_rank_latest ? String(qp.qs_rank_latest).replace(/^=/, "") : null),
+        qs_photo: photo,
+        photo_credit: photo
           ? [String(qp.image_credit ?? "").replace(/<[^>]*>/g, "").trim(), qp.image_license].filter(Boolean).join(" · ")
           : null,
-        photo_source: qp?.image_source_url ?? null,
+        photo_source: photo ? qp.image_source_url ?? null : null,
       };
       if (!map.has(key)) map.set(key, []);
       map.get(key)!.push(enriched);
@@ -400,8 +420,8 @@ function CatalogBrowser() {
 
 function CatalogCard({ u, photosReady }: { u: any; photosReady: boolean }) {
   // If the DB has no campus image, fall back to a live Wikipedia thumbnail.
-      const wiki = useWikiImage(u.name, photosReady && !u.campus_image_url && !u.qs_photo);
-  const imageSrc = u.campus_image_url || u.qs_photo || wiki.data || null;
+      
+  const imageSrc = u.campus_image_url || u.qs_photo || null;
   return (
     <article className="group relative flex h-full flex-col overflow-hidden rounded-xl border border-border bg-heading transition-all duration-500 hover:-translate-y-1 hover:border-[oklch(0.74_0.10_85_/_0.6)] hover:shadow-[0_20px_40px_-20px_rgba(0,60,40,0.25)]">
       {/* Top campus image banner */}
