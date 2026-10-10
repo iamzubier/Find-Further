@@ -45,6 +45,13 @@ const sameC = (a?: string | null, b?: string | null) => {
   return !x || !y || x === y || x.includes(y) || y.includes(x);
 };
 
+const hostOf = (u?: string | null) => {
+  if (!u) return "";
+  try {
+    return new URL(/^https?:\/\//i.test(u) ? u : `https://${u}`).hostname.replace(/^www\d?\./, "").toLowerCase();
+  } catch { return ""; }
+};
+
 const SearchSchema = z.object({
   country: z.string().optional(),
   program: z.string().optional(),
@@ -295,25 +302,28 @@ function CatalogBrowser() {
     },
   });
 
-      const qsPhotosQuery = useQuery({
-    queryKey: ["qs-photos-all"],
+     const qsPhotosQuery = useQuery({
+    queryKey: ["qs-photos-all-v2"],
     staleTime: 60 * 60 * 1000,
     queryFn: async () => {
       const byName: Record<string, any[]> = {};
+      const byHost: Record<string, any[]> = {};
       for (let from = 0; ; from += 1000) {
         const { data, error } = await photosDb
           .from("qs")
-          .select("title, country, qs_rank_latest, image_thumb_url, image_url, image_credit, image_license, image_source_url")
+          .select("title, country, domain, qs_rank_latest, image_thumb_url, image_url, image_credit, image_license, image_source_url")
           .order("id")
           .range(from, from + 999);
         if (error || !data) break;
         for (const r of data as any[]) {
           const k = normName(String(r.title ?? ""));
           if (k) (byName[k] = byName[k] || []).push(r);
+          const h = hostOf(r.domain);
+          if (h) (byHost[h] = byHost[h] || []).push(r);
         }
         if (data.length < 1000) break;
       }
-      return byName;
+      return { byName, byHost };
     },
   });
 
