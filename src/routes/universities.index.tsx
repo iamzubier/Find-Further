@@ -421,13 +421,13 @@ function CatalogBrowser() {
 function CatalogCard({ u, photosReady }: { u: any; photosReady: boolean }) {
   // If the DB has no campus image, fall back to a live Wikipedia thumbnail.
       
-  const imageSrc = u.campus_image_url || u.qs_photo || null;
+    const imageSrc = u.qs_photo || u.campus_image_url || null;
   return (
     <article className="group relative flex h-full flex-col overflow-hidden rounded-xl border border-border bg-heading transition-all duration-500 hover:-translate-y-1 hover:border-[oklch(0.74_0.10_85_/_0.6)] hover:shadow-[0_20px_40px_-20px_rgba(0,60,40,0.25)]">
       {/* Top campus image banner */}
       <div className="relative h-40 w-full overflow-hidden" style={{ background: "var(--gradient-hero)" }}>
         <SmartCampusImage src={imageSrc} name={u.name} noOverlay />
-                {u.qs_photo && !u.campus_image_url && u.photo_credit && (
+                        {u.qs_photo && u.photo_credit && (
           <a
             href={u.photo_source ?? undefined}
             target="_blank"
