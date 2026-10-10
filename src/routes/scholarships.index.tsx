@@ -862,3 +862,83 @@ function WtfScholarshipsCarousel({ all }: { all: ViewSch[] }) {
     </section>
   );
 }
+
+/* ──────────────── Hero campus collage ──────────────── */
+
+type HeroPhoto = { name: string; country: string; src: string };
+
+/* Editorial stand-ins, used only while the verified campus photos load (or if
+   one fails to download), so the hero never collapses to empty colour. */
+const FALLBACK_HERO_PHOTOS: HeroPhoto[] = [
+  { name: "The reading room", country: "", src: exploreImg },
+  { name: "Late study", country: "", src: tipsImg },
+  { name: "Notes and applications", country: "", src: compareImg },
+];
+
+function HeroCampusCollage({ photos }: { photos: HeroPhoto[] }) {
+  const shown = useMemo(() => {
+    const list = photos.slice(0, 3);
+    if (list.length < 3) {
+      for (const f of FALLBACK_HERO_PHOTOS) {
+        if (list.length >= 3) break;
+        if (!list.some((p) => p.src === f.src)) list.push(f);
+      }
+    }
+    return list;
+  }, [photos]);
+
+  const frames = [
+    "left-0 top-6 h-[72%] w-[58%] -rotate-3 float-slow",
+    "right-0 top-0 h-[80%] w-[54%] rotate-2 float-slow",
+    "bottom-0 left-1/2 z-20 h-[58%] w-[50%] -translate-x-1/2 rotate-[0.8deg]",
+  ];
+  const drift = ["0s", "-4.5s", "0s"];
+
+  return (
+    <div className="relative mx-auto h-[260px] w-full max-w-[540px] sm:h-[320px] lg:h-[430px]">
+      <div aria-hidden className="absolute -inset-3 rounded-lg border border-[#f5f0e0]/10" />
+      <div
+        aria-hidden
+        className="absolute -inset-10 opacity-70 blur-2xl"
+        style={{ background: "radial-gradient(60% 55% at 60% 45%, rgba(217,181,101,0.22), transparent 70%)" }}
+      />
+      {shown.map((p, i) => (
+        <figure
+          key={p.src + i}
+          className={`group absolute overflow-hidden rounded-md border border-[#f5f0e0]/25 bg-[#2a0e14] shadow-[0_28px_60px_-28px_rgba(0,0,0,0.85)] transition-transform duration-500 hover:z-30 hover:scale-[1.03] ${frames[i]}`}
+          style={{ animationDelay: drift[i] }}
+        >
+          <div className="relative h-full w-full">
+            <SmartCampusImage
+              src={p.src}
+              name={p.name}
+              alt={`${p.name} campus`}
+              noOverlay
+              loading="eager"
+              className="transition-transform duration-1000 group-hover:scale-[1.06]"
+            />
+            <div
+              aria-hidden
+              className="pointer-events-none absolute inset-0"
+              style={{
+                background:
+                  "linear-gradient(to top, rgba(26,5,10,0.9), rgba(26,5,10,0.28) 52%, transparent)",
+              }}
+            />
+            <figcaption className="absolute inset-x-0 bottom-0 flex items-center gap-2 px-3 pb-2.5">
+              <span className="h-px w-4 shrink-0 bg-[#D9B565]/70" />
+              <span className="truncate text-[10px] font-semibold uppercase tracking-[0.16em] text-[#f5f0e0]/90">
+                {p.name}
+              </span>
+              {p.country && (
+                <span className="truncate text-[10px] uppercase tracking-[0.16em] text-[#f5f0e0]/50">
+                  · {p.country}
+                </span>
+              )}
+            </figcaption>
+          </div>
+        </figure>
+      ))}
+    </div>
+  );
+}
