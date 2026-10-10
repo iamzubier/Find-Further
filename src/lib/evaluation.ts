@@ -90,64 +90,100 @@ export type MatchedUni = {
   logo_url: string | null;
   campus_image_url: string | null;
   tuition_display: string | null;
-  matchPct: number;
+    matchPct: number;
+  coverage: number;   // 0–1: how much of the score rests on verified data
+  gpaKnown: boolean;
   reasons: string[];
   meetsGpa: boolean;
 };
 
 /** Match a fetched university_detail row against the evaluation input. */
+type Reqs = { min_gpa_us?: number; ielts?: number; toefl?: number; sat_min?: number };
+
+/** Match a fetched university_detail row against the evaluation input.
+ *  Only criteria the university has verified data for are scored;
+ *  `coverage` says how much of the score rests on real data. */
 export function matchUniversity(uni: {
   slug: string; name: string; country: string; city: string | null;
   qs_rank: number | null; logo_url: string | null; campus_image_url: string | null;
-  admission_reqs: { min_gpa_us?: number; ielts?: number; toefl?: number; sat_min?: number } | null;
+  admission_reqs: Reqs | null;
   tuition: { display?: string; per_year_usd?: number } | null;
   scholarships?: unknown[] | null;
 }, p: EvalInput): MatchedUni {
   const reasons: string[] = [];
-  let score = 0; let weight = 0;
+  const reqs: Reqs = uni.admission_reqs ?? {};
+  const MAX_WEIGHT = 90;
+  let score = 0;
+  let weight = 0;
 
-  const reqGpa = uni.admission_reqs?.min_gpa_us ?? 3.0;
-  weight += 35;
-  const gap = p.converted.us4 - reqGpa;
-  const meetsGpa = gap >= 0;
-  if (gap >= 0.3) { score += 35; reasons.push(`Your US ${p.converted.us4.toFixed(2)} comfortably clears their ${reqGpa.toFixed(1)} bar.`); }
-  else if (gap >= 0) { score += 26; reasons.push(`Your grade meets their ${reqGpa.toFixed(1)} minimum.`); }
-  else if (gap >= -0.3) { score += 12; reasons.push(`Grade slightly below ${reqGpa.toFixed(1)} — reach.`); }
+  // Grades (35): only when the university's minimum is known
+  const gpaKnown = typeof reqs.min_gpa_us === "number";
+  let meetsGpa = false;
+  if (gpaKnown) {
+    const reqGpa = reqs.min_gpa_us as number;
+    const gap = p.converted.us4 - reqGpa;
+    weight += 35;
+    meetsGpa = gap >= 0;
+    if (gap >= 0.3) { score += 35; reasons.push(`Your US ${p.converted.us4.toFixed(2)} comfortably clears their ${reqGpa.toFixed(1)} bar.`); }
+    else if (gap >= 0) { score += 26; reasons.push(`Your grade meets their ${reqGpa.toFixed(1)} minimum.`); }
+    else if (gap >= -0.3) { score += 12; reasons.push(`Grade slightly below ${reqGpa.toFixed(1)}: reach.`); }
+    else { reasons.push(`Grade is well below their ${reqGpa.toFixed(1)} bar.`); }
+  }
 
-  weight += 20;
-  const reqIelts = uni.admission_reqs?.ielts ?? 6.5;
-  if ((p.tests.ielts ?? 0) >= reqIelts || (p.tests.toefl ?? 0) >= (uni.admission_reqs?.toefl ?? 90)) {
-    score += 20; reasons.push(`English score meets their requirement.`);
-  } else if ((p.tests.ielts ?? 0) >= reqIelts - 0.5) score += 12;
+  // English (20): only when an English requirement is known
+  const reqIelts = typeof reqs.ielts === "number" ? reqs.ielts : null;
+  const reqToefl = typeof reqs.toefl === "number" ? reqs.toefl : null;
+  if (reqIelts !== null || reqToefl !== null) {
+    weight += 20;
+    const ielts = p.tests.ielts ?? 0;
+    const toefl = p.tests.toefl ?? 0;
+    const meetsEnglish =
+      (reqIelts !== null && ielts >= reqIelts) || (reqToefl !== null && toefl >= reqToefl);
+    if (meetsEnglish) { score += 20; reasons.push("English score meets their requirement."); }
+    else if (reqIelts !== null && ielts > 0 && ielts >= reqIelts - 0.5) { score += 12; reasons.push(`English is within 0.5 of their IELTS ${reqIelts}.`); }
+    else if (ielts || toefl) reasons.push("English score is below their requirement.");
+    else reasons.push("No English test on file yet, and they require one.");
+  }
 
-  weight += 15;
-  if (uni.admission_reqs?.sat_min && p.tests.sat && p.tests.sat >= uni.admission_reqs.sat_min) score += 15;
-  else if (!uni.admission_reqs?.sat_min) score += 12;
+  // SAT (15): only when they set a minimum
+  if (typeof reqs.sat_min === "number") {
+    weight += 15;
+    if (p.tests.sat && p.tests.sat >= reqs.sat_min) score += 15;
+    else if (p.tests.sat) reasons.push(`SAT is below their ${reqs.sat_min} minimum.`);
+    else reasons.push(`They expect SAT ${reqs.sat_min}+ and none is on file.`);
+  }
 
-  weight += 15;
-  const tuitionUsd = uni.tuition?.per_year_usd ?? 20000;
-  const cap = p.budget === "Under $5k" ? 5000 : p.budget === "$5k–15k" ? 15000 : p.budget === "$15k–30k" ? 30000 : 100000;
-  if (tuitionUsd <= cap) { score += 15; if (tuitionUsd < 1000) reasons.push("Tuition is effectively free."); }
-  else if (tuitionUsd <= cap * 1.5) score += 7;
+  // Budget (15): only when the student gave a budget and the cost is known
+  const cost = uni.tuition?.per_year_usd;
+  if (p.budget && typeof cost === "number") {
+    weight += 15;
+    const cap =
+      p.budget === "Fully Funded" ? 1000 :
+      p.budget === "Under $5k" ? 5000 :
+      p.budget === "$5k–15k" ? 15000 :
+      p.budget === "$15k–30k" ? 30000 : 100000;
+    if (cost <= cap) { score += 15; if (cost < 1000) reasons.push("Tuition is effectively free."); }
+    else if (cost <= cap * 1.5) { score += 7; reasons.push("Tuition is above your budget, but close."); }
+    else reasons.push("Tuition is well above your budget.");
+  }
 
-  weight += 10;
-  if (p.targetCountries.length && p.targetCountries.includes(countryToCode(uni.country))) {
-    score += 10; reasons.push(`${uni.country} is on your target list.`);
-  } else if (!p.targetCountries.length) score += 6;
+  // Scholarships (5): only when the student needs one and we know the list
+  if ((p.scholarshipNeed === "yes" || p.scholarshipNeed === "nice") && Array.isArray(uni.scholarships)) {
+    weight += 5;
+    if (uni.scholarships.length > 0) { score += 5; reasons.push("Scholarships available."); }
+  }
 
-  weight += 5;
-  if ((uni.scholarships?.length ?? 0) > 0) { score += 5; if (p.scholarshipNeed === "yes") reasons.push("Scholarships available."); }
-
-  const matchPct = Math.round((score / weight) * 100);
+  const matchPct = weight > 0 ? Math.round((score / weight) * 100) : 0;
   return {
     slug: uni.slug, name: uni.name, country: uni.country, city: uni.city,
     qs_rank: uni.qs_rank, logo_url: uni.logo_url, campus_image_url: uni.campus_image_url,
     tuition_display: uni.tuition?.display ?? null,
-    matchPct, reasons: reasons.slice(0, 3), meetsGpa,
+    matchPct, coverage: +(weight / MAX_WEIGHT).toFixed(2), gpaKnown,
+    reasons: reasons.slice(0, 3), meetsGpa,
   };
 }
 
-function countryToCode(country: string): string {
+export function countryToCode(country: string): string {
   const map: Record<string, string> = {
     "United States": "US", "USA": "US", "United Kingdom": "GB", "UK": "GB",
     "Germany": "DE", "Canada": "CA", "Australia": "AU", "Netherlands": "NL",
