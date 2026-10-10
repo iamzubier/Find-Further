@@ -12,6 +12,7 @@
   --color-popover: var(--popover); --color-popover-foreground: var(--popover-foreground); --color-primary: var(--primary); --color-primary-foreground: var(--primary-foreground);
   --color-primary-glow: var(--primary-glow); --color-secondary: var(--secondary); --color-secondary-foreground: var(--secondary-foreground); --color-muted: var(--muted); --color-muted-foreground: var(--muted-foreground);
   --color-accent: var(--accent); --color-accent-foreground: var(--accent-foreground); --color-gold: var(--gold); --color-gold-foreground: var(--gold-foreground);
+  --color-on-dark: var(--on-dark); --color-gold-on-dark: var(--gold-on-dark);
   --color-destructive: var(--destructive); --color-destructive-foreground: var(--destructive-foreground); --color-warning: var(--warning); --color-warning-foreground: var(--warning-foreground);
   --color-border: var(--border); --color-input: var(--input); --color-ring: var(--ring); --color-ring-offset-background: var(--background);
   --animate-fade-up: fade-up 0.7s cubic-bezier(0.16, 1, 0.3, 1) both; --animate-shimmer: shimmer 2.5s linear infinite;
@@ -25,6 +26,8 @@
   --border: #E4D9CC; --input: #D8C9BB; --ring: #651F2B; --radius: 6px;
   --gradient-emerald: linear-gradient(135deg, #651F2B, #8B3342); --gradient-gold: linear-gradient(135deg, #651F2B, #8B3342);
   --gradient-hero: linear-gradient(135deg, #651F2B, #43151D); --shadow-luxe: 0 12px 30px -20px rgba(41,39,37,.5); --shadow-gold: 0 4px 18px -8px rgba(101,31,43,.35);
+  /* Warm gold tuned for dark surfaces (footer, feature bands) where the light-mode gold is too dim to read */
+  --on-dark: #FAF3E8; --gold-on-dark: #E7B96B; --gradient-gold-on-dark: linear-gradient(135deg, #F6E0AE, #D9A24A);
 }
 .dark { --background: #FAF3E8; --foreground: #292725; --card: #FFFCF7; --card-foreground: #292725; --popover: #FFFCF7; --popover-foreground: #292725; --primary: #651F2B; --primary-foreground: #FFFCF7; --secondary: #E4D9CC; --secondary-foreground: #292725; --muted: #F1E8DD; --muted-foreground: #6F6963; --border: #E4D9CC; --input: #D8C9BB; --ring: #651F2B; }
 
@@ -100,6 +103,14 @@
   }
   .gold-text {
     background: var(--gradient-gold);
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+  }
+  .gold-text-dark {
+    background: var(--gradient-gold-on-dark);
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+  }
+  .gradient-text-dark {
+    background: var(--gradient-gold-on-dark);
     -webkit-background-clip: text; background-clip: text; color: transparent;
   }
   .serif-italic { font-family: var(--font-heading); font-style: italic; font-weight: 500; }
