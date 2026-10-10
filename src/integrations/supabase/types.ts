@@ -484,8 +484,18 @@ export type Database = {
           domains: string[] | null
           has_curated_data: boolean
           id: string
+          logo_url: string | null
           name: string
+          qs_academic_reputation: number | null
+          qs_citations_per_faculty: number | null
+          qs_employer_reputation: number | null
+          qs_faculty_student_ratio: number | null
+          qs_international_faculty: number | null
+          qs_international_students: number | null
+          qs_overall_score: number | null
           qs_rank: number | null
+          qs_rank_latest: string | null
+          qs_sustainability: number | null
           region: string | null
           slug: string | null
           state_province: string | null
@@ -497,8 +507,18 @@ export type Database = {
           domains?: string[] | null
           has_curated_data?: boolean
           id: string
+          logo_url?: string | null
           name: string
+          qs_academic_reputation?: number | null
+          qs_citations_per_faculty?: number | null
+          qs_employer_reputation?: number | null
+          qs_faculty_student_ratio?: number | null
+          qs_international_faculty?: number | null
+          qs_international_students?: number | null
+          qs_overall_score?: number | null
           qs_rank?: number | null
+          qs_rank_latest?: string | null
+          qs_sustainability?: number | null
           region?: string | null
           slug?: string | null
           state_province?: string | null
@@ -510,8 +530,18 @@ export type Database = {
           domains?: string[] | null
           has_curated_data?: boolean
           id?: string
+          logo_url?: string | null
           name?: string
+          qs_academic_reputation?: number | null
+          qs_citations_per_faculty?: number | null
+          qs_employer_reputation?: number | null
+          qs_faculty_student_ratio?: number | null
+          qs_international_faculty?: number | null
+          qs_international_students?: number | null
+          qs_overall_score?: number | null
           qs_rank?: number | null
+          qs_rank_latest?: string | null
+          qs_sustainability?: number | null
           region?: string | null
           slug?: string | null
           state_province?: string | null

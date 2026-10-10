@@ -2,7 +2,18 @@ import { Link } from "@tanstack/react-router";
 
 export const OFFICIAL_LOGO_URL = "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/464120b8-38ac-453b-9198-c6597c4294d0-wRX4vldGqof9v8fZygtfncVgQCxKAk.png";
 
-export function Logo({ className = "" }: { className?: string; showWord?: boolean }) {
+export function Logo({
+  className = "",
+  showWord = true,
+  tone = "light",
+}: {
+  className?: string;
+  showWord?: boolean;
+  /** "dark" = the logo sits on a dark surface, so the wordmark and accent use light tokens */
+  tone?: "light" | "dark";
+}) {
+  const word = tone === "dark" ? "text-on-dark" : "text-foreground";
+  const accent = tone === "dark" ? "gradient-text-dark" : "gradient-text";
   return (
     <Link to="/" className={`group inline-flex items-center gap-2.5 ${className}`} aria-label="FindFurther home">
       <img
@@ -10,8 +21,8 @@ export function Logo({ className = "" }: { className?: string; showWord?: boolea
         alt="FindFurther mascot logo"
         className="h-10 w-10 rounded-full object-cover shadow-[0_2px_10px_-2px_rgba(101,31,43,0.4)] transition-transform duration-500 group-hover:rotate-[5deg]"
       />
-      <span className="font-heading text-[1.4rem] font-bold leading-none tracking-tight text-foreground">
-        Find<span className="font-bold gradient-text">Further</span>
+      <span className={`font-heading text-[1.4rem] font-bold leading-none tracking-tight ${word}`}>
+        Find<span className={`font-bold ${accent}`}>Further</span>
       </span>
     </Link>
   );

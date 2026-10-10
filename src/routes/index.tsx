@@ -338,7 +338,7 @@ function ScholarshipsBand() {
           <div>
             <div className="text-[10px] uppercase tracking-[0.28em] text-gold">Live this season</div>
             <h2 className="mt-3 font-heading text-4xl font-bold tracking-tight text-background md:text-5xl">
-              Scholarships, <em className="gold-text not-italic font-medium">handpicked.</em>
+              Scholarships, <em className="gold-text-dark not-italic font-medium">handpicked.</em>
             </h2>
             <p className="mt-3 max-w-xl text-background/70">
               Every entry verified against official sources. Real deadlines, real money, real applicants getting in.
@@ -516,7 +516,7 @@ function Stats() {
         <div className="relative grid gap-10 md:grid-cols-4">
           {stats.map((s, i) => (
             <div key={s.label} className={`text-white relative ${i > 0 ? "md:border-l md:border-white/10 md:pl-8" : ""}`}>
-              <div className="gold-text font-heading text-5xl font-extrabold tracking-tight md:text-6xl">{s.num}</div>
+              <div className="gold-text-dark font-heading text-5xl font-extrabold tracking-tight md:text-6xl">{s.num}</div>
               <div className="mt-2 text-xs uppercase tracking-[0.22em] text-white/70">{s.label}</div>
               <div className="mt-4 h-px w-12 bg-gold/60" />
             </div>

@@ -16,11 +16,11 @@ export function Footer() {
 
       <div className="relative mx-auto grid max-w-7xl gap-10 px-4 py-16 md:grid-cols-4 lg:px-6">
         <div className="md:col-span-1">
-          <div className="[&_*]:!text-[#FAF3E8]">
-            <Logo />
+          <div>
+            <Logo tone="dark" />
           </div>
           <p className="mt-4 text-sm leading-relaxed text-[#FAF3E8]/85">
-            The atlas for students with ambition. <span className="serif-italic gold-text">No borders. No commissions.</span>
+            The atlas for students with ambition. <span className="serif-italic gold-text-dark">No borders. No commissions.</span>
 <div className="flex items-center gap-4 mt-4">
   {/* X (Twitter) */}
   <a href="https://x.com/FindFurther" target="_blank" rel="noopener noreferrer" className="text-[#FAF3E8]/60 hover:text-[#FF8C00] transition-colors">
@@ -74,7 +74,7 @@ export function Footer() {
           <h4 className="mb-4 font-heading text-xs font-bold uppercase tracking-[0.18em] text-[#FAF3E8]/50">Global</h4>
           <p className="text-sm leading-relaxed text-[#FAF3E8]/70">
             Built for students from any country, applying to any university worldwide.
-            <span className="block mt-3 serif-italic gold-text text-base">Free. Forever.</span>
+            <span className="block mt-3 serif-italic gold-text-dark text-base">Free. Forever.</span>
           </p>
         </div>
       </div>
@@ -82,7 +82,7 @@ export function Footer() {
       <div className="relative border-t border-heading/10">
         <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-2 px-4 py-6 text-xs text-[#FAF3E8]/50 sm:flex-row lg:px-6">
           <span>© {new Date().getFullYear()} FindFurther — crafted for the next generation of scholars.</span>
-          <span className="serif-italic gold-text tracking-wider">Ad · Astra</span>
+          <span className="serif-italic gold-text-dark tracking-wider">Ad · Astra</span>
         </div>
       </div>
     </footer>
